@@ -38,6 +38,7 @@
 #import "LoginController.h"
 #import "MGTwitterEngine.h"
 #import "FollowersController.h"
+#import "MyTweetViewController.h"
 
 static int NetworkActivityIndicatorCounter = 0;
 
@@ -87,6 +88,10 @@ static int NetworkActivityIndicatorCounter = 0;
 	[localViewControllersArray addObject:localNavigationController];
 	[localNavigationController release];
 
+	localNavigationController = [self createNavControllerWrappingViewControllerOfClass:[MyTweetViewController class] nibName:@"UserMessageList" tabIconName:@"mytweets.tiff" tabTitle:@"My Tweets"];
+	[localViewControllersArray addObject:localNavigationController];
+	[localNavigationController release];
+    
 	localNavigationController = [self createNavControllerWrappingViewControllerOfClass:[FollowersController class] nibName:@"UserMessageList" tabIconName:@"followers.tiff" tabTitle:@"Followers"];
 	[localViewControllersArray addObject:localNavigationController];
 	[localNavigationController release];

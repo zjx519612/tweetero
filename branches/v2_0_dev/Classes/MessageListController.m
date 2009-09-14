@@ -30,7 +30,9 @@
 #import "ImageLoader.h"
 #import "MessageViewController.h"
 #import "TweetterAppDelegate.h"
+#import "CustomImageView.h"
 #include "util.h"
+#include "TweetViewController.h"
 
 #define NAME_TAG 1
 #define TIME_TAG 2
@@ -138,13 +140,13 @@
 	if([identifier isEqualToString:@"UICell"])
 	{
 		UITableViewCell *uiCell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:identifier] autorelease];
-		uiCell.textAlignment = UITextAlignmentCenter;
-		uiCell.font = [UIFont systemFontOfSize:16];
+        UILabel *label = [uiCell textLabel];
+        
+		label.textAlignment = UITextAlignmentCenter;
+		label.font = [UIFont systemFontOfSize:16];
 		return uiCell;
 	}
-		
-	
-	
+    
 	if([identifier isEqualToString:@"TwittListCell"])
 	{
 		CGRect rect;
@@ -155,7 +157,9 @@
 		
 		//Userpic view
 		rect = CGRectMake(BORDER_WIDTH, (ROW_HEIGHT - IMAGE_SIDE) / 2.0, IMAGE_SIDE, IMAGE_SIDE);
-		UIImageView *imageView = [[UIImageView alloc] initWithFrame:rect];
+		
+        //UIImageView *imageView = [[UIImageView alloc] initWithFrame:rect];
+        CustomImageView *imageView = [[CustomImageView alloc] initWithFrame:rect];
 		imageView.tag = IMAGE_TAG;
 		[cell.contentView addSubview:imageView];
 		[imageView release];
@@ -221,13 +225,15 @@
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath 
 {
-
+    UILabel *cellLabel = [cell textLabel];
+    
 	if([self noMessages])
 	{
 		if(_errorDesc)
-			cell.text = _errorDesc;
+			cellLabel.text = _errorDesc; //cell.text = _errorDesc;
 		else
-			cell.text = _loading? [self loadingMessagesString]: [self noMessagesString];
+            cellLabel.text = _loading? [self loadingMessagesString]: [self noMessagesString];
+			//cell.text = _loading? [self loadingMessagesString]: [self noMessagesString];
 		return;
 	}
     
@@ -298,17 +304,21 @@
 		
 				
 		//Set userpic
-		UIImageView *imageView = (UIImageView *)[cell viewWithTag:IMAGE_TAG];
-		imageView.image = nil;
-		[[ImageLoader sharedLoader] setImageWithURL:[userData objectForKey:@"profile_image_url"] toView:imageView];
 		
+        //UIImageView *imageView = (UIImageView *)[cell viewWithTag:IMAGE_TAG];
+		//imageView.image = nil;
+		//[[ImageLoader sharedLoader] setImageWithURL:[userData objectForKey:@"profile_image_url"] toView:imageView];
+		CustomImageView *imageView = (CustomImageView *)[cell viewWithTag:IMAGE_TAG];
+        imageView.image = [[ImageLoader sharedLoader] imageWithURL:[userData objectForKey:@"profile_image_url"]];
+        
 		//Set user name
 		label = (UILabel *)[cell viewWithTag:NAME_TAG];
 		label.text = [userData objectForKey:@"screen_name"];
 	} 
 	else
 	{
-		cell.text = @"Load More...";
+		//cell.text = @"Load More...";
+        cellLabel.text = @"Load More...";
 	}
 }
 
@@ -352,10 +362,15 @@
 			[messageData setObject:userInfo forKey:@"user"];
 			[messageData setObject:[NSNumber numberWithBool:YES] forKey:@"DirectMessage"];
 		}
-			
+#if 0
 		MessageViewController *msgView = [[MessageViewController alloc] initWithMessage:messageData];
 		[self.navigationController pushViewController:msgView animated:YES];
 		[msgView release];
+#else
+        TweetViewController *tweetView = [[TweetViewController alloc] initWithStore:self messageIndex:indexPath.row];
+        [self.navigationController pushViewController:tweetView animated:YES];
+        [tweetView release];
+#endif
 	}
 	else
 	{
@@ -363,7 +378,51 @@
 	}
 }
 
+- (void)traceDict:(NSDictionary*)dict
+{
+    NSEnumerator *keys = [dict keyEnumerator];
+    id key = nil;
+    while ((key = [keys nextObject]) != nil)
+    {
+        id obj = [dict objectForKey:key];
+        //NSLog(@"Test");
+        NSLog(@"Key: %@ for: ", (NSString*)key);
+        if ([(NSString*)key compare:@"user"] == NSOrderedSame)
+            [self traceDict:obj];
+        
+        if ([obj respondsToSelector:@selector(rangeOfString:)])
+        {
+            NSLog((NSString*)obj);
+        }
+        else
+        {
+            NSLog(@"NOT STRING");
+        }
+    }
+}
 
+// DEBUG Methods -------------------------------------------------------------------------------------------------------------------
+#pragma mark TweetViewDelegate
+- (int)messageCount
+{
+    return [_messages count];
+}
+
+- (NSDictionary *)messageData:(int)index
+{
+    NSMutableDictionary *messageData = [NSMutableDictionary dictionaryWithDictionary:[_messages objectAtIndex:index]];
+    id userInfo = [messageData objectForKey:@"sender"];
+    if(userInfo && [messageData objectForKey:@"user"] == nil)
+    {
+        [messageData setObject:userInfo forKey:@"user"];
+        [messageData setObject:[NSNumber numberWithBool:YES] forKey:@"DirectMessage"];
+    }
+    
+    //[self traceDict:messageData];
+    return messageData;
+}
+
+// DEBUG Methods -------------------------------------------------------------------------------------------------------------------
 
 - (void)accountChanged:(NSNotification*)notification
 {

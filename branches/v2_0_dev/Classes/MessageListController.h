@@ -25,12 +25,12 @@
 // 
 
 #import <UIKit/UIKit.h>
-
+#import "TweetViewController.h"
 @class MGTwitterEngine;
 
 #define MESSAGES_PER_PAGE 20
 
-@interface MessageListController : UITableViewController 
+@interface MessageListController : UITableViewController <TweetViewDelegate>
 {
 	MGTwitterEngine *_twitter;
 	NSArray *_messages;

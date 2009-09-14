@@ -32,6 +32,7 @@
 #import "UserMessageListController.h"
 #import "TweetterAppDelegate.h"
 #import "TwitEditorController.h"
+#import "CustomImageView.h"
 #include "util.h"
 
 @implementation UserInfo
