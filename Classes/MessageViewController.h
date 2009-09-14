@@ -29,7 +29,6 @@
 #import "yFrogImageUploader.h"
 #import "MGConnectionWrap.h"
 
-
 enum _MessageViewSuspendedOperations
 {
 	noMVOperations,

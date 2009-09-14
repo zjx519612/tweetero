@@ -42,7 +42,6 @@
 
 @synthesize progressSheet;
 
-
 - (id)initWithMessage:(NSDictionary*)message 
 {
     if (self = [super initWithNibName:@"MessageView" bundle:nil]) 
@@ -57,7 +56,6 @@
     }
     return self;
 }
-
 
 - (IBAction)nameSelected 
 {
@@ -76,6 +74,7 @@
 	_newLineCounter = [lines count];
 	NSMutableArray *filteredLines = [[NSMutableArray alloc] initWithCapacity:_newLineCounter];
 	NSEnumerator *en = [lines objectEnumerator];
+    
 	while(line = [en nextObject])
 	{
 		NSArray *words = [line componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];

@@ -27,16 +27,17 @@
 #import <UIKit/UIKit.h>
 
 @class MGTwitterEngine;
+@class CustomImageView;
 
 @interface UserInfo : UIViewController {
-    IBOutlet UIImageView *avatarView;
+    IBOutlet CustomImageView *avatarView;
     IBOutlet UIView *controlView;
     IBOutlet UIWebView *infoView;
     IBOutlet UILabel *nameField;
     IBOutlet UILabel *realNameField;
 	IBOutlet UISwitch *notifySwitch;
 	IBOutlet UIButton *sendDirectMessage;
-	
+    
 	BOOL _gotInfo;
 	MGTwitterEngine *_twitter;
 	NSString *_username;
