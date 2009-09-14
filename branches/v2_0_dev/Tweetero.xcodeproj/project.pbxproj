@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0049463110591A4700C6B2B2 /* down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 0049463010591A4700C6B2B2 /* down.tif */; };
+		0049463610591BDE00C6B2B2 /* up.tif in Resources */ = {isa = PBXBuildFile; fileRef = 0049463510591BDE00C6B2B2 /* up.tif */; };
+		0049472C10594BCB00C6B2B2 /* MyTweetViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0049472B10594BCB00C6B2B2 /* MyTweetViewController.m */; };
+		004947691059561400C6B2B2 /* mytweets.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 004947681059561400C6B2B2 /* mytweets.tiff */; };
+		00999DC910567D1D003906C7 /* TweetViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00999DC810567D1D003906C7 /* TweetViewController.m */; };
+		00999E801056A04E003906C7 /* Reply.png in Resources */ = {isa = PBXBuildFile; fileRef = 00999E7F1056A04E003906C7 /* Reply.png */; };
+		00DDB1DF105E7B030020C9C1 /* CustomImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDB1DE105E7B030020C9C1 /* CustomImageView.m */; };
+		00DDB2EC105E9D6D0020C9C1 /* AccountController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00DDB2EA105E9D6D0020C9C1 /* AccountController.xib */; };
+		00DDB2EF105E9D890020C9C1 /* TweetView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00DDB2ED105E9D890020C9C1 /* TweetView.xib */; };
+		00DDB2F7105E9E190020C9C1 /* AccountController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDB2F5105E9E190020C9C1 /* AccountController.m */; };
 		0F5E42450F951968001D74D5 /* yfrog.png in Resources */ = {isa = PBXBuildFile; fileRef = 0F5E42440F951968001D74D5 /* yfrog.png */; };
 		1D3623260D0F684500981E51 /* TweetterAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* TweetterAppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
@@ -84,6 +94,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0049463010591A4700C6B2B2 /* down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = down.tif; path = Resource/Images/down.tif; sourceTree = "<group>"; };
+		0049463510591BDE00C6B2B2 /* up.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = up.tif; path = Resource/Images/up.tif; sourceTree = "<group>"; };
+		0049472A10594BCB00C6B2B2 /* MyTweetViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyTweetViewController.h; sourceTree = "<group>"; };
+		0049472B10594BCB00C6B2B2 /* MyTweetViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyTweetViewController.m; sourceTree = "<group>"; };
+		004947681059561400C6B2B2 /* mytweets.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = mytweets.tiff; path = Resource/Images/mytweets.tiff; sourceTree = "<group>"; };
+		00999DC710567D1D003906C7 /* TweetViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetViewController.h; sourceTree = "<group>"; };
+		00999DC810567D1D003906C7 /* TweetViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweetViewController.m; sourceTree = "<group>"; };
+		00999E7F1056A04E003906C7 /* Reply.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Reply.png; path = Resource/Images/Reply.png; sourceTree = "<group>"; };
+		00DDB1DD105E7B030020C9C1 /* CustomImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomImageView.h; sourceTree = "<group>"; };
+		00DDB1DE105E7B030020C9C1 /* CustomImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomImageView.m; sourceTree = "<group>"; };
+		00DDB2EB105E9D6D0020C9C1 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AccountController.xib; sourceTree = "<group>"; };
+		00DDB2EE105E9D890020C9C1 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/TweetView.xib; sourceTree = "<group>"; };
+		00DDB2F5105E9E190020C9C1 /* AccountController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccountController.m; sourceTree = "<group>"; };
+		00DDB2F6105E9E190020C9C1 /* AccountController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountController.h; sourceTree = "<group>"; };
 		0F5E42440F951968001D74D5 /* yfrog.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = yfrog.png; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* TweetterAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetterAppDelegate.h; sourceTree = "<group>"; };
@@ -226,6 +250,14 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				00DDB2F5105E9E190020C9C1 /* AccountController.m */,
+				00DDB2F6105E9E190020C9C1 /* AccountController.h */,
+				00999DC710567D1D003906C7 /* TweetViewController.h */,
+				00999DC810567D1D003906C7 /* TweetViewController.m */,
+				D959B7980F65A1FE00CBBA1A /* MessageViewController.h */,
+				D959B7990F65A1FF00CBBA1A /* MessageViewController.m */,
+				D93537060F7091F60005DA7D /* MessageListController.h */,
+				D93537070F7091F60005DA7D /* MessageListController.m */,
 				D99B77AD0F83EDEC00FA19A9 /* FollowersController.h */,
 				D99B77AE0F83EDEC00FA19A9 /* FollowersController.m */,
 				D94009160F787DF500CE66BE /* TweetQueue.h */,
@@ -238,8 +270,6 @@
 				D91B25BB0F748650009E1A8E /* DirectMessagesController.m */,
 				D93537450F70A7000005DA7D /* RepliesListController.h */,
 				D93537460F70A7000005DA7D /* RepliesListController.m */,
-				D93537060F7091F60005DA7D /* MessageListController.h */,
-				D93537070F7091F60005DA7D /* MessageListController.m */,
 				D935354A0F6CA27E0005DA7D /* TapScrollView.h */,
 				D935354B0F6CA27E0005DA7D /* TapScrollView.m */,
 				D9480DF70F68834400818977 /* WebViewController.h */,
@@ -254,8 +284,6 @@
 				AA6494230F75E31100E40348 /* ImagePreview.m */,
 				D9D7B1760F5E21590010CA9B /* HomeViewController.h */,
 				D9D7B1770F5E21590010CA9B /* HomeViewController.m */,
-				D959B7980F65A1FE00CBBA1A /* MessageViewController.h */,
-				D959B7990F65A1FF00CBBA1A /* MessageViewController.m */,
 				D97A8E0E0F6680F7008A1BC7 /* NewMessageController.h */,
 				D97A8E0F0F6680F7008A1BC7 /* NewMessageController.m */,
 				D9CCC4D10F5CDAEA009CACBB /* LoginController.h */,
@@ -283,6 +311,10 @@
 				AA9A0DE00F7C48C200F9E2DC /* AboutController.m */,
 				D93047CD1030FD3300F903C5 /* TweetPlayer.h */,
 				D93047CE1030FD3300F903C5 /* TweetPlayer.m */,
+				0049472A10594BCB00C6B2B2 /* MyTweetViewController.h */,
+				0049472B10594BCB00C6B2B2 /* MyTweetViewController.m */,
+				00DDB1DD105E7B030020C9C1 /* CustomImageView.h */,
+				00DDB1DE105E7B030020C9C1 /* CustomImageView.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -323,6 +355,7 @@
 			isa = PBXGroup;
 			children = (
 				AAC3B7B00F6F380C008C9AF8 /* Images */,
+				00DDB2ED105E9D890020C9C1 /* TweetView.xib */,
 				AA8919060F6DD1BB00E4F79D /* defaults.plist */,
 				AA9A0DDA0F7C486500F9E2DC /* About.xib */,
 				AA87A6480F76B4AA00AB8F4B /* ImageView.xib */,
@@ -338,6 +371,7 @@
 				D9480DFC0F6883C500818977 /* WebView.xib */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				498D97600F62F49F004E1B20 /* Localizable.strings */,
+				00DDB2EA105E9D6D0020C9C1 /* AccountController.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -358,6 +392,10 @@
 		AAC3B7B00F6F380C008C9AF8 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				004947681059561400C6B2B2 /* mytweets.tiff */,
+				0049463510591BDE00C6B2B2 /* up.tif */,
+				0049463010591A4700C6B2B2 /* down.tif */,
+				00999E7F1056A04E003906C7 /* Reply.png */,
 				0F5E42440F951968001D74D5 /* yfrog.png */,
 				D99295740F7D6F780087EC4E /* Frog.tiff */,
 				D9400ABD0F7C40DA00CE66BE /* About.tiff */,
@@ -477,6 +515,12 @@
 				D9400F280F856E4400CE66BE /* following.tiff in Resources */,
 				0F5E42450F951968001D74D5 /* yfrog.png in Resources */,
 				AA7F2C310FE7F2E1005D2C4C /* MovieIcon.tif in Resources */,
+				00999E801056A04E003906C7 /* Reply.png in Resources */,
+				0049463110591A4700C6B2B2 /* down.tif in Resources */,
+				0049463610591BDE00C6B2B2 /* up.tif in Resources */,
+				004947691059561400C6B2B2 /* mytweets.tiff in Resources */,
+				00DDB2EC105E9D6D0020C9C1 /* AccountController.xib in Resources */,
+				00DDB2EF105E9D890020C9C1 /* TweetView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -526,12 +570,32 @@
 				AA9A0DE10F7C48C200F9E2DC /* AboutController.m in Sources */,
 				D99B77AF0F83EDEC00FA19A9 /* FollowersController.m in Sources */,
 				D93047CF1030FD3300F903C5 /* TweetPlayer.m in Sources */,
+				00999DC910567D1D003906C7 /* TweetViewController.m in Sources */,
+				0049472C10594BCB00C6B2B2 /* MyTweetViewController.m in Sources */,
+				00DDB1DF105E7B030020C9C1 /* CustomImageView.m in Sources */,
+				00DDB2F7105E9E190020C9C1 /* AccountController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		00DDB2EA105E9D6D0020C9C1 /* AccountController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				00DDB2EB105E9D6D0020C9C1 /* English */,
+			);
+			name = AccountController.xib;
+			sourceTree = "<group>";
+		};
+		00DDB2ED105E9D890020C9C1 /* TweetView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				00DDB2EE105E9D890020C9C1 /* English */,
+			);
+			name = TweetView.xib;
+			sourceTree = "<group>";
+		};
 		492662AE0F6D7C9E00782FFD /* SettingsView.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -696,6 +760,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				CODE_SIGN_ENTITLEMENTS = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
