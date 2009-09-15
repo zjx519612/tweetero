@@ -42,10 +42,27 @@
 
 @implementation MessageListController
 
+@synthesize rootNavigationController;
 
+- (void)setRootNavigationController:(UINavigationController *)controller;
+{
+    if (_rootNavigationController != controller)
+    {
+        [controller retain];
+        [_rootNavigationController autorelease];
+        _rootNavigationController = controller;
+    }
+}
+
+- (UINavigationController *)rootNavigationController
+{
+    return _rootNavigationController;
+}
 
 - (void)dealloc
 {
+    [_rootNavigationController release];
+    _rootNavigationController = nil;
 	while (_indicatorCount) 
 	{
 		[self releaseActivityIndicator];
@@ -364,11 +381,11 @@
 		}
 #if 0
 		MessageViewController *msgView = [[MessageViewController alloc] initWithMessage:messageData];
-		[self.navigationController pushViewController:msgView animated:YES];
+		[self.rootNavigationController pushViewController:msgView animated:YES];
 		[msgView release];
 #else
         TweetViewController *tweetView = [[TweetViewController alloc] initWithStore:self messageIndex:indexPath.row];
-        [self.navigationController pushViewController:tweetView animated:YES];
+        [self.rootNavigationController pushViewController:tweetView animated:YES];
         [tweetView release];
 #endif
 	}

@@ -39,6 +39,7 @@
 #import "MGTwitterEngine.h"
 #import "FollowersController.h"
 #import "MyTweetViewController.h"
+#import "AccountController.h"
 
 static int NetworkActivityIndicatorCounter = 0;
 
@@ -46,94 +47,30 @@ static int NetworkActivityIndicatorCounter = 0;
 
 @synthesize window;
 @synthesize tabBarController;
-
-- (UINavigationController *)createNavControllerWrappingViewControllerOfClass:(Class)cntrloller 
-																			nibName:(NSString*)nibName 
-																			tabIconName:(NSString*)iconName
-																			tabTitle:(NSString*)tabTitle
-{
-	UIViewController* viewController = [[cntrloller alloc] initWithNibName:nibName bundle:nil];
-	
-	NavigationRotateController *theNavigationController;
-	theNavigationController = [[NavigationRotateController alloc] initWithRootViewController:viewController];
-	viewController.tabBarItem.image = [UIImage imageNamed:iconName];
-	viewController.title = NSLocalizedString(tabTitle, @""); 
-	[viewController release];
-	
-	return theNavigationController;
-}
-
-
-- (void)setupPortraitUserInterface 
-{
-	UINavigationController *localNavigationController;
-	
-	NSMutableArray *localViewControllersArray = [[NSMutableArray alloc] initWithCapacity:4];
-
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass:[HomeViewController class] nibName:nil tabIconName:@"HomeTabIcon.tiff" tabTitle:@"Home"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	if([MGTwitterEngine username] == nil)
-		[LoginController showModeless:localNavigationController animated:NO];
-		
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass:[RepliesListController class] nibName:@"UserMessageList" tabIconName:@"Replies.tiff" tabTitle:@"Replies"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass:[DirectMessagesController class] nibName:@"UserMessageList" tabIconName:@"Messages.tiff" tabTitle:@"Messages"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass:[TweetQueueController class] nibName:@"TweetQueue" tabIconName:@"Queue.tiff" tabTitle:[TweetQueueController queueTitle]];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass:[MyTweetViewController class] nibName:@"UserMessageList" tabIconName:@"mytweets.tiff" tabTitle:@"My Tweets"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-    
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass:[FollowersController class] nibName:@"UserMessageList" tabIconName:@"followers.tiff" tabTitle:@"Followers"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass:[FollowingController class] nibName:@"UserMessageList" tabIconName:@"following.tiff" tabTitle:@"Following"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass:[SettingsController class] nibName:@"SettingsView" tabIconName:@"SettingsTabIcon.tiff" tabTitle:@"Settings"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass:[AboutController class] nibName:@"About" tabIconName:@"About.tiff" tabTitle:@"About"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	tabBarController.viewControllers = localViewControllersArray;
-	
-	[localViewControllersArray release];
-	
-}
-
-
-
-
+@synthesize navigationController;
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application 
 {
-	NSDictionary *appDefaults = [[NSDictionary alloc] initWithContentsOfFile:
-						[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]];
+	NSDictionary *appDefaults = [[NSDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 	[appDefaults release];
 
-
-	[self setupPortraitUserInterface];
-    [window addSubview:tabBarController.view];
-
+    //if ([MGTwitterEngine username] != nil)
+    {
+        AccountController *accountController = [[AccountController alloc] init];
+        navigationController = [[NavigationRotateController alloc] initWithRootViewController:accountController];
+        [accountController release];
+        [window addSubview:navigationController.view];
+    }
+    //else
+    {
+        //[self setupPortraitUserInterface];
+        //[window addSubview:tabBarController.view];
+    }
 	[[LocationManager locationManager] startUpdates];
 	
 	[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
 }
-
 
 - (void)dealloc 
 {

@@ -35,12 +35,14 @@
     IBOutlet id passwordField;
 	IBOutlet id rememberSwitch;
 	IBOutlet id iconView;
-	BOOL _modal;
-	BOOL _remember;
+    
+    NSString *_currentUsername;
+    NSString *_currentPassword;
 }
- -(id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle modal:(BOOL)modal;
+
+- (id)initWithUserData:(NSString *)userName password:(NSString *)password;
+
 - (IBAction)cancel:(id)sender;
 - (IBAction)login:(id)sender;
-+ (void)showModal:(UINavigationController*)parentController;
-+ (void)showModeless:(UINavigationController*)parentController animated:(BOOL)anim;
+
 @end

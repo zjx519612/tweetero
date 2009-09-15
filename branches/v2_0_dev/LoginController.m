@@ -29,22 +29,26 @@
 
 @implementation LoginController
 
- -(id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle modal:(BOOL)modal
- {
-	self = [super initWithNibName:nibName bundle:nibBundle];
-	if(self)
-	{
-		_modal = modal;
-	}
-	
-	return self;
- }
- 
+- (id)initWithUserData:(NSString *)userName password:(NSString *)password
+{
+    if ((self = [super initWithNibName:@"Login" bundle:nil]))
+    {
+        _currentUsername = [userName retain];
+        _currentPassword = [password retain];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [_currentUsername release];
+    [_currentPassword release];
+    [super dealloc];
+}
+
 - (IBAction)cancel:(id)sender 
 {
-	if(_remember)
-		[MGTwitterEngine remindPassword];
-    [self.navigationController dismissModalViewControllerAnimated:YES];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (IBAction)login:(id)sender 
@@ -53,35 +57,11 @@
 	NSString *password = [passwordField text];
 	
 	[MGTwitterEngine setUsername:login password:password remember:[rememberSwitch isOn]];
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"AccountChanged" object:nil 
-		userInfo:[NSDictionary dictionaryWithObjectsAndKeys:login, @"login", password, @"password", nil]];
-	
-	[self.navigationController dismissModalViewControllerAnimated:YES];
-}
-
-+ (void)showModeless:(UINavigationController*)parentController animated:(BOOL)anim
-{
-	static LoginController* sharedController;
-	if(!sharedController)
-	{
-		sharedController = [[LoginController alloc] initWithNibName:@"Login" bundle:nil modal:NO];
-	}
-	
-	[parentController pushViewController:sharedController animated:anim];
-}
-
-+ (void)showModal:(UINavigationController*)parentController
-{
-	static LoginController* sharedController;
-	static UINavigationController *navigationController;
-	if(!sharedController)
-	{
-		sharedController = [[LoginController alloc] initWithNibName:@"Login" bundle:nil modal:YES];
-		navigationController = [[UINavigationController alloc] initWithRootViewController:sharedController];
-	}
-	
-	[parentController presentModalViewController:navigationController animated:YES];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"AccountDataChanged" 
+                                                        object: nil
+                                                      userInfo: [NSDictionary dictionaryWithObjectsAndKeys:login, @"login", password, @"password", nil]];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)viewDidLoad 
@@ -89,19 +69,16 @@
     [super viewDidLoad];
 
  	self.navigationItem.rightBarButtonItem = loginButton;
-	if(_modal) self.navigationItem.leftBarButtonItem = cancelButton;
+    self.navigationItem.leftBarButtonItem = cancelButton;
 	self.navigationItem.title = @"Twitter Account";
-	[loginField setText:[MGTwitterEngine username]];
-	[passwordField setText:[MGTwitterEngine password]];
-	_remember = [[loginField text] length] == 0? NO: YES;
-	[rememberSwitch setOn: _remember];
+    
+    [loginField setText:_currentUsername];
+    [passwordField setText:_currentPassword];
+	[rememberSwitch setOn: NO];
 	
 	UIImage *icon = [UIImage imageNamed:@"Frog.tiff"];
 	if(icon)
 		[iconView setImage:icon];
-		
-	if(_remember)
-		[MGTwitterEngine forgetPassword];
 }
 
 #pragma mark -
@@ -112,8 +89,5 @@
 	[textField resignFirstResponder];
     return YES;
 }
-
-
-
 
 @end
