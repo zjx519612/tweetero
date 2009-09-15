@@ -40,7 +40,10 @@
 	int _indicatorCount;
 	BOOL _loading;
 	NSString *_errorDesc;
+    UINavigationController *_rootNavigationController;
 }
+
+@property (nonatomic, retain) UINavigationController *rootNavigationController;
 
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count;
 - (void)reloadAll;

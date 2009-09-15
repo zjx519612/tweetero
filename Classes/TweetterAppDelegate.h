@@ -26,10 +26,12 @@
 
 #import <UIKit/UIKit.h>
 
+@class NavigationRotateController;
 @interface TweetterAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate> 
 {
     UIWindow *window;
     UITabBarController *tabBarController;
+    NavigationRotateController *navigationController;
 }
 
 + (void) increaseNetworkActivityIndicator;
@@ -37,5 +39,6 @@
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;
+@property (nonatomic, retain) NavigationRotateController *navigationController;
 
 @end

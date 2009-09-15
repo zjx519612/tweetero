@@ -13,6 +13,8 @@
 		004947691059561400C6B2B2 /* mytweets.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 004947681059561400C6B2B2 /* mytweets.tiff */; };
 		00999DC910567D1D003906C7 /* TweetViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00999DC810567D1D003906C7 /* TweetViewController.m */; };
 		00999E801056A04E003906C7 /* Reply.png in Resources */ = {isa = PBXBuildFile; fileRef = 00999E7F1056A04E003906C7 /* Reply.png */; };
+		00DDA861105F9798008AE91E /* TabController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDA860105F9798008AE91E /* TabController.m */; };
+		00DDA8A8105FA927008AE91E /* AccountManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDA8A7105FA927008AE91E /* AccountManager.m */; };
 		00DDB1DF105E7B030020C9C1 /* CustomImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDB1DE105E7B030020C9C1 /* CustomImageView.m */; };
 		00DDB2EC105E9D6D0020C9C1 /* AccountController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00DDB2EA105E9D6D0020C9C1 /* AccountController.xib */; };
 		00DDB2EF105E9D890020C9C1 /* TweetView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00DDB2ED105E9D890020C9C1 /* TweetView.xib */; };
@@ -102,6 +104,10 @@
 		00999DC710567D1D003906C7 /* TweetViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetViewController.h; sourceTree = "<group>"; };
 		00999DC810567D1D003906C7 /* TweetViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweetViewController.m; sourceTree = "<group>"; };
 		00999E7F1056A04E003906C7 /* Reply.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Reply.png; path = Resource/Images/Reply.png; sourceTree = "<group>"; };
+		00DDA85F105F9798008AE91E /* TabController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TabController.h; sourceTree = "<group>"; };
+		00DDA860105F9798008AE91E /* TabController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TabController.m; sourceTree = "<group>"; };
+		00DDA8A6105FA927008AE91E /* AccountManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountManager.h; sourceTree = "<group>"; };
+		00DDA8A7105FA927008AE91E /* AccountManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccountManager.m; sourceTree = "<group>"; };
 		00DDB1DD105E7B030020C9C1 /* CustomImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomImageView.h; sourceTree = "<group>"; };
 		00DDB1DE105E7B030020C9C1 /* CustomImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomImageView.m; sourceTree = "<group>"; };
 		00DDB2EB105E9D6D0020C9C1 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/AccountController.xib; sourceTree = "<group>"; };
@@ -250,8 +256,12 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				00DDA8A6105FA927008AE91E /* AccountManager.h */,
+				00DDA8A7105FA927008AE91E /* AccountManager.m */,
 				00DDB2F5105E9E190020C9C1 /* AccountController.m */,
 				00DDB2F6105E9E190020C9C1 /* AccountController.h */,
+				D9CCC4D10F5CDAEA009CACBB /* LoginController.h */,
+				D9CCC4D20F5CDAEA009CACBB /* LoginController.m */,
 				00999DC710567D1D003906C7 /* TweetViewController.h */,
 				00999DC810567D1D003906C7 /* TweetViewController.m */,
 				D959B7980F65A1FE00CBBA1A /* MessageViewController.h */,
@@ -286,8 +296,6 @@
 				D9D7B1770F5E21590010CA9B /* HomeViewController.m */,
 				D97A8E0E0F6680F7008A1BC7 /* NewMessageController.h */,
 				D97A8E0F0F6680F7008A1BC7 /* NewMessageController.m */,
-				D9CCC4D10F5CDAEA009CACBB /* LoginController.h */,
-				D9CCC4D20F5CDAEA009CACBB /* LoginController.m */,
 				1D3623240D0F684500981E51 /* TweetterAppDelegate.h */,
 				1D3623250D0F684500981E51 /* TweetterAppDelegate.m */,
 				49B3F5B40F66A78000DFFE04 /* yFrogImageDownoader.h */,
@@ -315,6 +323,8 @@
 				0049472B10594BCB00C6B2B2 /* MyTweetViewController.m */,
 				00DDB1DD105E7B030020C9C1 /* CustomImageView.h */,
 				00DDB1DE105E7B030020C9C1 /* CustomImageView.m */,
+				00DDA85F105F9798008AE91E /* TabController.h */,
+				00DDA860105F9798008AE91E /* TabController.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -574,6 +584,8 @@
 				0049472C10594BCB00C6B2B2 /* MyTweetViewController.m in Sources */,
 				00DDB1DF105E7B030020C9C1 /* CustomImageView.m in Sources */,
 				00DDB2F7105E9E190020C9C1 /* AccountController.m in Sources */,
+				00DDA861105F9798008AE91E /* TabController.m in Sources */,
+				00DDA8A8105FA927008AE91E /* AccountManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
