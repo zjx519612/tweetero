@@ -253,11 +253,9 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		080E96DDFE201D6D7F000001 /* Classes */ = {
+		00B69FD21061193D005E8DF6 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				00DDA8A6105FA927008AE91E /* AccountManager.h */,
-				00DDA8A7105FA927008AE91E /* AccountManager.m */,
 				00DDB2F5105E9E190020C9C1 /* AccountController.m */,
 				00DDB2F6105E9E190020C9C1 /* AccountController.h */,
 				D9CCC4D10F5CDAEA009CACBB /* LoginController.h */,
@@ -270,8 +268,6 @@
 				D93537070F7091F60005DA7D /* MessageListController.m */,
 				D99B77AD0F83EDEC00FA19A9 /* FollowersController.h */,
 				D99B77AE0F83EDEC00FA19A9 /* FollowersController.m */,
-				D94009160F787DF500CE66BE /* TweetQueue.h */,
-				D94009170F787DF500CE66BE /* TweetQueue.m */,
 				D94009260F7885E900CE66BE /* TweetQueueController.h */,
 				D94009270F7885E900CE66BE /* TweetQueueController.m */,
 				D91B26120F7499AD009E1A8E /* NavigationRotateController.h */,
@@ -280,22 +276,46 @@
 				D91B25BB0F748650009E1A8E /* DirectMessagesController.m */,
 				D93537450F70A7000005DA7D /* RepliesListController.h */,
 				D93537460F70A7000005DA7D /* RepliesListController.m */,
-				D935354A0F6CA27E0005DA7D /* TapScrollView.h */,
-				D935354B0F6CA27E0005DA7D /* TapScrollView.m */,
 				D9480DF70F68834400818977 /* WebViewController.h */,
 				D9480DF80F68834400818977 /* WebViewController.m */,
 				D9B394DF0F66E1D00039242D /* UserInfo.h */,
 				D9B394E00F66E1D00039242D /* UserInfo.m */,
-				D96BACEB0F6365020034A131 /* ImageLoader.h */,
-				D96BACEC0F6365020034A131 /* ImageLoader.m */,
 				498D966C0F62CA7C004E1B20 /* TwitEditorController.h */,
 				498D966D0F62CA7C004E1B20 /* TwitEditorController.m */,
-				AA6494220F75E31100E40348 /* ImagePreview.h */,
-				AA6494230F75E31100E40348 /* ImagePreview.m */,
 				D9D7B1760F5E21590010CA9B /* HomeViewController.h */,
 				D9D7B1770F5E21590010CA9B /* HomeViewController.m */,
 				D97A8E0E0F6680F7008A1BC7 /* NewMessageController.h */,
 				D97A8E0F0F6680F7008A1BC7 /* NewMessageController.m */,
+				D9F4C2220F6AE68E006D4F2E /* ImageViewController.h */,
+				D9F4C2230F6AE68E006D4F2E /* ImageViewController.m */,
+				492662B40F6D7D3F00782FFD /* SettingsController.h */,
+				492662B50F6D7D3F00782FFD /* SettingsController.m */,
+				D93537190F7099630005DA7D /* UserMessageListController.h */,
+				D935371A0F7099630005DA7D /* UserMessageListController.m */,
+				0049472A10594BCB00C6B2B2 /* MyTweetViewController.h */,
+				0049472B10594BCB00C6B2B2 /* MyTweetViewController.m */,
+				00DDA85F105F9798008AE91E /* TabController.h */,
+				00DDA860105F9798008AE91E /* TabController.m */,
+				AA9A0DDF0F7C48C200F9E2DC /* AboutController.h */,
+				AA9A0DE00F7C48C200F9E2DC /* AboutController.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				00B69FD21061193D005E8DF6 /* Controllers */,
+				00DDA8A6105FA927008AE91E /* AccountManager.h */,
+				00DDA8A7105FA927008AE91E /* AccountManager.m */,
+				D94009160F787DF500CE66BE /* TweetQueue.h */,
+				D94009170F787DF500CE66BE /* TweetQueue.m */,
+				D935354A0F6CA27E0005DA7D /* TapScrollView.h */,
+				D935354B0F6CA27E0005DA7D /* TapScrollView.m */,
+				D96BACEB0F6365020034A131 /* ImageLoader.h */,
+				D96BACEC0F6365020034A131 /* ImageLoader.m */,
+				AA6494220F75E31100E40348 /* ImagePreview.h */,
+				AA6494230F75E31100E40348 /* ImagePreview.m */,
 				1D3623240D0F684500981E51 /* TweetterAppDelegate.h */,
 				1D3623250D0F684500981E51 /* TweetterAppDelegate.m */,
 				49B3F5B40F66A78000DFFE04 /* yFrogImageDownoader.h */,
@@ -306,25 +326,13 @@
 				AA6492C80F75BBCC00E40348 /* MGConnectionWrap.m */,
 				AA47D5BA0F7B3BAA005E0EEC /* MessageUploader.h */,
 				AA47D5BB0F7B3BAA005E0EEC /* MessageUploader.m */,
-				D9F4C2220F6AE68E006D4F2E /* ImageViewController.h */,
-				D9F4C2230F6AE68E006D4F2E /* ImageViewController.m */,
-				492662B40F6D7D3F00782FFD /* SettingsController.h */,
-				492662B50F6D7D3F00782FFD /* SettingsController.m */,
 				4964A70B0F6D97A3004F0307 /* LocationManager.h */,
 				4964A70C0F6D97A3004F0307 /* LocationManager.m */,
-				D93537190F7099630005DA7D /* UserMessageListController.h */,
-				D935371A0F7099630005DA7D /* UserMessageListController.m */,
 				AA87F6460F71D9D300D7A2C0 /* TwitterConnectionProtocol.h */,
-				AA9A0DDF0F7C48C200F9E2DC /* AboutController.h */,
-				AA9A0DE00F7C48C200F9E2DC /* AboutController.m */,
 				D93047CD1030FD3300F903C5 /* TweetPlayer.h */,
 				D93047CE1030FD3300F903C5 /* TweetPlayer.m */,
-				0049472A10594BCB00C6B2B2 /* MyTweetViewController.h */,
-				0049472B10594BCB00C6B2B2 /* MyTweetViewController.m */,
 				00DDB1DD105E7B030020C9C1 /* CustomImageView.h */,
 				00DDB1DE105E7B030020C9C1 /* CustomImageView.m */,
-				00DDA85F105F9798008AE91E /* TabController.h */,
-				00DDA860105F9798008AE91E /* TabController.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";

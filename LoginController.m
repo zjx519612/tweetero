@@ -29,6 +29,15 @@
 
 @implementation LoginController
 
+- (id)init
+{
+    if ((self = [super initWithNibName:@"Login" bundle:nil]))
+    {
+        _currentUsername = nil;
+        _currentPassword = nil;
+    }
+    return self;
+}
 - (id)initWithUserData:(NSString *)userName password:(NSString *)password
 {
     if ((self = [super initWithNibName:@"Login" bundle:nil]))
@@ -41,8 +50,10 @@
 
 - (void)dealloc
 {
-    [_currentUsername release];
-    [_currentPassword release];
+    if (_currentUsername)
+        [_currentUsername release];
+    if (_currentPassword)
+        [_currentPassword release];
     [super dealloc];
 }
 
@@ -58,9 +69,13 @@
 	
 	[MGTwitterEngine setUsername:login password:password remember:[rememberSwitch isOn]];
     
+    NSDictionary *userInfoDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                login, @"login", password, @"password",
+                                                _currentUsername, @"old_login", _currentPassword, @"old_password",
+                                                nil];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AccountDataChanged" 
                                                         object: nil
-                                                      userInfo: [NSDictionary dictionaryWithObjectsAndKeys:login, @"login", password, @"password", nil]];
+                                                      userInfo: userInfoDict];
     [self.navigationController popViewControllerAnimated:YES];
 }
 

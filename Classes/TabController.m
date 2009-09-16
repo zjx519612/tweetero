@@ -25,37 +25,65 @@
 #import "MyTweetViewController.h"
 
 @interface TabController (Private)
-
-- (UINavigationController *)createNavControllerWrappingViewControllerOfClass: (Class)cntrloller 
-                                                                     nibName: (NSString*)nibName 
-                                                                 tabIconName: (NSString*)iconName
-                                                                    tabTitle: (NSString*)tabTitle;
-- (UIViewController *)createViewController: (Class)class 
-                                   nibName: (NSString*)nibName
-                               tabIconName: (NSString *)iconName 
-                                tabTitle: (NSString *)tabTitle;
+- (UIViewController *)createViewController: (Class)class nibName: (NSString*)nibName tabIconName: (NSString *)iconName tabTitle: (NSString *)tabTitle;
 - (void)initTabBarController;
-- (void)setupPortraitUserInterface;
+@end
+
+@implementation TabController
+
+- (id)init
+{
+    if ((self = [super init]))
+    {
+        //_tabBarController = [[UITabBarController alloc] init];
+        //_tabBarController.delegate = self;
+        //self.view = _tabBarController.view;
+        [self initTabBarController];
+        //self.delegate = self;
+    }
+    return self;
+}
+
+- (void)dealloc 
+{
+    //_tabBarController.delegate = nil;
+    //[_tabBarController release];
+    [super dealloc];
+}
+
+- (void)didReceiveMemoryWarning 
+{
+    [super didReceiveMemoryWarning];
+}
+
+- (void)viewDidLoad
+{
+    _moreNavigationController = self.navigationController;
+    /*
+    UITabBar *tab = _tabBarController.tabBar;
+    
+    MessageListController *theController = (MessageListController *)[tab.items objectAtIndex:0];
+    theController.rootNavigationController = self.navigationController;
+     */
+}
+
+- (void)viewDidUnload 
+{
+	// Release any retained subviews of the main view.
+	// e.g. self.myOutlet = nil;
+}
+
+- (BOOL)tabBarController:(UITabBarController *)tabBarController shouldSelectViewController:(UIViewController *)viewController
+{
+    //_moreNavigationController = nil;
+    if (viewController.tabBarItem.tag > 3)
+        [self.navigationController pushViewController:viewController animated:YES];
+    return YES;
+}
 
 @end
 
 @implementation TabController (Private)
-
-- (UINavigationController *)createNavControllerWrappingViewControllerOfClass:(Class)cntrloller 
-                                                                     nibName:(NSString*)nibName 
-                                                                 tabIconName:(NSString*)iconName
-                                                                    tabTitle:(NSString*)tabTitle
-{
-	UIViewController* viewController = [[cntrloller alloc] initWithNibName:nibName bundle:nil];
-	
-	NavigationRotateController *theNavigationController;
-	theNavigationController = [[NavigationRotateController alloc] initWithRootViewController:viewController];
-	viewController.tabBarItem.image = [UIImage imageNamed:iconName];
-	viewController.title = NSLocalizedString(tabTitle, @""); 
-	[viewController release];
-	
-	return theNavigationController;
-}
 
 - (UIViewController *)createViewController: (Class)class nibName: (NSString*)nibName tabIconName: (NSString *)iconName tabTitle: (NSString *)tabTitle
 {
@@ -76,169 +104,72 @@
                                        nibName: nil 
                                    tabIconName: @"HomeTabIcon.tiff" 
                                       tabTitle: @"Home"];
-    ((HomeViewController*)theController).rootNavigationController = self.navigationController;
+    theController.tabBarItem.tag = 0;
     [controllers addObject:theController];
     
 	theController = [self createViewController: [RepliesListController class] 
                                        nibName: @"UserMessageList" 
                                    tabIconName: @"Replies.tiff" 
                                       tabTitle: @"Replies"];
+    theController.tabBarItem.tag = 1;
     [controllers addObject:theController];
 	
 	theController = [self createViewController: [DirectMessagesController class] 
                                        nibName: @"UserMessageList" 
                                    tabIconName: @"Messages.tiff" 
                                       tabTitle: @"Messages"];
+    theController.tabBarItem.tag = 2;
     [controllers addObject:theController];
 	
 	theController = [self createViewController: [TweetQueueController class] 
                                        nibName: @"TweetQueue" 
                                    tabIconName: @"Queue.tiff" 
                                       tabTitle: [TweetQueueController queueTitle]];
+    theController.tabBarItem.tag = 3;
     [controllers addObject:theController];
     
 	theController = [self createViewController: [MyTweetViewController class] 
                                        nibName: @"UserMessageList" 
                                    tabIconName: @"mytweets.tiff" 
                                       tabTitle: @"My Tweets"];
+    theController.tabBarItem.tag = 4;
     [controllers addObject:theController];
     
 	theController = [self createViewController: [FollowersController class] 
                                        nibName: @"UserMessageList" 
                                    tabIconName: @"followers.tiff" 
                                       tabTitle: @"Followers"];
+    theController.tabBarItem.tag = 5;
     [controllers addObject:theController];
 	
 	theController = [self createViewController: [FollowingController class] 
                                        nibName: @"UserMessageList" 
                                    tabIconName: @"following.tiff" 
                                       tabTitle: @"Following"];
+    theController.tabBarItem.tag = 6;
     [controllers addObject:theController];
 	
 	theController = [self createViewController: [SettingsController class]
                                        nibName: @"SettingsView"
                                    tabIconName: @"SettingsTabIcon.tiff"
                                       tabTitle: @"Settings"];
+    theController.tabBarItem.tag = 7;
     [controllers addObject:theController];
 	
 	theController = [self createViewController: [AboutController class]
                                        nibName: @"About"
                                    tabIconName: @"About.tiff"
                                       tabTitle: @"About"];
+    theController.tabBarItem.tag = 8;
     [controllers addObject:theController];
+    
 	// Set controllers array
-	_tabBarController.viewControllers = controllers;
+	self.viewControllers = controllers;
+    //_tabBarController.customizableViewControllers = nil;
+    //_tabBarController.moreNavigationController.navigationBar.hidden = YES;
 	[controllers release];
     
     [pool release];
-}
-
-- (void)setupPortraitUserInterface 
-{
-	UINavigationController *localNavigationController = nil;
-	
-	NSMutableArray *localViewControllersArray = [[NSMutableArray alloc] initWithCapacity:4];
-    
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass: [HomeViewController class] 
-                                                                               nibName: nil
-                                                                           tabIconName: @"HomeTabIcon.tiff"
-                                                                              tabTitle: @"Home"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	//if([MGTwitterEngine username] == nil)
-	//	[LoginController showModeless:localNavigationController animated:NO];
-    
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass: [RepliesListController class]
-                                                                               nibName: @"UserMessageList"
-                                                                           tabIconName: @"Replies.tiff" 
-                                                                              tabTitle: @"Replies"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass: [DirectMessagesController class]
-                                                                               nibName: @"UserMessageList" 
-                                                                           tabIconName: @"Messages.tiff" 
-                                                                              tabTitle: @"Messages"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass: [TweetQueueController class]
-                                                                               nibName: @"TweetQueue" 
-                                                                           tabIconName: @"Queue.tiff"
-                                                                              tabTitle: [TweetQueueController queueTitle]];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-    
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass: [MyTweetViewController class]
-                                                                               nibName: @"UserMessageList" 
-                                                                           tabIconName: @"mytweets.tiff"
-                                                                              tabTitle: @"My Tweets"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-    
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass: [FollowersController class]
-                                                                               nibName: @"UserMessageList"
-                                                                           tabIconName: @"followers.tiff"
-                                                                              tabTitle: @"Followers"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass: [FollowingController class]
-                                                                               nibName: @"UserMessageList"
-                                                                           tabIconName: @"following.tiff"
-                                                                              tabTitle: @"Following"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass: [SettingsController class]
-                                                                               nibName: @"SettingsView"
-                                                                           tabIconName: @"SettingsTabIcon.tiff"
-                                                                              tabTitle: @"Settings"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	localNavigationController = [self createNavControllerWrappingViewControllerOfClass: [AboutController class]
-                                                                               nibName: @"About"
-                                                                           tabIconName: @"About.tiff"
-                                                                              tabTitle: @"About"];
-	[localViewControllersArray addObject:localNavigationController];
-	[localNavigationController release];
-	
-	_tabBarController.viewControllers = localViewControllersArray;
-	[localViewControllersArray release];
-}
-
-@end
-
-@implementation TabController
-
-- (id)init
-{
-    if ((self = [super init]))
-    {
-        _tabBarController = [[UITabBarController alloc] init];
-        self.view = _tabBarController.view;
-        
-        [self initTabBarController];
-    }
-    return self;
-}
-
-- (void)dealloc 
-{
-    [_tabBarController release];
-    [super dealloc];
-}
-
-- (void)didReceiveMemoryWarning 
-{
-    [super didReceiveMemoryWarning];
-}
-
-- (void)viewDidUnload 
-{
-	// Release any retained subviews of the main view.
-	// e.g. self.myOutlet = nil;
 }
 
 @end

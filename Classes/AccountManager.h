@@ -25,7 +25,8 @@
 - (NSString *)userPassword:(NSString *)userName;
 
 // User data managament
-- (NSString *)saveUser:(NSString *)userName password:(NSString *)password;
+- (void)addUser:(NSString *)userName password:(NSString *)password;
+- (void)updateUser:(NSString *)userName newUserName:(NSString *)newUserName newPassword:(NSString *)password;
 - (void)removeUser:(NSString *)userName;
 
 // Login methods

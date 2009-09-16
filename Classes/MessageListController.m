@@ -385,7 +385,10 @@
 		[msgView release];
 #else
         TweetViewController *tweetView = [[TweetViewController alloc] initWithStore:self messageIndex:indexPath.row];
-        [self.rootNavigationController pushViewController:tweetView animated:YES];
+        
+        
+        [self.navigationController pushViewController:tweetView animated:YES];
+        //[self.rootNavigationController pushViewController:tweetView animated:YES];
         [tweetView release];
 #endif
 	}

@@ -34,6 +34,7 @@
     NavigationRotateController *navigationController;
 }
 
++ (UINavigationController *)rootNavigationController;
 + (void) increaseNetworkActivityIndicator;
 + (void) decreaseNetworkActivityIndicator;
 

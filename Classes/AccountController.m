@@ -18,10 +18,15 @@
     NSDictionary *userInfo = (NSDictionary *)[notification userInfo];
     NSString *userName = [userInfo objectForKey:@"login"];
     NSString *userPassword = [userInfo objectForKey:@"password"];
+    NSString *oldPassword = [userInfo objectForKey:@"old_password"];
+    NSString *oldUserName = [userInfo objectForKey:@"old_login"];
     
     if (userName)
     {
-        [[AccountManager manager] saveUser:userName password:userPassword];
+        if (oldPassword == nil && oldUserName == nil)
+            [[AccountManager manager] addUser:userName password:userPassword];
+        else
+            [[AccountManager manager] updateUser:oldUserName newUserName:userName newPassword:userPassword];
         [_tableAccounts reloadData];
     }
 }
@@ -132,6 +137,11 @@
     // Login with user
     [[AccountManager manager] login:userName];
     [self showTabController];
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 50;
 }
 
 @end
