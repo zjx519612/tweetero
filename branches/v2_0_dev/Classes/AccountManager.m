@@ -11,6 +11,7 @@
 
 #define ACCOUNT_MANAGER_KEY             @"Accounts"
 #define ACCOUNT_MANAGER_LAST_USER_KEY   @"AccountLastUser"
+#define SEC_ATTR_SERVER                 @"twitter.com"
 
 static AccountManager *accountManager = nil;
 
@@ -19,6 +20,7 @@ static AccountManager *accountManager = nil;
 - (NSString *)currentUserName;
 - (int)currentUserIndex;
 - (void)saveLastLoggedUser;
+- (NSMutableDictionary *)prepareSecItemEntry:(NSString *)server user:(NSString *)userName;
 @end
 
 @implementation AccountManager (Private)
@@ -51,6 +53,16 @@ static AccountManager *accountManager = nil;
 {
     NSString *userName = [self currentUserName];
     [[NSUserDefaults standardUserDefaults] setObject:userName forKey:ACCOUNT_MANAGER_LAST_USER_KEY];
+}
+
+- (NSMutableDictionary *)prepareSecItemEntry:(NSString *)server user:(NSString *)userName
+{
+    NSMutableDictionary *secItemEntry = [[NSMutableDictionary alloc] init];
+    
+    [secItemEntry setObject:(id)kSecClassInternetPassword forKey:(id)kSecClass];
+    [secItemEntry setObject:server forKey:(id)kSecAttrServer];
+    [secItemEntry setObject:userName forKey:(id)kSecAttrAccount];
+    return [secItemEntry autorelease];
 }
 
 @end
@@ -97,39 +109,32 @@ static AccountManager *accountManager = nil;
 
 - (NSString *)userPassword:(NSString *)userName
 {
-    NSString *password = nil;
+    NSMutableDictionary *secItemEntry = [self prepareSecItemEntry:SEC_ATTR_SERVER user:userName];
     
-    NSMutableDictionary *secItemEntry = [[NSMutableDictionary alloc] init];
-    
-    [secItemEntry setObject:(id)kSecClassInternetPassword forKey:(id)kSecClass];
-    [secItemEntry setObject:@"twitter.com" forKey:(id)kSecAttrServer];
-    [secItemEntry setObject:userName forKey:(id)kSecAttrAccount];
     [secItemEntry setObject:(id)kSecMatchLimitOne forKey:(id)kSecMatchLimit];
     [secItemEntry setObject:(id)kCFBooleanTrue forKey:(id)kSecReturnData];
     
-    NSData *result;
+    NSData *result = nil;
     OSStatus err = SecItemCopyMatching((CFDictionaryRef)secItemEntry, (CFTypeRef*)&result);
-    
+ 
+    NSString *password = nil;
     if (err == noErr && result)
         password = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
-    
-    [secItemEntry release];
-    
+
     return [password autorelease];
 }
 
-- (NSString *)saveUser:(NSString *)userName password:(NSString *)password
+- (void)addUser:(NSString *)userName password:(NSString *)password
 {
-    [_users addObject:userName];
-    [[NSUserDefaults standardUserDefaults] setObject:_users forKey:ACCOUNT_MANAGER_KEY];
-
+    if (!userName || !password)
+        return;
+    
+    if (([userName length] == 0) || ([password length]) == 0)
+        return;
+    
     NSData *passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
-    NSMutableDictionary *secItemEntry = [[NSMutableDictionary alloc] init];
-    
-    [secItemEntry setObject:(id)kSecClassInternetPassword forKey:(id)kSecClass];
-    [secItemEntry setObject:@"twitter.com" forKey:(id)kSecAttrServer];
-    [secItemEntry setObject:userName forKey:(id)kSecAttrAccount];
-    
+    NSMutableDictionary *secItemEntry = [self prepareSecItemEntry:SEC_ATTR_SERVER user:userName];
+
     // Try update user data.
     OSStatus err = noErr;
     NSMutableDictionary *attrToUpdate = [[NSMutableDictionary alloc] init];
@@ -141,17 +146,53 @@ static AccountManager *accountManager = nil;
     // Add new user data if update is failed.
     if (err != noErr)
     {
-        SecItemDelete((CFDictionaryRef)secItemEntry);
+        [self removeUser:userName];
+        
         [secItemEntry setObject:passwordData forKey:(id)kSecValueData];
-        SecItemAdd((CFDictionaryRef)secItemEntry, NULL);
+        err = SecItemAdd((CFDictionaryRef)secItemEntry, NULL);
+
+        // Save username
+        if (err == noErr)
+        {
+            [_users addObject:userName];
+            [[NSUserDefaults standardUserDefaults] setObject:_users forKey:ACCOUNT_MANAGER_KEY];
+        }
     }
-    [secItemEntry release];
-    
-    return userName;
+}
+
+- (void)updateUser:(NSString *)userName newUserName:(NSString *)newUserName newPassword:(NSString *)password
+{
+    if (userName && newUserName && password)
+    {
+        if ([userName length] == 0 || [newUserName length] == 0 || [password length] == 0)
+            return;
+        
+        NSMutableDictionary *secItemEntry = [self prepareSecItemEntry:SEC_ATTR_SERVER user:userName];
+        
+        if ([userName compare:newUserName] == NSOrderedSame)
+        {
+            // Update user data
+            NSData *passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
+            NSMutableDictionary *attrToUpdate = [[NSMutableDictionary alloc] init];
+            
+            [attrToUpdate setObject:passwordData forKey:(id)kSecValueData];
+            SecItemUpdate((CFDictionaryRef)secItemEntry, (CFDictionaryRef)attrToUpdate);
+            [attrToUpdate release];
+        }
+        else
+        {
+            // Delete old user and add new user data
+            [self removeUser:userName];
+            [self addUser:newUserName password:password];
+        }
+    }
 }
 
 - (void)removeUser:(NSString *)userName
 {
+    NSMutableDictionary *secItemEntry = [self prepareSecItemEntry:SEC_ATTR_SERVER user:userName];
+    
+    SecItemDelete((CFDictionaryRef)secItemEntry);
     [_users removeObject:userName];
     [[NSUserDefaults standardUserDefaults] setObject:_users forKey:ACCOUNT_MANAGER_KEY];
 }

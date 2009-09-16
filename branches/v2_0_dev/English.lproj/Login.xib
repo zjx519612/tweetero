@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">528</int>
-		<string key="IBDocument.SystemVersion">9G55</string>
+		<string key="IBDocument.SystemVersion">9L31a</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.43</string>
+		<string key="IBDocument.AppKitVersion">949.54</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -128,7 +128,7 @@
 					</object>
 					<object class="IBUISwitch" id="998380313">
 						<reference key="NSNextResponder" ref="509946502"/>
-						<int key="NSvFlags">292</int>
+						<int key="NSvFlags">-2147483356</int>
 						<string key="NSFrame">{{20, 159}, {94, 27}}</string>
 						<reference key="NSSuperview" ref="509946502"/>
 						<bool key="IBUIOpaque">NO</bool>
@@ -140,7 +140,7 @@
 					</object>
 					<object class="IBUILabel" id="722983856">
 						<reference key="NSNextResponder" ref="509946502"/>
-						<int key="NSvFlags">292</int>
+						<int key="NSvFlags">-2147483356</int>
 						<string key="NSFrame">{{122, 162}, {165, 21}}</string>
 						<reference key="NSSuperview" ref="509946502"/>
 						<bool key="IBUIOpaque">NO</bool>
@@ -468,7 +468,8 @@
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
-		<string key="IBDocument.LastKnownRelativeProjectPath">../Tweetter.xcodeproj</string>
+		<string key="IBDocument.LastKnownRelativeProjectPath">../Tweetero.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
+		<string key="IBCocoaTouchPluginVersion">3.0</string>
 	</data>
 </archive>

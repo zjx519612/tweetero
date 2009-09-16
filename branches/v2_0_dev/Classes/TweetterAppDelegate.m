@@ -79,6 +79,11 @@ static int NetworkActivityIndicatorCounter = 0;
     [super dealloc];
 }
 
++ (UINavigationController *)rootNavigationController
+{
+    return [(TweetterAppDelegate*)[UIApplication sharedApplication] navigationController];
+}
+
 + (void) increaseNetworkActivityIndicator
 {
 	NetworkActivityIndicatorCounter++;

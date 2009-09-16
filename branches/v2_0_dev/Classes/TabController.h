@@ -8,9 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TabController : UIViewController 
+@interface TabController : UITabBarController//UIViewController <UITabBarControllerDelegate>
 {
-    UITabBarController  *_tabBarController;
+    //UITabBarController  *_tabBarController;
 }
+
+- (id)init;
+- (void)dealloc;
 
 @end
