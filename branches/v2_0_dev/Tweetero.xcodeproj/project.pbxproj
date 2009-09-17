@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0009CAE810622C0100982D2B /* CustomTabBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0009CAE710622C0100982D2B /* CustomTabBarController.m */; };
 		0049463110591A4700C6B2B2 /* down.tif in Resources */ = {isa = PBXBuildFile; fileRef = 0049463010591A4700C6B2B2 /* down.tif */; };
 		0049463610591BDE00C6B2B2 /* up.tif in Resources */ = {isa = PBXBuildFile; fileRef = 0049463510591BDE00C6B2B2 /* up.tif */; };
 		0049472C10594BCB00C6B2B2 /* MyTweetViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0049472B10594BCB00C6B2B2 /* MyTweetViewController.m */; };
@@ -96,6 +97,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0009CAE610622C0100982D2B /* CustomTabBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomTabBarController.h; sourceTree = "<group>"; };
+		0009CAE710622C0100982D2B /* CustomTabBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomTabBarController.m; sourceTree = "<group>"; };
 		0049463010591A4700C6B2B2 /* down.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = down.tif; path = Resource/Images/down.tif; sourceTree = "<group>"; };
 		0049463510591BDE00C6B2B2 /* up.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = up.tif; path = Resource/Images/up.tif; sourceTree = "<group>"; };
 		0049472A10594BCB00C6B2B2 /* MyTweetViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyTweetViewController.h; sourceTree = "<group>"; };
@@ -253,6 +256,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0009CAE510622BCE00982D2B /* UIControls */ = {
+			isa = PBXGroup;
+			children = (
+				0009CAE610622C0100982D2B /* CustomTabBarController.h */,
+				0009CAE710622C0100982D2B /* CustomTabBarController.m */,
+				D93047CD1030FD3300F903C5 /* TweetPlayer.h */,
+				D93047CE1030FD3300F903C5 /* TweetPlayer.m */,
+				00DDB1DD105E7B030020C9C1 /* CustomImageView.h */,
+				00DDB1DE105E7B030020C9C1 /* CustomImageView.m */,
+				D935354A0F6CA27E0005DA7D /* TapScrollView.h */,
+				D935354B0F6CA27E0005DA7D /* TapScrollView.m */,
+				AA6494220F75E31100E40348 /* ImagePreview.h */,
+				AA6494230F75E31100E40348 /* ImagePreview.m */,
+			);
+			name = UIControls;
+			sourceTree = "<group>";
+		};
 		00B69FD21061193D005E8DF6 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -305,17 +325,14 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				0009CAE510622BCE00982D2B /* UIControls */,
 				00B69FD21061193D005E8DF6 /* Controllers */,
 				00DDA8A6105FA927008AE91E /* AccountManager.h */,
 				00DDA8A7105FA927008AE91E /* AccountManager.m */,
 				D94009160F787DF500CE66BE /* TweetQueue.h */,
 				D94009170F787DF500CE66BE /* TweetQueue.m */,
-				D935354A0F6CA27E0005DA7D /* TapScrollView.h */,
-				D935354B0F6CA27E0005DA7D /* TapScrollView.m */,
 				D96BACEB0F6365020034A131 /* ImageLoader.h */,
 				D96BACEC0F6365020034A131 /* ImageLoader.m */,
-				AA6494220F75E31100E40348 /* ImagePreview.h */,
-				AA6494230F75E31100E40348 /* ImagePreview.m */,
 				1D3623240D0F684500981E51 /* TweetterAppDelegate.h */,
 				1D3623250D0F684500981E51 /* TweetterAppDelegate.m */,
 				49B3F5B40F66A78000DFFE04 /* yFrogImageDownoader.h */,
@@ -329,10 +346,6 @@
 				4964A70B0F6D97A3004F0307 /* LocationManager.h */,
 				4964A70C0F6D97A3004F0307 /* LocationManager.m */,
 				AA87F6460F71D9D300D7A2C0 /* TwitterConnectionProtocol.h */,
-				D93047CD1030FD3300F903C5 /* TweetPlayer.h */,
-				D93047CE1030FD3300F903C5 /* TweetPlayer.m */,
-				00DDB1DD105E7B030020C9C1 /* CustomImageView.h */,
-				00DDB1DE105E7B030020C9C1 /* CustomImageView.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -594,6 +607,7 @@
 				00DDB2F7105E9E190020C9C1 /* AccountController.m in Sources */,
 				00DDA861105F9798008AE91E /* TabController.m in Sources */,
 				00DDA8A8105FA927008AE91E /* AccountManager.m in Sources */,
+				0009CAE810622C0100982D2B /* CustomTabBarController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

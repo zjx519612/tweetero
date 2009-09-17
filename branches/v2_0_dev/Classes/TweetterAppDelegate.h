@@ -25,6 +25,7 @@
 // 
 
 #import <UIKit/UIKit.h>
+#import "AccountController.h"
 
 @class NavigationRotateController;
 @interface TweetterAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate> 

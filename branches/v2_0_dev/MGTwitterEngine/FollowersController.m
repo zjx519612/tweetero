@@ -320,7 +320,6 @@
 		[_users release];
 	
 	_users = [userInfo retain];
-	
 	[self.tableView reloadData];
 	
 	[self releaseActivityIndicator];

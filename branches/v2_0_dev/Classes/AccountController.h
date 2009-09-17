@@ -11,4 +11,6 @@
 - (IBAction)clickAdd;
 - (IBAction)clickEdit;
 
++ (void)showAccountController:(UINavigationController*)navigationController;
+
 @end

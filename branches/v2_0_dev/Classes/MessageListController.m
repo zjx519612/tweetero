@@ -387,8 +387,8 @@
         TweetViewController *tweetView = [[TweetViewController alloc] initWithStore:self messageIndex:indexPath.row];
         
         
-        [self.navigationController pushViewController:tweetView animated:YES];
-        //[self.rootNavigationController pushViewController:tweetView animated:YES];
+        //[self.tabBarController.navigationController pushViewController:tweetView animated:YES];
+        [self.rootNavigationController pushViewController:tweetView animated:YES];
         [tweetView release];
 #endif
 	}
@@ -475,7 +475,8 @@
 	[self releaseActivityIndicator];
 	
 	if(self.tabBarController.selectedViewController == self.navigationController && [error code] == 401)
-		[LoginController showModal:self.navigationController];
+        [AccountController showAccountController:self.parentViewController.navigationController];
+		//[LoginController showModal:self.navigationController];
 		
 	if(_messages)
 	{

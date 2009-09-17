@@ -43,6 +43,11 @@
 
 @implementation AccountController
 
++ (void)showAccountController:(UINavigationController*)navigationController
+{
+    [navigationController popToRootViewControllerAnimated:YES];
+}
+
 - (id)init
 {
     // Call init method from super class

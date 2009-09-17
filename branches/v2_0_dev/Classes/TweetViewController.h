@@ -1,3 +1,11 @@
+//
+//  TweetViewController.h
+//  Tweetero
+//
+//  Created by Sergey Shkrabak on 9/12/09.
+//  Copyright 2009 Codeminders. All rights reserved.
+//
+
 #import <UIKit/UIKit.h>
 #import "yFrogImageDownoader.h"
 #import "yFrogImageUploader.h"

@@ -37,14 +37,18 @@
     IBOutlet UILabel *realNameField;
 	IBOutlet UISwitch *notifySwitch;
 	IBOutlet UIButton *sendDirectMessage;
+    IBOutlet UISegmentedControl *followButton;
+    IBOutlet UIButton *followBtn;
     
 	BOOL _gotInfo;
 	MGTwitterEngine *_twitter;
 	NSString *_username;
-
+    BOOL _friends;
 	NSString *isUserReceivingUpdatesForConnectionID;
 }
 - (id)initWithUserName:(NSString*)uname;
+- (IBAction)changeFollowing:(id)sender;
+- (IBAction)follow;
 - (IBAction)sendMessage;
 - (IBAction)sendReply;
 - (IBAction)showTwitts;

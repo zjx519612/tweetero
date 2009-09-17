@@ -1,3 +1,11 @@
+//
+//  TweetViewController.m
+//  Tweetero
+//
+//  Created by Sergey Shkrabak on 9/12/09.
+//  Copyright 2009 Codeminders. All rights reserved.
+//
+
 #import "TweetViewController.h"
 #import "ImageLoader.h"
 #import "TwitEditorController.h"
@@ -378,7 +386,6 @@ const int kHeadTagLocation = 4;
 	}
 	
 	NSString *htmlTemplate = @"<html></script></head><body style=\"width:%d; overflow:visible; padding:0; margin:0\"><big>%@</big></body></html>";
-    //NSString *htmlTemplate = @"<html></script></head><body style=\"width:%d; overflow:visible; padding:0; margin:0\">%@</body></html>";
 	html = [NSString stringWithFormat:htmlTemplate, (int)_webView.frame.size.width - 10, [filteredLines componentsJoinedByString:@"<br>"]];
 	[filteredLines release];
 	return html;
@@ -776,13 +783,11 @@ const int kHeadTagLocation = 4;
 	[self.navigationController popViewControllerAnimated:YES];
 }
 
-
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-	
-	if(self.tabBarController.selectedViewController == self.navigationController && [error code] == 401)
-		[LoginController showModal:self.navigationController];
+    if ([error code] == 401)
+        [AccountController showAccountController:self.navigationController];
 }
 
 @end

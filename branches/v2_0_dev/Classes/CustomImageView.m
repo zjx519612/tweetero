@@ -29,7 +29,6 @@
     float radius = 5.0f;
 
     CGContextRef context = UIGraphicsGetCurrentContext();
-    //rect = CGRectInset(rect, 1.0f, 1.0f);
     
     CGContextBeginPath(context);
     CGContextMoveToPoint(context, CGRectGetMinX(rect) + radius, CGRectGetMinY(rect));
