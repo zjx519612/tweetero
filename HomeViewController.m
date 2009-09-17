@@ -56,7 +56,7 @@
 	
 	UIBarButtonItem *newMsgButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose
 		target:self action:@selector(newMessage)];
-	self.navigationItem.rightBarButtonItem = newMsgButton;
+	self.parentViewController.navigationItem.rightBarButtonItem = newMsgButton;
 	[newMsgButton release];
 	
 	UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
@@ -66,15 +66,13 @@
 
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:@"TwittsUpdated" object:nil];
 	if([MGTwitterEngine password] == nil)
-		[LoginController showModal:self.navigationController];
+        [AccountController showAccountController:self.parentViewController.navigationController];
 }
-
 
 - (void)viewDidAppear:(BOOL)animated 
 {
     [super viewDidAppear:animated];
 }
-
 
 - (void)accountChanged:(NSNotification*)notification
 {
@@ -113,7 +111,7 @@
 - (void)reload
 {
 	if([MGTwitterEngine password] == nil)
-		[LoginController showModal:self.navigationController];
+        [AccountController showAccountController:self.parentViewController.navigationController];
 	else
 		[self reloadAll];
 }

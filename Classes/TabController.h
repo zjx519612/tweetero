@@ -7,13 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CustomTabBarController.h"
 
-@interface TabController : UITabBarController//UIViewController <UITabBarControllerDelegate>
+@interface TabController : CustomTabBarController
 {
-    //UITabBarController  *_tabBarController;
 }
-
-- (id)init;
-- (void)dealloc;
 
 @end

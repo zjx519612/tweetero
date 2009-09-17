@@ -48,6 +48,7 @@
 		_gotInfo = NO;
 		_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
 		_username = [uname retain];
+        _friends = NO;
 	}
 	
 	return self;
@@ -68,6 +69,28 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
+}
+
+- (IBAction)changeFollowing:(id)sender
+{
+    NSString *title = _friends ? @"FOLLOWING" : @"STOP FOLLOWING";
+    [followButton setTitle:title forSegmentAtIndex:0];
+}
+
+- (IBAction)follow
+{
+    if (_friends)
+    {
+        // STOP FOLLOWING
+        [_twitter disableUpdatesFor:_username];
+    }
+    else
+    {
+        // FOLLOWING
+        [_twitter enableUpdatesFor:_username];
+    }
+    _friends = !_friends;
+    followBtn.titleLabel.text = (_friends == YES) ? @"Follow" : @"Unfollow";
 }
 
 - (IBAction)sendMessage 
@@ -131,6 +154,34 @@
 	[alert release];
 }
 
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
+- (void)traceDict:(NSDictionary*)dict
+{
+    NSEnumerator *keys = [dict keyEnumerator];
+    id key = nil;
+    while ((key = [keys nextObject]) != nil)
+    {
+        id obj = [dict objectForKey:key];
+        //NSLog(@"Test");
+        NSLog(@"Key: %@ for: ", (NSString*)key);
+        //if ([(NSString*)key compare:@"user"] == NSOrderedSame)
+        //    [self traceDict:obj];
+        
+        if ([obj respondsToSelector:@selector(rangeOfString:)])
+        {
+            NSLog((NSString*)obj);
+        }
+        else
+        {
+            NSLog(@"NOT STRING");
+        }
+    }
+}
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------
 - (void)miscInfoReceived:(NSArray *)miscInfo forRequest:(NSString *)connectionIdentifier
 {
 	if(![self.isUserReceivingUpdatesForConnectionID isEqualToString:connectionIdentifier])
@@ -139,11 +190,18 @@
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	NSDictionary *followData = [miscInfo objectAtIndex:0];
 	
-	BOOL friends = NO;
+	//BOOL friends = NO;
+    //[self traceDict:followData];
+    
 	id friendsObj = [followData objectForKey:@"friends"];
 	if(friendsObj)
-		friends = [friendsObj boolValue];
-	sendDirectMessage.hidden = !friends;
+		_friends = ![friendsObj boolValue];
+	sendDirectMessage.hidden = _friends;
+    
+    followBtn.titleLabel.text = (_friends == YES) ? @"Follow" : @"Unfollow";
+    //[_twitter isUser:[MGTwitterEngine username] receivingUpdatesFor:_username];
+    //NSString *title = _friends ? @"STOP FOLLOWING" : @"FOLLOWING";
+    //[followButton setTitle:title forSegmentAtIndex:0];
 }
 
 - (void)userInfoReceived:(NSArray *)userInfo forRequest:(NSString *)connectionIdentifier;
