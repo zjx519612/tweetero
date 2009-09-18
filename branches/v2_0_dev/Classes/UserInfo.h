@@ -43,12 +43,13 @@
 	BOOL _gotInfo;
 	MGTwitterEngine *_twitter;
 	NSString *_username;
-    BOOL _friends;
+    BOOL _following;
 	NSString *isUserReceivingUpdatesForConnectionID;
 }
 - (id)initWithUserName:(NSString*)uname;
 - (IBAction)changeFollowing:(id)sender;
 - (IBAction)follow;
+- (IBAction)followers;
 - (IBAction)sendMessage;
 - (IBAction)sendReply;
 - (IBAction)showTwitts;

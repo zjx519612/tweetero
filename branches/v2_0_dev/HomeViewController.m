@@ -47,11 +47,24 @@
     [super dealloc];
 }
 
+- (void)viewControllerDidActivate:(id)parent
+{
+    UIViewController *parentController = parent;
+    
+    parentController.navigationItem.title = @"Home";
+	UIBarButtonItem *newMsgButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem: UIBarButtonSystemItemCompose
+                                                                                  target: self
+                                                                                  action: @selector(newMessage)];
+	parentController.navigationItem.rightBarButtonItem = newMsgButton;
+	[newMsgButton release];
+    
+    [self setRootNavigationController:parentController.navigationController];
+}
 
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-
+    /*
 	self.navigationItem.title = @"Tweetero Home";
 	
 	UIBarButtonItem *newMsgButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose
@@ -63,7 +76,7 @@
 		target:self action:@selector(reload)];
 	self.navigationItem.leftBarButtonItem = reloadButton;
 	[reloadButton release];
-
+     */
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:@"TwittsUpdated" object:nil];
 	if([MGTwitterEngine password] == nil)
         [AccountController showAccountController:self.parentViewController.navigationController];
@@ -104,7 +117,7 @@
 - (void)newMessage
 {
 	TwitEditorController *msgView = [[TwitEditorController alloc] init];
-	[self.navigationController pushViewController:msgView animated:YES];
+	[self.rootNavigationController pushViewController:msgView animated:YES];
 	[msgView release];
 }
 

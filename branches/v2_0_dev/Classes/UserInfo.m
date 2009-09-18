@@ -33,6 +33,7 @@
 #import "TweetterAppDelegate.h"
 #import "TwitEditorController.h"
 #import "CustomImageView.h"
+#import "FollowersController.h"
 #include "util.h"
 
 @implementation UserInfo
@@ -48,7 +49,7 @@
 		_gotInfo = NO;
 		_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
 		_username = [uname retain];
-        _friends = NO;
+        _following = NO;
 	}
 	
 	return self;
@@ -73,24 +74,31 @@
 
 - (IBAction)changeFollowing:(id)sender
 {
-    NSString *title = _friends ? @"FOLLOWING" : @"STOP FOLLOWING";
+    NSString *title = _following ? @"FOLLOWING" : @"STOP FOLLOWING";
     [followButton setTitle:title forSegmentAtIndex:0];
 }
 
 - (IBAction)follow
 {
-    if (_friends)
+    NSString *ident = nil;
+    if (_following)
     {
         // STOP FOLLOWING
-        [_twitter disableUpdatesFor:_username];
+        ident = [_twitter disableUpdatesFor:_username];
     }
     else
     {
         // FOLLOWING
-        [_twitter enableUpdatesFor:_username];
+        ident = [_twitter enableUpdatesFor:_username];
     }
-    _friends = !_friends;
-    followBtn.titleLabel.text = (_friends == YES) ? @"Follow" : @"Unfollow";
+}
+
+// Show user followers
+- (IBAction)followers
+{
+    FollowersController *controller = [[FollowersController alloc] initWithUser:_username];
+    [self.navigationController pushViewController:controller animated:YES];
+    [controller release];
 }
 
 - (IBAction)sendMessage 
@@ -165,23 +173,24 @@
     {
         id obj = [dict objectForKey:key];
         //NSLog(@"Test");
-        NSLog(@"Key: %@ for: ", (NSString*)key);
+
         //if ([(NSString*)key compare:@"user"] == NSOrderedSame)
         //    [self traceDict:obj];
         
+        NSString *value;
         if ([obj respondsToSelector:@selector(rangeOfString:)])
-        {
-            NSLog((NSString*)obj);
-        }
-        else
-        {
-            NSLog(@"NOT STRING");
-        }
+            value = (NSString*)obj;
+        //else
+            //value = [NSString stringWithCString:NAMEOF([obj class])];
+        
+        NSLog(@"Key: %@ for: %@", (NSString*)key, value);
     }
+    NSLog(@"\n");
 }
 //-------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------
+
 - (void)miscInfoReceived:(NSArray *)miscInfo forRequest:(NSString *)connectionIdentifier
 {
 	if(![self.isUserReceivingUpdatesForConnectionID isEqualToString:connectionIdentifier])
@@ -190,18 +199,12 @@
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	NSDictionary *followData = [miscInfo objectAtIndex:0];
 	
-	//BOOL friends = NO;
-    //[self traceDict:followData];
+	BOOL friends = NO;
     
 	id friendsObj = [followData objectForKey:@"friends"];
 	if(friendsObj)
-		_friends = ![friendsObj boolValue];
-	sendDirectMessage.hidden = _friends;
-    
-    followBtn.titleLabel.text = (_friends == YES) ? @"Follow" : @"Unfollow";
-    //[_twitter isUser:[MGTwitterEngine username] receivingUpdatesFor:_username];
-    //NSString *title = _friends ? @"STOP FOLLOWING" : @"FOLLOWING";
-    //[followButton setTitle:title forSegmentAtIndex:0];
+		friends = ![friendsObj boolValue];
+	sendDirectMessage.hidden = friends;
 }
 
 - (void)userInfoReceived:(NSArray *)userInfo forRequest:(NSString *)connectionIdentifier;
@@ -209,6 +212,16 @@
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	NSDictionary *userData = [userInfo objectAtIndex:0];
 	
+    //[self traceDict:userData];
+    
+    id following = [userData objectForKey:@"following"];
+    if (following)
+    {
+        _following = [following boolValue];
+        followBtn.titleLabel.text = _following ? NSLocalizedString(@"Unfollow", @"") : NSLocalizedString(@"Follow", @"");
+        followBtn.titleLabel.textAlignment = UITextAlignmentCenter;
+    }
+    
 	UIImage *avatar = [[ImageLoader sharedLoader] imageWithURL:[userData objectForKey:@"profile_image_url"]];
 	CGSize avatarViewSize = avatarView.frame.size;
 	if(avatar.size.width > avatarViewSize.width || avatar.size.height > avatarViewSize.height)

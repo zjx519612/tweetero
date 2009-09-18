@@ -29,6 +29,7 @@
 #import "TweetQueueController.h"
 #import "TweetQueue.h"
 #import "TwitEditorController.h"
+#import "AccountController.h"
 #include "util.h"
 
 @implementation TweetQueueController
@@ -57,14 +58,20 @@
 	}
 }
 
+- (void)viewControllerDidActivate:(id)parent
+{
+    _navigatedController = parent;
+}
+
 - (void)setQueueTitle
 {
 	NSString* title = [[self class] queueTitle];
-	self.navigationItem.title = title;
-	self.tabBarItem.title = title;
-
-	UINavigationController *more = self.tabBarController.moreNavigationController;
-	[self reloadTablesInSubview:more.view];
+	//self.navigationItem.title = title;
+	//self.tabBarItem.title = title;
+    _navigatedController.navigationItem.title = title;
+    
+	//UINavigationController *more = self.tabBarController.moreNavigationController;
+	//[self reloadTablesInSubview:more.view];
 }
 
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
@@ -130,7 +137,8 @@
 		return;
 		
 	TwitEditorController *msgView = [[TwitEditorController alloc] init];
-	[self.navigationController pushViewController:msgView animated:YES];
+	//[self.navigationController pushViewController:msgView animated:YES];
+    [_navigatedController.navigationController pushViewController:msgView animated:YES];
 	[msgView editUnsentMessage:index.row];
 	[msgView release];
 }
@@ -242,11 +250,12 @@
 	
 	if(!login || !pass)
 	{
-		[LoginController showModal:self.navigationController];
+        [AccountController showAccountController:_navigatedController.navigationController];
+		//[LoginController showModal:self.navigationController];
 		return;
 	}
 
-	self.progressSheet = ShowActionSheet(NSLocalizedString(@"Uploading the messages to Twitter...", @""), self, NSLocalizedString(@"Cancel", @""), self.tabBarController.view);
+	self.progressSheet = ShowActionSheet(NSLocalizedString(@"Uploading the messages to Twitter...", @""), self, NSLocalizedString(@"Cancel", @""), self.view);
 	[self postNextMessage];
 }
 
@@ -279,7 +288,8 @@
 	[self.tableView reloadData];
 	[self enableModifyButtons:NO];
 
-	if (self.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent || self.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque) 
+	if (_navigatedController.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent || 
+        _navigatedController.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque) 
 		queueSegmentedControl.tintColor = [UIColor darkGrayColor];
 	else
 		queueSegmentedControl.tintColor = defaultTintColor;
@@ -370,9 +380,9 @@
 	}
 	else
 	{
-		cell.textAlignment = UITextAlignmentCenter;
-		cell.font = [UIFont systemFontOfSize:16];
-		cell.text = @"No Unsent Tweets";
+		cell.textLabel.textAlignment = UITextAlignmentCenter;
+		cell.textLabel.font = [UIFont systemFontOfSize:16];
+		cell.textLabel.text = @"No Unsent Tweets";
 	}
 	
 	cell.contentView.backgroundColor = indexPath.row % 2? [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1]: [UIColor whiteColor];

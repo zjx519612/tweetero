@@ -33,6 +33,7 @@
 	UIColor *defaultTintColor;
 	UIActionSheet *progressSheet;
 
+    UIViewController *_navigatedController;
 	id <TwitterConnectionProtocol>  _connection;
 }
 - (void)deleteTweet;

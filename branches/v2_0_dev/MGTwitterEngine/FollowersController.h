@@ -44,18 +44,18 @@
 
 @interface FollowersController : UserListController
 {
-	
+    NSString *_username;
 }
 
-
+- (id)initWithUser:(NSString *)username;
 
 @end
 
 @interface FollowingController : UserListController
 {
-	
+    NSString *_username;
 }
 
-
+- (id)initWithUser:(NSString *)username;
 
 @end

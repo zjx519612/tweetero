@@ -125,8 +125,8 @@
 	if([identifier isEqualToString:@"UICell"])
 	{
 		UITableViewCell *uiCell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:identifier] autorelease];
-		uiCell.textAlignment = UITextAlignmentCenter;
-		uiCell.font = [UIFont systemFontOfSize:16];
+		uiCell.textLabel.textAlignment = UITextAlignmentCenter;
+		uiCell.textLabel.font = [UIFont systemFontOfSize:16];
 		return uiCell;
 	}
 	
@@ -197,7 +197,7 @@
 	
 	if([self noUsers])
 	{
-		cell.text = _loading? [self loadingMessagesString]: [self noUsersString];
+		cell.textLabel.text = _loading? [self loadingMessagesString]: [self noUsersString];
 		return;
 	}
     
@@ -222,7 +222,7 @@
 	} 
 	else
 	{
-		cell.text = @"Load More...";
+		cell.textLabel.text = @"Load More...";
 	}
 }
 
@@ -301,8 +301,10 @@
 	
 	[self releaseActivityIndicator];
 	
-	if(self.tabBarController.selectedViewController == self.navigationController && [error code] == 401)
-		[LoginController showModal:self.navigationController];
+    if ([error code] == 401)
+        [AccountController showAccountController:self.navigationController];
+	//if(self.tabBarController.selectedViewController == self.navigationController && [error code] == 401)
+	//	[LoginController showModal:self.navigationController];
 	
 	if(_users)
 	{
@@ -374,6 +376,22 @@
 
 @implementation FollowersController
 
+- (id)initWithUser:(NSString *)username
+{
+    if ((self = [super initWithNibName:@"UserMessageList" bundle:nil]))
+    {
+        _username = [[NSString alloc] initWithString:username];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    if (_username)
+        [_username autorelease];
+    [super dealloc];
+}
+
 - (NSString*)noUsersString
 {
 	return @"No Followers";
@@ -391,7 +409,10 @@
 	if([MGTwitterEngine password] != nil)
 	{
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
-		[_twitter getFollowersIncludingCurrentStatus:YES];
+		//if (_username)
+            //[_twitter getFollowersForUser:_username];
+        //else
+            [_twitter getFollowersIncludingCurrentStatus:YES];
 	}
 }
 
@@ -400,6 +421,22 @@
 
 
 @implementation FollowingController
+
+- (id)initWithUser:(NSString *)username
+{
+    if ((self = [super initWithNibName:@"UserMessageList" bundle:nil]))
+    {
+        _username = [[NSString alloc] initWithString:username];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    if (_username)
+        [_username autorelease];
+    [super dealloc];
+}
 
 - (NSString*)noUsersString
 {
@@ -418,7 +455,7 @@
 	if([MGTwitterEngine password] != nil)
 	{
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
-		[_twitter getRecentlyUpdatedFriendsFor:nil startingAtPage:0];
+		[_twitter getRecentlyUpdatedFriendsFor:_username startingAtPage:0];
 	}
 }
 

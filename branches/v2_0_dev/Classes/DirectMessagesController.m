@@ -30,16 +30,31 @@
 
 @implementation DirectMessagesController
 
+- (void)viewControllerDidActivate:(id)parent
+{
+    UIViewController *parentController = parent;
+    
+    parentController.navigationItem.title = @"Direct Messages";
+    
+	UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem: UIBarButtonSystemItemRefresh
+                                                                                  target: self
+                                                                                  action: @selector(reload)];
+	parentController.navigationItem.rightBarButtonItem = reloadButton;
+	[reloadButton release];
+    [self setRootNavigationController:parentController.navigationController];
+}
+
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
+    /*
 	self.navigationItem.title = @"Direct Messages";
 	
 	UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
 		target:self action:@selector(reload)];
 	self.navigationItem.leftBarButtonItem = reloadButton;
 	[reloadButton release];
-	
+	*/
 	
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:@"DirectMessageSent" object:nil];
 }
@@ -69,7 +84,7 @@
 		[_twitter getDirectMessagesSince:nil startingAtPage:numPage];
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
 		[_twitter getSentDirectMessagesSince:nil startingAtPage:numPage];
-		self.navigationItem.title = [MGTwitterEngine username];
+		//self.rootNavigationController.navigationItem.title = [MGTwitterEngine username];
 	}
 }
 

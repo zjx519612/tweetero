@@ -126,6 +126,10 @@ const int kTabBarHeight = 46;
             if ([controller respondsToSelector:@selector(setRootNavigationController:)])
                 [controller performSelector:@selector(setRootNavigationController:) withObject:self.navigationController];
             
+            self.navigationItem.rightBarButtonItem = nil;
+            if ([controller respondsToSelector:@selector(viewControllerDidActivate:)])
+                [controller performSelector:@selector(viewControllerDidActivate:) withObject:self];
+            
             controller.view.frame = CGRectMake(0, 0, kViewScreenWidth, kViewScreenHeight);
            [_contentView addSubview:controller.view];
         }

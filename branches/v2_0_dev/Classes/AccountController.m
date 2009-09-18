@@ -62,7 +62,7 @@
         [button release];
         
         // Edit button
-        button = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Edit", @"") style:UIBarButtonItemStyleBordered target:self action:@selector(clickEdit)];
+        button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(clickEdit)];
         self.navigationItem.leftBarButtonItem = button;
         [button release];
         

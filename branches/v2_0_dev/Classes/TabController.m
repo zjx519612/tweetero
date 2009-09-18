@@ -23,9 +23,31 @@
 #import "LoginController.h"
 #import "FollowersController.h"
 #import "MyTweetViewController.h"
+#import "SearchController.h"
 
 @implementation TabController
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    /*
+    UIBarButtonItem *newMsgButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem: UIBarButtonSystemItemCompose
+                                                                                  target: self
+                                                                                  action: @selector(clickNewMessage)];
+    self.navigationItem.rightBarButtonItem = newMsgButton;
+    [newMsgButton release];
+     */
+}
+
+#pragma mark Actions
+- (IBAction)clickNewMessage
+{
+	TwitEditorController *editController = [[TwitEditorController alloc] init];
+	[self.navigationController pushViewController:editController animated:YES];
+	[editController release];
+}
+
+#pragma mark Parent Methods
 - (UIViewController *)createViewController: (Class)class nibName: (NSString*)nibName tabIconName: (NSString *)iconName tabTitle: (NSString *)tabTitle
 {
     UIViewController *theController = [[[class alloc] initWithNibName:nibName bundle: nil] autorelease];
@@ -38,12 +60,13 @@
 {
     UIViewController *theController = nil;
     NSMutableArray *controllers = [[NSMutableArray alloc] initWithCapacity:4];
+    int tag;
     
     theController = [self createViewController: [HomeViewController class] 
                                        nibName: nil 
                                    tabIconName: @"HomeTabIcon.tiff" 
                                       tabTitle: @"Home"];
-    theController.tabBarItem.tag = 0;
+    theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
     [controllers addObject:theController.tabBarItem];
     
@@ -51,7 +74,7 @@
                                        nibName: @"UserMessageList" 
                                    tabIconName: @"Replies.tiff" 
                                       tabTitle: @"Replies"];
-    theController.tabBarItem.tag = 1;
+    theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
     [controllers addObject:theController.tabBarItem];
     
@@ -59,7 +82,7 @@
                                        nibName: @"UserMessageList" 
                                    tabIconName: @"Messages.tiff" 
                                       tabTitle: @"Messages"];
-    theController.tabBarItem.tag = 2;
+    theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
     [controllers addObject:theController.tabBarItem];
     
@@ -67,7 +90,7 @@
                                        nibName: @"TweetQueue" 
                                    tabIconName: @"Queue.tiff" 
                                       tabTitle: [TweetQueueController queueTitle]];
-    theController.tabBarItem.tag = 3;
+    theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
     [controllers addObject:theController.tabBarItem];
     
@@ -75,7 +98,7 @@
                                        nibName: @"UserMessageList" 
                                    tabIconName: @"mytweets.tiff" 
                                       tabTitle: @"My Tweets"];
-    theController.tabBarItem.tag = 4;
+    theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
     [controllers addObject:theController.tabBarItem];
     
@@ -83,7 +106,7 @@
                                        nibName: @"UserMessageList" 
                                    tabIconName: @"followers.tiff" 
                                       tabTitle: @"Followers"];
-    theController.tabBarItem.tag = 5;
+    theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
     [controllers addObject:theController.tabBarItem];
     
@@ -91,7 +114,15 @@
                                        nibName: @"UserMessageList" 
                                    tabIconName: @"following.tiff" 
                                       tabTitle: @"Following"];
-    theController.tabBarItem.tag = 6;
+    theController.tabBarItem.tag = tag++;
+    [self addViewController:theController];
+    [controllers addObject:theController.tabBarItem];
+    
+    theController = [self createViewController: [SearchController class]
+                                       nibName: @"UserMessageList"
+                                   tabIconName: @"about.tiff" 
+                                      tabTitle: @"Search"];
+    theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
     [controllers addObject:theController.tabBarItem];
     
@@ -99,15 +130,15 @@
                                        nibName: @"SettingsView"
                                    tabIconName: @"SettingsTabIcon.tiff"
                                       tabTitle: @"Settings"];
-    theController.tabBarItem.tag = 7;
+    theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
     [controllers addObject:theController.tabBarItem];
     
 	theController = [self createViewController: [AboutController class]
                                        nibName: @"About"
-                                   tabIconName: @"About.tiff"
+                                   tabIconName: @"AboutColor.tiff"
                                       tabTitle: @"About"];
-    theController.tabBarItem.tag = 8;
+    theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
     [controllers addObject:theController.tabBarItem];
     

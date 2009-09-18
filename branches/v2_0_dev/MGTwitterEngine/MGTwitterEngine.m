@@ -1565,7 +1565,6 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                            responseType:MGTwitterUsers];
 }
 
-
 - (NSString *)getFeaturedUsers
 {
     NSString *path = [NSString stringWithFormat:@"statuses/featured.%@", API_FORMAT];
