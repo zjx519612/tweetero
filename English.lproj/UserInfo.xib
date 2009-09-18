@@ -139,7 +139,7 @@
 								<reference key="IBUIFont" ref="849283321"/>
 								<int key="IBUIButtonType">1</int>
 								<string key="IBUINormalTitle">Unfollow</string>
-								<object class="NSColor" key="IBUIHighlightedTitleColor">
+								<object class="NSColor" key="IBUIHighlightedTitleColor" id="334868693">
 									<int key="NSColorSpace">3</int>
 									<bytes key="NSWhite">MQA</bytes>
 								</object>
@@ -147,13 +147,32 @@
 									<int key="NSColorSpace">1</int>
 									<bytes key="NSRGB">MC4xOTYwNzg0MyAwLjMwOTgwMzkzIDAuNTIxNTY4NjYAA</bytes>
 								</object>
-								<object class="NSColor" key="IBUINormalTitleShadowColor">
+								<object class="NSColor" key="IBUINormalTitleShadowColor" id="764912537">
 									<int key="NSColorSpace">3</int>
 									<bytes key="NSWhite">MC41AA</bytes>
 								</object>
 							</object>
+							<object class="IBUIButton" id="536402129">
+								<reference key="NSNextResponder" ref="436847353"/>
+								<int key="NSvFlags">292</int>
+								<string key="NSFrame">{{20, 200}, {240, 37}}</string>
+								<reference key="NSSuperview" ref="436847353"/>
+								<bool key="IBUIOpaque">NO</bool>
+								<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
+								<int key="IBUIContentHorizontalAlignment">0</int>
+								<int key="IBUIContentVerticalAlignment">0</int>
+								<reference key="IBUIFont" ref="849283321"/>
+								<int key="IBUIButtonType">1</int>
+								<string key="IBUINormalTitle">Followers</string>
+								<reference key="IBUIHighlightedTitleColor" ref="334868693"/>
+								<object class="NSColor" key="IBUINormalTitleColor">
+									<int key="NSColorSpace">1</int>
+									<bytes key="NSRGB">MC4xOTYwNzg0MyAwLjMwOTgwMzkzIDAuNTIxNTY4NjYAA</bytes>
+								</object>
+								<reference key="IBUINormalTitleShadowColor" ref="764912537"/>
+							</object>
 						</object>
-						<string key="NSFrame">{{20, 195}, {280, 208}}</string>
+						<string key="NSFrame">{{20, 195}, {280, 265}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<object class="NSColor" key="IBUIBackgroundColor" id="36016311">
 							<int key="NSColorSpace">1</int>
@@ -416,6 +435,15 @@
 					</object>
 					<int key="connectionID">43</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">followers</string>
+						<reference key="source" ref="536402129"/>
+						<reference key="destination" ref="372490531"/>
+						<int key="IBEventType">7</int>
+					</object>
+					<int key="connectionID">45</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -469,6 +497,7 @@
 							<reference ref="362335957"/>
 							<reference ref="354174176"/>
 							<reference ref="534203695"/>
+							<reference ref="536402129"/>
 						</object>
 						<reference key="parent" ref="191373211"/>
 					</object>
@@ -522,6 +551,11 @@
 						<reference key="object" ref="534203695"/>
 						<reference key="parent" ref="436847353"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">44</int>
+						<reference key="object" ref="536402129"/>
+						<reference key="parent" ref="436847353"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -542,6 +576,7 @@
 					<string>33.IBPluginDependency</string>
 					<string>36.IBPluginDependency</string>
 					<string>41.IBPluginDependency</string>
+					<string>44.IBPluginDependency</string>
 					<string>7.IBPluginDependency</string>
 					<string>8.IBPluginDependency</string>
 					<string>9.IBPluginDependency</string>
@@ -559,6 +594,7 @@
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>CustomImageView</string>
+					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -587,7 +623,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">43</int>
+			<int key="maxID">45</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -609,6 +645,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>changeFollowing:</string>
 							<string>follow</string>
+							<string>followers</string>
 							<string>notifySwitchChanged</string>
 							<string>sendMessage</string>
 							<string>sendReply</string>
@@ -616,6 +653,7 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>

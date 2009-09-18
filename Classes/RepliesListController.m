@@ -39,15 +39,30 @@
 	return self;
 }
 
+- (void)viewControllerDidActivate:(id)parent
+{
+    UIViewController *parentController = parent;
+    
+    parentController.navigationItem.title = NSLocalizedString(@"Replies", @"");
+    
+	UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+                                                                                  target:self action:@selector(reload)];
+	parentController.navigationItem.rightBarButtonItem = reloadButton;
+	[reloadButton release];
+    [self setRootNavigationController:parentController.navigationController];
+}
+
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-	self.navigationItem.title = NSLocalizedString(@"Replies", @"");
+	/*
+    self.navigationItem.title = NSLocalizedString(@"Replies", @"");
 	
 	UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
 		target:self action:@selector(reload)];
 	self.navigationItem.leftBarButtonItem = reloadButton;
 	[reloadButton release];
+     */
 }
 
 - (void)accountChanged:(NSNotification*)notification

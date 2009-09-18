@@ -202,6 +202,9 @@ const int kHeadTagLocation = 4;
             //UIImageView *celImage = [cell imageView];
             //celImage.image = [UIImage imageNamed:@"Reply.png"];
             textLabel.text = [content objectAtIndex:index];
+            if (index == 1)
+                textLabel.textColor = _isDirectMessage ? [UIColor grayColor] : [UIColor blackColor];
+
             break;
         }
         // Delete cell
@@ -763,9 +766,21 @@ const int kHeadTagLocation = 4;
     {
         switch (indexPath.row)
         {
-            case 0: [self replyTwit];       break; // Reply
-            case 1: [self favoriteTwit];    break; // Favorite
-            case 2: [self forwardTwit];     break; // Forward
+            // Reply
+            case 0: 
+                [self replyTwit];
+                break;
+
+            // Favorite
+            case 1: 
+                if (!_isDirectMessage)
+                    [self favoriteTwit];
+                break;
+                
+            // Forward
+            case 2: 
+                [self forwardTwit];
+                break; 
         }
     }
     else if (indexPath.section == TVSectionDelete)

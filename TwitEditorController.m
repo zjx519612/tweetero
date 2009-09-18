@@ -626,7 +626,7 @@
 													otherButtonTitles:buttons[0], buttons[1], buttons[2], buttons[3], buttons[4], nil];
 	actionSheet.actionSheetStyle = UIActionSheetStyleAutomatic;
 	actionSheet.tag = PHOTO_Q_SHEET_TAG;
-	[actionSheet showInView:self.tabBarController.view];
+	[actionSheet showInView:self.view];
 	[actionSheet release];
 	
 }
@@ -754,7 +754,8 @@
 	
 	if(!login || !pass)
 	{
-		[LoginController showModal:self.navigationController];
+		//[LoginController showModal:self.navigationController];
+        [AccountController showAccountController:self.navigationController];
 		return;
 	}
 	
@@ -767,7 +768,8 @@
 	
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
 	if(!self.progressSheet)
-		self.progressSheet = ShowActionSheet(NSLocalizedString(@"Send twit on Twitter", @""), self, NSLocalizedString(@"Cancel", @""), self.tabBarController.view);
+		self.progressSheet = ShowActionSheet(NSLocalizedString(@"Send twit on Twitter", @""), self, NSLocalizedString(@"Cancel", @""), 
+                                             self.view);
 		
 	postImageSegmentedControl.enabled = NO;
 
