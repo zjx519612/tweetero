@@ -48,12 +48,9 @@ enum _TwitEditorSuspendedOperations
 
 @interface TwitEditorController : UIViewController  <UINavigationControllerDelegate, 
 													UIImagePickerControllerDelegate, 
-													UITextViewDelegate
-													, ImageUploaderDelegate
-													, UIActionSheetDelegate
-													, MGConnectionDelegate
-													, UIAlertViewDelegate
-													> 
+													UITextViewDelegate, ImageUploaderDelegate,
+                                                    UIActionSheetDelegate, MGConnectionDelegate, 
+                                                    UIAlertViewDelegate> 
 {
     IBOutlet UISegmentedControl *pickImage;
     IBOutlet UIBarButtonItem *cancelButton;
@@ -62,7 +59,6 @@ enum _TwitEditorSuspendedOperations
     IBOutlet UITextView *messageText;
     IBOutlet ImagePickerController *imgPicker;
     IBOutlet UILabel *charsCount;
-	
 	BOOL			inTextEditingMode;
 
 	UIActionSheet *progressSheet;
@@ -122,6 +118,9 @@ enum _TwitEditorSuspendedOperations
 - (void)textViewDidEndEditing:(UITextView *)textView;
 - (void)textViewDidBeginEditing:(UITextView *)textView;
 
+- (NSString *)sendMessage:(NSString *)body;
+- (BOOL)isDirectMessage;
+
 - (void)popController;
 
 - (void)startUploadingOfPickedMediaIfNeed;
@@ -137,7 +136,7 @@ enum _TwitEditorSuspendedOperations
 @property (nonatomic, retain) NSString *currentMediaYFrogURL;
 @property (nonatomic, retain) id <TwitterConnectionProtocol> connectionDelegate;
 @property (nonatomic, retain) NSDictionary *_message;
-@property (nonatomic, retain) NSURL*		pickedVideo;
-@property (nonatomic, retain) UIImage*		pickedPhoto;
+@property (nonatomic, retain) NSURL *pickedVideo;
+@property (nonatomic, retain) UIImage *pickedPhoto;
 
 @end

@@ -32,18 +32,14 @@
 	IBOutlet UISegmentedControl *queueSegmentedControl;
 	UIColor *defaultTintColor;
 	UIActionSheet *progressSheet;
-
     UIViewController *_navigatedController;
 	id <TwitterConnectionProtocol>  _connection;
 }
+
 - (void)deleteTweet;
 - (void)sendAllTweets;
-
 - (IBAction)segmentedActions:(id)sender;
-
-
 - (void)MessageUploadFinished:(BOOL)uploaded  sender:(MessageUploader *)sender;
-
 + (NSString*)queueTitle;
 - (void)setQueueTitle;
 

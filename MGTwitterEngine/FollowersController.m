@@ -30,6 +30,7 @@
 #import "ImageLoader.h"
 #import "UserInfo.h"
 #import "TweetterAppDelegate.h"
+#import "CustomImageView.h"
 
 #define NAME_TAG 1
 #define REAL_NAME_TAG 2
@@ -142,7 +143,8 @@
 		
 		//Userpic view
 		rect = CGRectMake(BORDER_WIDTH, (ROW_HEIGHT - IMAGE_SIDE) / 2.0, IMAGE_SIDE, IMAGE_SIDE);
-		UIImageView *imageView = [[UIImageView alloc] initWithFrame:rect];
+		//UIImageView *imageView = [[UIImageView alloc] initWithFrame:rect];
+        CustomImageView *imageView = [[CustomImageView alloc] initWithFrame:rect];
 		imageView.tag = IMAGE_TAG;
 		[cell.contentView addSubview:imageView];
 		[imageView release];
@@ -208,9 +210,11 @@
 		
 		//Set userpic
 		UIImageView *imageView = (UIImageView *)[cell viewWithTag:IMAGE_TAG];
-		imageView.image = nil;
-		[[ImageLoader sharedLoader] setImageWithURL:[userData objectForKey:@"profile_image_url"] toView:imageView];
-		
+		//imageView.image = nil;
+		//[[ImageLoader sharedLoader] setImageWithURL:[userData objectForKey:@"profile_image_url"] toView:imageView];
+        UIImage *avatar = [[ImageLoader sharedLoader] imageWithURL:[userData objectForKey:@"profile_image_url"]];
+		imageView.image = avatar;
+        
 		UILabel *label;
 		//Set user name
 		label = (UILabel *)[cell viewWithTag:NAME_TAG];
@@ -409,13 +413,14 @@
 	if([MGTwitterEngine password] != nil)
 	{
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
-		//if (_username)
-            //[_twitter getFollowersForUser:_username];
-        //else
+		if (_username)
+            if ([_twitter respondsToSelector:@selector(getFollowersForUser:lite:)])
+                [_twitter performSelector:@selector(getFollowersForUser:lite:) withObject:_username withObject:(id)YES];
+            //[_twitter getFollowersForUser:_username lite:YES];
+        else
             [_twitter getFollowersIncludingCurrentStatus:YES];
 	}
 }
-
 
 @end
 

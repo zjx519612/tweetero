@@ -40,36 +40,36 @@
 @end
 
 
-@interface MessageUploader : NSObject <TwitterConnectionProtocol
-													, ImageUploaderDelegate
-													, MGConnectionDelegate
-										>
+@interface MessageUploader : NSObject <TwitterConnectionProtocol, ImageUploaderDelegate, MGConnectionDelegate>
 {
 	BOOL			canceled;
+    BOOL            _isDirectMessage;
 	MGTwitterEngine *_twitter;
 	
 	NSString* _body;
 	int _replyTo;
 	NSData* _imageData;	
 	NSURL* _videoURL;	
-
+    NSString* _username;
+    
 	id <MessageUploaderDelegate>  _delegate;
 	id <TwitterConnectionProtocol>  _connection;
 }
 
 - (void)cancel;
 - (BOOL)canceled;
-- (id)initWithText:(NSString*)text image:(UIImage*)image video:(NSURL*)videoURL replayTo:(int)replayTo delegate:(id <MessageUploaderDelegate>)delegate; //call initWithText:imageJPEGData:replayTo:delegate:
-- (id)initWithText:(NSString*)text imageJPEGData:(NSData*)JPEGData video:(NSURL*)videoURL replayTo:(int)replayTo delegate:(id <MessageUploaderDelegate>)delegate;
+- (id)initWithText:(NSString*)text image:(UIImage*)image video:(NSURL*)videoURL replayTo:(int)replayTo forUser:(NSString*)username delegate:(id <MessageUploaderDelegate>)delegate; //call initWithText:imageJPEGData:replayTo:delegate:
+- (id)initWithText:(NSString*)text imageJPEGData:(NSData*)JPEGData video:(NSURL*)videoURL replayTo:(int)replayTo forUser:(NSString*)username delegate:(id <MessageUploaderDelegate>)delegate;
 
 - (void) send;
 
 - (void)uploadedImage:(NSString*)yFrogURL sender:(ImageUploader*)sender;
 
 @property (nonatomic, retain) NSString* _body;
+@property (nonatomic, retain) NSString* _username;
 @property (nonatomic, retain) NSData* _imageData;
 @property (nonatomic, retain) NSURL* _videoURL;
-
+@property (nonatomic, readonly) BOOL _isDirectMessage;
 @property (nonatomic, retain) id <TwitterConnectionProtocol> _connection;
 @property (nonatomic, retain) id <MessageUploaderDelegate> _delegate;
 

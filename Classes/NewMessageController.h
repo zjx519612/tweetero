@@ -26,10 +26,22 @@
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
+#import "TwitEditorController.h"
 
 @class MGTwitterEngine;
 
-@interface NewMessageController : UIViewController <UITextViewDelegate> 
+@interface NewMessageController : TwitEditorController
+{
+    NSString *_user;
+}
+
+- (id)init;
+- (void)setUser:(NSString*)user;
+- (NSString *)username;
+
+@end
+
+@interface NewMessageControllerOld : UIViewController <UITextViewDelegate> 
 {
     IBOutlet UITextView *textEdit;
     IBOutlet id sendButton;

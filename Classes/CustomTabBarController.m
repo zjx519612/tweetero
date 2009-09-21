@@ -115,6 +115,8 @@ const int kTabBarHeight = 46;
     
     if (item.tag == kMoreBarItemTag)
     {
+        self.navigationItem.title = @"More";
+        self.navigationItem.rightBarButtonItem = nil;
         [_contentView addSubview:_moreTable];
     }
     else
@@ -123,6 +125,7 @@ const int kTabBarHeight = 46;
 
         if (controller)
         {
+            self.navigationItem.title = controller.title;
             if ([controller respondsToSelector:@selector(setRootNavigationController:)])
                 [controller performSelector:@selector(setRootNavigationController:) withObject:self.navigationController];
             

@@ -27,8 +27,80 @@
 #import "NewMessageController.h"
 #import "MGTwitterEngine.h"
 #import "TweetterAppDelegate.h"
+#import "TweetQueue.h"
 
 @implementation NewMessageController
+
+- (id)init
+{
+    if ((self = [super initWithNibName:@"PostImage" bundle:nil]))
+    {
+        _user = nil;
+    }
+    return self;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    _user = nil;
+}
+
+- (void)dealloc
+{
+    [_user release];
+    [super dealloc];
+}
+
+- (void)setUser:(NSString*)user
+{
+	_user = [user retain];
+	//toField.text = [NSString stringWithFormat:@"Direct Message to %@", _user];
+}
+
+- (NSString *)username
+{
+    return [[_user retain] autorelease];
+}
+
+- (NSString *)sendMessage:(NSString *)body
+{
+    int replyToId = 0;
+	
+	if(_message)
+		replyToId = [[_message objectForKey:@"id"] intValue];
+	
+	//[sendButton setEnabled:NO];
+	NSString* connectionID = [_twitter sendDirectMessage:body to:_user];
+	if(connectionID)
+	{
+		[TweetterAppDelegate increaseNetworkActivityIndicator];
+		[cancelButton setEnabled:NO];
+	}
+    return connectionID;
+}
+
+- (BOOL)isDirectMessage
+{
+    return YES;
+}
+
+- (void)editUnsentMessage:(int)index
+{	
+    [super editUnsentMessage:index];
+    
+	NSString* text;
+	NSData* imageData;
+	NSURL* movieURL;
+    NSString* username;
+    
+	if([[TweetQueue sharedQueue] getMessage:&text andImageData:&imageData movieURL:&movieURL inReplyTo:&_queuedReplyId forUser:&username atIndex:index])
+        [self setUser:username];
+}
+
+@end
+
+@implementation NewMessageControllerOld
 
 - (void)viewDidLoad
 {
@@ -43,7 +115,6 @@
 	textEdit.delegate = self;
 	[self textViewDidChange:textEdit];	
 }
-
 
 - (void)dealloc
 {

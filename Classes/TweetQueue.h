@@ -35,16 +35,17 @@
 + (TweetQueue*)sharedQueue;
 
 
-- (BOOL)addMessage:(NSString*)text withImage:(UIImage*)image withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo;
-- (BOOL)addMessage:(NSString*)text withImageData:(NSData*)imageData withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo;
+- (BOOL)addMessage:(NSString*)text withImage:(UIImage*)image withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo forUser:(NSString*)username;
+- (BOOL)addMessage:(NSString*)text withImageData:(NSData*)imageData withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo forUser:(NSString*)username;
 
 - (int)count;
+- (BOOL)isDirectMessage:(int)index;
 
-- (BOOL)getMessage:(NSString**)text andImageData:(NSData**)imageData movieURL:(NSURL**)movieURL inReplyTo:(int*)inReplyTo atIndex:(int)index;
+- (BOOL)getMessage:(NSString**)text andImageData:(NSData**)imageData movieURL:(NSURL**)movieURL inReplyTo:(int*)inReplyTo forUser:(NSString**)username atIndex:(int)index;
 
 - (BOOL)deleteMessage:(int)index;
 - (BOOL)deleteAllMessages;
 
-- (BOOL)replaceMessage:(NSString*)text withImage:(UIImage*)image withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo atIndex:(int)index;
-- (BOOL)replaceMessage:(NSString*)text withImageData:(NSData*)imageData withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo atIndex:(int)index;
+- (BOOL)replaceMessage:(NSString*)text withImage:(UIImage*)image withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo forUser:(NSString*)username atIndex:(int)index;
+- (BOOL)replaceMessage:(NSString*)text withImageData:(NSData*)imageData withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo forUser:(NSString*)username atIndex:(int)index;
 @end
