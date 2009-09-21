@@ -73,10 +73,9 @@
 - (void)setCharsCount
 {
 	charsCount.text = [NSString stringWithFormat:@"%d", MAX_SYMBOLS_COUNT_IN_TEXT_VIEW - [messageText.text length]];
-
 }
 
-- (void) setNavigatorButtons
+- (void)setNavigatorButtons
 {
 	if(self.navigationItem.leftBarButtonItem != cancelButton)
 	{
@@ -98,7 +97,6 @@
 		if(self.navigationItem.rightBarButtonItem)
 			[[self navigationItem] setRightBarButtonItem:nil animated:YES];
 	}
-
 }
 
 - (void)setMessageTextText:(NSString*)newText
@@ -108,7 +106,7 @@
 	[self setNavigatorButtons];
 }
 
-- (NSRange) urlPlaceHolderRange
+- (NSRange)urlPlaceHolderRange
 {
 	NSRange urlPlaceHolderRange = [messageText.text rangeOfString:photoURLPlaceholderMask];
 	if(urlPlaceHolderRange.location == NSNotFound)
@@ -116,7 +114,7 @@
 	return urlPlaceHolderRange;
 }
 
-- (NSString*) currentMediaURLPlaceholder
+- (NSString*)currentMediaURLPlaceholder
 {
 	if(pickedVideo)
 		return videoURLPlaceholderMask;
@@ -125,8 +123,7 @@
 	return nil;
 }
 
-
-- (void) setURLPlaceholder
+- (void)setURLPlaceholder
 {
 	NSRange photoPlaceHolderRange = [messageText.text rangeOfString:photoURLPlaceholderMask];
 	NSRange videoPlaceHolderRange = [messageText.text rangeOfString:videoURLPlaceholderMask];
@@ -273,7 +270,7 @@
 	[self setNavigatorButtons];
 }
 
-- (void) setImage:(UIImage*)img movie:(NSURL*)url
+- (void)setImage:(UIImage*)img movie:(NSURL*)url
 {
 	self.pickedPhoto = img;
 	self.pickedVideo = url;
@@ -285,7 +282,6 @@
 	[self setImageImage:prevImage];
 }
 
-
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
 	messageTextWillIgnoreNextViewAppearing = YES;
@@ -296,10 +292,8 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishWithPickingPhoto:(UIImage *)img pickingMovie:(NSURL*)url
 {
-//img = nil;
-//url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"TestYfrog" ofType:@"mov"]];
-
-
+    //img = nil;
+    //url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"TestYfrog" ofType:@"mov"]];
 	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
 	twitWasChangedManually = YES;
 	messageTextWillIgnoreNextViewAppearing = YES;
@@ -336,9 +330,6 @@
 		}
 	}
 }
-
-
-
 /*
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishWithPickingPhoto:(UIImage *)img pickingMovie:(NSURL*)url
 {
@@ -373,7 +364,6 @@
 	}
 }
 */
-
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
 	
@@ -388,7 +378,7 @@
 	[self imagePickerController:picker didFinishWithPickingPhoto:img pickingMovie:nil];
 }
 
--(void)movieFinishedCallback:(NSNotification*)aNotification
+- (void)movieFinishedCallback:(NSNotification*)aNotification
 {
     MPMoviePlayerController* theMovie = [aNotification object];
  
@@ -437,24 +427,30 @@
 		messageBody = [messageBody stringByReplacingOccurrencesOfString:photoURLPlaceholderMask withString:currentMediaYFrogURL];
 		messageBody = [messageBody stringByReplacingOccurrencesOfString:videoURLPlaceholderMask withString:currentMediaYFrogURL];
 	}
-
+    
+    NSString *username = nil;
+    if ([self isDirectMessage])
+        if ([self respondsToSelector:@selector(username)])
+            username = [self performSelector:@selector(username)];
+    
 	if(_queueIndex >= 0)
 	{
 		[[TweetQueue sharedQueue] replaceMessage: messageBody 
-									withImage: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhoto : nil  
-									withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
-									inReplyTo: _queuedReplyId
-									atIndex:_queueIndex];
+                                       withImage: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhoto : nil  
+                                       withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
+                                       inReplyTo: _queuedReplyId
+                                         forUser: username
+                                         atIndex:_queueIndex];
 	}
 	else
 	{
 		[[TweetQueue sharedQueue] addMessage: messageBody 
-									withImage: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhoto : nil  
-									withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
-									inReplyTo: _message ? [[_message objectForKey:@"id"] intValue] : 0];
+                                   withImage: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhoto : nil  
+                                   withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
+                                   inReplyTo: _message ? [[_message objectForKey:@"id"] intValue] : 0
+                                     forUser: username];
 	}
 }
-
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad 
@@ -552,7 +548,6 @@
     // Release anything that's not essential, such as cached data
 }
 
-
 - (IBAction)finishEditAction
 {
 	[messageText resignFirstResponder];
@@ -579,8 +574,7 @@
 	BOOL photoLibraryEnabled = NO;
 	BOOL movieCameraEnabled = NO;
 	BOOL movieLibraryEnabled = NO;
-		
-		
+    
 	NSArray *mediaTypes = nil;
 
 	if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary])
@@ -616,8 +610,8 @@
 		buttons[i++] = NSLocalizedString(@"Use video camera", @"");
 	if(photoLibraryEnabled)
 		buttons[i++] = NSLocalizedString(@"Use library", @"");
-//	if(movieLibraryEnabled)
-//		buttons[i++] = NSLocalizedString(@"Use video library", @"");
+    //if(movieLibraryEnabled)
+	//	buttons[i++] = NSLocalizedString(@"Use video library", @"");
 	if(imageAlreadyExists)
 		buttons[i++] = NSLocalizedString(@"RemoveImageTitle" , @"");
 	
@@ -630,7 +624,6 @@
 	[actionSheet release];
 	
 }
-
 /*
 - (void)grabImage 
 {
@@ -669,9 +662,7 @@
 	[actionSheet release];
 	
 }
-
 */
-
 - (IBAction)attachImagesActions:(id)sender
 {
 	[self grabImage];
@@ -689,7 +680,7 @@
 		[uploader postImage:pickedPhoto delegate:self userData:pickedPhoto];
 	else
 		[uploader postMP4Data:[NSData dataWithContentsOfURL:pickedVideo] delegate:self userData:pickedVideo];
-//	[uploader release];
+	//[uploader release];
 }
 
 - (void)startUploadingOfPickedMediaIfNeed
@@ -703,7 +694,6 @@
 		self.progressSheet = nil;
 	}		
 }
-
 /*
 - (void)startUploadingOfPickedMediaIfNeed
 {
@@ -723,7 +713,6 @@
 	}		
 }
 */
-
 - (void)postImageAction 
 {
 	if(![self mediaIsPicked] && ![[messageText.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length])
@@ -774,12 +763,14 @@
 	postImageSegmentedControl.enabled = NO;
 
 	NSString* mgTwitterConnectionID = nil;
-	if(_message)
-		mgTwitterConnectionID = [_twitter sendUpdate:messageBody inReplyTo:[[_message objectForKey:@"id"] intValue]];
-	else if(_queueIndex >= 0)
-		mgTwitterConnectionID = [_twitter sendUpdate:messageBody inReplyTo:_queuedReplyId];
-	else
-		mgTwitterConnectionID = [_twitter sendUpdate:messageBody];
+    
+    mgTwitterConnectionID = [self sendMessage:messageBody];
+	//if(_message)
+	//	mgTwitterConnectionID = [_twitter sendUpdate:messageBody inReplyTo:[[_message objectForKey:@"id"] intValue]];
+	//else if(_queueIndex >= 0)
+	//	mgTwitterConnectionID = [_twitter sendUpdate:messageBody inReplyTo:_queuedReplyId];
+	//else
+	//	mgTwitterConnectionID = [_twitter sendUpdate:messageBody];
 		
 	MGConnectionWrap * mgConnectionWrap = [[MGConnectionWrap alloc] initWithTwitter:_twitter connection:mgTwitterConnectionID delegate:self];
 	self.connectionDelegate = mgConnectionWrap;
@@ -789,6 +780,24 @@
 		[[TweetQueue sharedQueue] deleteMessage:_queueIndex];
 
 	return;
+}
+
+- (NSString *)sendMessage:(NSString *)body
+{
+    NSString *conntectionID = nil;
+    
+	if(_message)
+		conntectionID = [_twitter sendUpdate:body inReplyTo:[[_message objectForKey:@"id"] intValue]];
+	else if(_queueIndex >= 0)
+		conntectionID = [_twitter sendUpdate:body inReplyTo:_queuedReplyId];
+	else
+		conntectionID = [_twitter sendUpdate:body];
+    return conntectionID;
+}
+
+- (BOOL)isDirectMessage
+{
+    return NO;
 }
 
 - (void)postImageLaterAction
@@ -813,21 +822,28 @@
 		messageBody = [messageBody stringByReplacingOccurrencesOfString:videoURLPlaceholderMask withString:currentMediaYFrogURL];
 	}
 
+    NSString *username = nil;
+    if ([self isDirectMessage])
+        if ([self respondsToSelector:@selector(username)])
+            username = [self performSelector:@selector(username)];
+    
 	BOOL added;
 	if(_queueIndex >= 0)
 	{
 		added = [[TweetQueue sharedQueue] replaceMessage: messageBody 
-											withImage: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhoto : nil  
-											withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
-											inReplyTo: _queuedReplyId
-											atIndex:_queueIndex];
+                                               withImage: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhoto : nil  
+                                               withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
+                                               inReplyTo: _queuedReplyId
+                                                 forUser: username
+                                                 atIndex:_queueIndex];
 	}
 	else
 	{
 		added = [[TweetQueue sharedQueue] addMessage: messageBody 
-											withImage: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhoto : nil  
-											withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
-											inReplyTo: _message ? [[_message objectForKey:@"id"] intValue] : 0];
+                                           withImage: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhoto : nil  
+                                           withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
+                                           inReplyTo: _message ? [[_message objectForKey:@"id"] intValue] : 0
+                                             forUser: username];
 	}
 	if(added)
 	{
@@ -940,7 +956,6 @@
 			[self presentModalViewController:imgPicker animated:YES];
 			return;
 		}
-		
 	}
 	else
 	{
@@ -989,7 +1004,6 @@
 	[self setMessageTextText:@""];
 	[self.navigationController popToRootViewControllerAnimated:YES];
 }
-
 
 - (IBAction)imagesSegmentedActions:(id)sender
 {
@@ -1052,8 +1066,11 @@
 		else
 		{
 			[self dismissProgressSheetIfExist];
-			UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Failed!", @"") message:NSLocalizedString(@"Error occure during uploading of image", @"")
-														   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles: nil];
+			UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Failed!", @"")
+                                                            message: NSLocalizedString(@"Error occure during uploading of image", @"")
+														   delegate: nil 
+                                                  cancelButtonTitle: NSLocalizedString(@"OK", @"") 
+                                                  otherButtonTitles: nil];
 			[alert show];	
 			[alert release];
 		}
@@ -1061,7 +1078,6 @@
 }
 
 #pragma mark MGTwitterEngineDelegate methods
-
 - (void)requestSucceeded:(NSString *)connectionIdentifier
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
@@ -1078,7 +1094,6 @@
 	[self.navigationController popViewControllerAnimated:YES];
 }
 
-
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
@@ -1086,8 +1101,11 @@
 	self.connectionDelegate = nil;
 	postImageSegmentedControl.enabled = YES;
 	
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Failed!", @"") message:[error localizedDescription]
-												   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles: nil];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Failed!", @"")
+                                                    message: [error localizedDescription]
+												   delegate: nil 
+                                          cancelButtonTitle: NSLocalizedString(@"OK", @"") 
+                                          otherButtonTitles: nil];
 	[alert show];	
 	[alert release];
 }
@@ -1102,7 +1120,6 @@
 
 - (void)doCancel
 {
-	
 	[self.navigationController popViewControllerAnimated:YES];
 	if(connectionDelegate)
 		[connectionDelegate cancel];
@@ -1146,14 +1163,14 @@
 	}
 }
 
-
 - (void)editUnsentMessage:(int)index
-{
-	
+{	
 	NSString* text;
 	NSData* imageData;
 	NSURL* movieURL;
-	if([[TweetQueue sharedQueue] getMessage:&text andImageData:&imageData movieURL:&movieURL inReplyTo:&_queuedReplyId atIndex:index])
+    NSString* username;
+    
+	if([[TweetQueue sharedQueue] getMessage:&text andImageData:&imageData movieURL:&movieURL inReplyTo:&_queuedReplyId forUser:&username atIndex:index])
 	{
 		_queueIndex = index;
 		[self setMessageTextText:text];

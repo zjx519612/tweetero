@@ -91,6 +91,7 @@
         // FOLLOWING
         ident = [_twitter enableUpdatesFor:_username];
     }
+    followBtn.enabled = NO;
 }
 
 // Show user followers
@@ -103,7 +104,8 @@
 
 - (IBAction)sendMessage 
 {
-	NewMessageController *msgView = [[NewMessageController alloc] initWithNibName:@"NewMessage" bundle:nil];
+	//NewMessageController *msgView = [[NewMessageController alloc] initWithNibName:@"NewMessage" bundle:nil];
+    NewMessageController *msgView = [[NewMessageController alloc] init];
 	[self.navigationController pushViewController:msgView animated:YES];
 	[msgView setUser:_username];
 	[msgView release];
@@ -212,8 +214,7 @@
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	NSDictionary *userData = [userInfo objectAtIndex:0];
 	
-    //[self traceDict:userData];
-    
+    followBtn.enabled = YES;
     id following = [userData objectForKey:@"following"];
     if (following)
     {

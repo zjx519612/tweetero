@@ -50,7 +50,7 @@
 	return libFolderPath;
 }
 
-- (NSString*) saveJPEGDataInLibrary:(NSData*)jpegData // return local path
+- (NSString*)saveJPEGDataInLibrary:(NSData*)jpegData // return local path
 {
 	NSFileManager* fm = [NSFileManager defaultManager];
 	BOOL folderExists = NO;
@@ -72,15 +72,10 @@
 	return success ? localPath : nil;
 }
 
-- (NSString*) saveImageInLibrary:(UIImage*)image
+- (NSString*)saveImageInLibrary:(UIImage*)image
 {
 	return [self saveJPEGDataInLibrary:UIImageJPEGRepresentation(image, 1.0f)];
 }
-
-
-
-
-
 
 + (TweetQueue*)sharedQueue
 {
@@ -90,15 +85,16 @@
 	return queue;
 }
 
-- (BOOL)addMessage:(NSString*)text withImage:(UIImage*)image withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo
+- (BOOL)addMessage:(NSString*)text withImage:(UIImage*)image withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo forUser:(NSString*)username
 {
-	return [self addMessage:text 
-				withImageData:image ? UIImageJPEGRepresentation(image, 1.0f) : nil 
-				withMovie:movieURL
-				inReplyTo:inReplyTo];
+	return [self addMessage: text 
+              withImageData: image ? UIImageJPEGRepresentation(image, 1.0f) : nil 
+                  withMovie: movieURL
+                  inReplyTo: inReplyTo 
+                    forUser: username];
 }
 
-- (BOOL)addMessage:(NSString*)text withImageData:(NSData*)imageData withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo
+- (BOOL)addMessage:(NSString*)text withImageData:(NSData*)imageData withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo forUser:(NSString*)username
 {
 	NSMutableDictionary *entry = [NSMutableDictionary dictionaryWithObject:text ? text : @"" forKey:@"text"];
 
@@ -116,6 +112,9 @@
 	if(movieURL)
 		[entry setObject:[movieURL path] forKey:@"videoPath"];
 	
+    if (username)
+        [entry setObject:username forKey:@"directmessage_username"];
+    
 	NSArray *array = [[NSUserDefaults standardUserDefaults] objectForKey:@"TweetQueue"];
 	array = array? [array arrayByAddingObject:entry]: [NSArray arrayWithObject:entry];
 	
@@ -124,16 +123,17 @@
 	return YES;
 }
 
-- (BOOL)replaceMessage:(NSString*)text withImage:(UIImage*)image withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo atIndex:(int)index
+- (BOOL)replaceMessage:(NSString*)text withImage:(UIImage*)image withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo forUser:(NSString*)username atIndex:(int)index
 {
-	return [self replaceMessage:text 
-				withImageData:image ? UIImageJPEGRepresentation(image, 1.0f) : nil
-				withMovie:movieURL 
-				inReplyTo:inReplyTo
-				atIndex:index];
+	return [self replaceMessage: text 
+                  withImageData: image ? UIImageJPEGRepresentation(image, 1.0f) : nil
+                      withMovie: movieURL 
+                      inReplyTo: inReplyTo
+                        forUser: username
+                        atIndex: index];
 }
 
-- (BOOL)replaceMessage:(NSString*)text withImageData:(NSData*)imageData withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo atIndex:(int)index
+- (BOOL)replaceMessage:(NSString*)text withImageData:(NSData*)imageData withMovie:(NSURL*)movieURL inReplyTo:(int)inReplyTo forUser:(NSString*)username atIndex:(int)index
 {
 	NSArray *prefArray = [[NSUserDefaults standardUserDefaults] objectForKey:@"TweetQueue"];
 	if(!prefArray || index >= [prefArray count])
@@ -156,6 +156,9 @@
 	if(movieURL)
 		[entry setObject:[movieURL path] forKey:@"videoPath"];
 	
+    if (username)
+        [entry setObject:username forKey:@"directmessage_username"];
+    
 	NSMutableArray *array = [NSMutableArray arrayWithArray:prefArray];
 	[array replaceObjectAtIndex:index withObject:entry];
 	
@@ -171,7 +174,18 @@
 	return array? [array count]: 0;
 }
 
-- (BOOL)getMessage:(NSString**)text andImageData:(NSData**)imageData movieURL:(NSURL**)movieURL inReplyTo:(int*)inReplyTo atIndex:(int)index
+- (BOOL)isDirectMessage:(int)index
+{
+	NSArray *array = [[NSUserDefaults standardUserDefaults] objectForKey:@"TweetQueue"];
+	if(!array || index >= [array count])
+        return NO;
+    
+	NSDictionary *entry = [array objectAtIndex:index];
+	
+    return ([entry objectForKey:@"directmessage_username"] != nil);
+}
+
+- (BOOL)getMessage:(NSString**)text andImageData:(NSData**)imageData movieURL:(NSURL**)movieURL inReplyTo:(int*)inReplyTo forUser:(NSString**)username atIndex:(int)index
 {
 	NSArray *array = [[NSUserDefaults standardUserDefaults] objectForKey:@"TweetQueue"];
 	if(!array || index >= [array count])
@@ -183,16 +197,19 @@
 	
 	NSDictionary *entry = [array objectAtIndex:index];
 	
-	if(text) 
+	if (text) 
 		*text = [entry objectForKey:@"text"];
 		
-	if(inReplyTo)
+    if (username)
+        *username = [entry objectForKey:@"directmessage_username"];
+    
+	if (inReplyTo)
 	{
 		NSNumber *replyNSNumber = [entry objectForKey:@"inReplyTo"];
 		*inReplyTo = replyNSNumber ? [replyNSNumber intValue] : 0;
 	}
 	
-	if(imageData) 
+	if (imageData) 
 	{
 		NSString* imagePath = [entry objectForKey:@"imagePath"];
 		if(imagePath)

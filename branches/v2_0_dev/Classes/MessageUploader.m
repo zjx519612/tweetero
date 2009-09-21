@@ -36,15 +36,16 @@
 @synthesize _connection;
 @synthesize _delegate;
 @synthesize _videoURL;
+@synthesize _isDirectMessage;
+@synthesize _username;
 
-
-- (id)initWithText:(NSString*)text image:(UIImage*)image video:(NSURL*)videoURL replayTo:(int)replayTo delegate:(id <MessageUploaderDelegate>)delegate
+- (id)initWithText:(NSString*)text image:(UIImage*)image video:(NSURL*)videoURL replayTo:(int)replayTo forUser:(NSString*)username delegate:(id <MessageUploaderDelegate>)delegate
 {
-	self = [self initWithText:text imageJPEGData:UIImageJPEGRepresentation(image, 1.0f) video:videoURL replayTo:replayTo delegate:delegate];
+	self = [self initWithText:text imageJPEGData:UIImageJPEGRepresentation(image, 1.0f) video:videoURL replayTo:replayTo forUser:username delegate:delegate];
 	return self;
 }
 
-- (id)initWithText:(NSString*)text imageJPEGData:(NSData*)JPEGData video:(NSURL*)videoURL replayTo:(int)replayTo delegate:(id <MessageUploaderDelegate>)delegate
+- (id)initWithText:(NSString*)text imageJPEGData:(NSData*)JPEGData video:(NSURL*)videoURL replayTo:(int)replayTo forUser:(NSString*)username delegate:(id <MessageUploaderDelegate>)delegate
 {
 	self = [super init];
 	if(self)
@@ -55,6 +56,8 @@
 		_replyTo = replayTo;
 		self._delegate = delegate;
 		self._videoURL = videoURL;
+        _isDirectMessage = (username != nil);
+        self._username = username;
 	}
 	return self;
 }
@@ -69,6 +72,7 @@
 		[TweetterAppDelegate decreaseNetworkActivityIndicator];
 
 	self._body = nil;
+    self._username = nil;
 	self._imageData = nil;	
 	self._videoURL = nil;	
 	self._connection = nil;
@@ -103,7 +107,12 @@
 	
 	[self retain];
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
-	NSString* mgTwitterConnectionID = [_twitter sendUpdate:self._body inReplyTo:_replyTo];
+	NSString* mgTwitterConnectionID = nil;
+    
+    if (self._isDirectMessage)
+        mgTwitterConnectionID = [_twitter sendDirectMessage:self._body to:self._username];
+    else
+        mgTwitterConnectionID = [_twitter sendUpdate:self._body inReplyTo:_replyTo];
 	MGConnectionWrap * mgConnectionWrap = [[MGConnectionWrap alloc] initWithTwitter:_twitter connection:mgTwitterConnectionID delegate:self];
 	self._connection = mgConnectionWrap;
 	[mgConnectionWrap release];

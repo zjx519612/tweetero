@@ -29,6 +29,7 @@
 #import "TweetQueueController.h"
 #import "TweetQueue.h"
 #import "TwitEditorController.h"
+#import "NewMessageController.h"
 #import "AccountController.h"
 #include "util.h"
 
@@ -48,7 +49,7 @@
 	return title;
 }
 
-- (void) reloadTablesInSubview:(UIView*)parentView
+- (void)reloadTablesInSubview:(UIView*)parentView
 {
 	for (UIView* view in parentView.subviews) 
 	{
@@ -61,6 +62,31 @@
 - (void)viewControllerDidActivate:(id)parent
 {
     _navigatedController = parent;
+    
+	[self.tableView reloadData];
+	[self enableModifyButtons:NO];
+    
+	queueSegmentedControl.frame = CGRectMake(0, 0, 130, 30);
+	[queueSegmentedControl setWidth:35 forSegmentAtIndex:0];
+	[queueSegmentedControl setWidth:40 forSegmentAtIndex:1];
+	queueSegmentedControl.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	queueSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
+    
+	UIBarButtonItem *segmentBarItem = [[[UIBarButtonItem alloc] initWithCustomView:queueSegmentedControl] autorelease];
+	//self.navigationItem.rightBarButtonItem = segmentBarItem;
+    _navigatedController.navigationItem.rightBarButtonItem = segmentBarItem;
+	defaultTintColor = [queueSegmentedControl.tintColor retain];	// keep track of this for later
+    
+    
+    
+	[self enableModifyButtons:NO];
+    
+	if (_navigatedController.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent || 
+        _navigatedController.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque) 
+		queueSegmentedControl.tintColor = [UIColor darkGrayColor];
+	else
+		queueSegmentedControl.tintColor = defaultTintColor;
+    
 }
 
 - (void)setQueueTitle
@@ -97,7 +123,6 @@
     [super dealloc];
 }
 
-
 - (void)enableModifyButtons:(BOOL)enable
 {
 	[queueSegmentedControl setEnabled:enable forSegmentAtIndex:0];
@@ -123,9 +148,11 @@
 	if(!index || index.row < 0 || index.row >= [[TweetQueue sharedQueue] count])
 		return;
 
-
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Do you wish to delete this tweet?" message:@"This operation cannot be undone"
-												   delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Do you wish to delete this tweet?" 
+                                                    message: @"This operation cannot be undone"
+												   delegate: self 
+                                          cancelButtonTitle: @"Cancel" 
+                                          otherButtonTitles: @"OK", nil];
 	[alert show];
 	[alert release];
 }
@@ -135,9 +162,12 @@
 	NSIndexPath *index = [self.tableView indexPathForSelectedRow];
 	if(!index || index.row < 0 || index.row >= [[TweetQueue sharedQueue] count])
 		return;
-		
-	TwitEditorController *msgView = [[TwitEditorController alloc] init];
-	//[self.navigationController pushViewController:msgView animated:YES];
+    
+    TwitEditorController *msgView = nil;
+    if ([[TweetQueue sharedQueue] isDirectMessage:index.row])
+        msgView = [[NewMessageController alloc] init];
+    else
+        msgView = [[TwitEditorController alloc] init];
     [_navigatedController.navigationController pushViewController:msgView animated:YES];
 	[msgView editUnsentMessage:index.row];
 	[msgView release];
@@ -170,8 +200,6 @@
 	}
 }
 
-
-
 - (void)postNextMessage
 {
 	if(![[TweetQueue sharedQueue] count] /*|| canceled*/)
@@ -183,15 +211,17 @@
 	NSString* text;
 	NSData* imageData;
 	NSURL*  movieURL;
+    NSString *username;
 	int replyTo = 0;
-	if([[TweetQueue sharedQueue] getMessage:&text andImageData:&imageData movieURL:&movieURL inReplyTo:&replyTo atIndex:0])
+	if([[TweetQueue sharedQueue] getMessage:&text andImageData:&imageData movieURL:&movieURL inReplyTo:&replyTo forUser:&username atIndex:0])
 	{
 		[self retain];
-		MessageUploader * uploader = [[MessageUploader alloc] initWithText:text 
-													imageJPEGData:imageData
-													video:movieURL 
-													replayTo:replyTo 
-													delegate:self];
+		MessageUploader * uploader = [[MessageUploader alloc] initWithText: text 
+                                                             imageJPEGData: imageData
+                                                                     video: movieURL 
+                                                                  replayTo: replyTo 
+                                                                   forUser: username
+                                                                  delegate: self];
 		self._connection = uploader;
 		[uploader send];
 		[uploader release];
@@ -199,8 +229,11 @@
 	else
 	{
 		[self dismissProgressSheetIfExist];
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Failed!", @"") message:NSLocalizedString(@"Error occure while reading the message", @"")
-													   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles: nil];
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Failed!", @"") 
+                                                        message: NSLocalizedString(@"Error occure while reading the message", @"")
+													   delegate: nil 
+                                              cancelButtonTitle: NSLocalizedString(@"OK", @"") 
+                                              otherButtonTitles: nil];
 		[alert show];	
 		[alert release];
 		return;
@@ -228,8 +261,11 @@
 	else
 	{
 		[self dismissProgressSheetIfExist];
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Failed!", @"") message:NSLocalizedString(@"Error occure while sending the message", @"")
-													   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles: nil];
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Failed!", @"") 
+                                                        message: NSLocalizedString(@"Error occure while sending the message", @"")
+													   delegate: nil 
+                                              cancelButtonTitle: NSLocalizedString(@"OK", @"") 
+                                              otherButtonTitles: nil];
 		[alert show];	
 		[alert release];
 	}
@@ -237,8 +273,6 @@
 	
 	[self release];
 }
-
-
 
 - (void)sendAllTweets 
 {
@@ -251,7 +285,6 @@
 	if(!login || !pass)
 	{
         [AccountController showAccountController:_navigatedController.navigationController];
-		//[LoginController showModal:self.navigationController];
 		return;
 	}
 
@@ -265,21 +298,13 @@
 		[_connection cancel];
 }
 
-
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
 
-	queueSegmentedControl.frame = CGRectMake(0, 0, 130, 30);
-	[queueSegmentedControl setWidth:35 forSegmentAtIndex:0];
-	[queueSegmentedControl setWidth:40 forSegmentAtIndex:1];
-	queueSegmentedControl.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	queueSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
-	UIBarButtonItem *segmentBarItem = [[[UIBarButtonItem alloc] initWithCustomView:queueSegmentedControl] autorelease];
-	self.navigationItem.rightBarButtonItem = segmentBarItem;
-	defaultTintColor = [queueSegmentedControl.tintColor retain];	// keep track of this for later
 
-	[self enableModifyButtons:NO];
+    
+
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -288,6 +313,21 @@
 	[self.tableView reloadData];
 	[self enableModifyButtons:NO];
 
+	queueSegmentedControl.frame = CGRectMake(0, 0, 130, 30);
+	[queueSegmentedControl setWidth:35 forSegmentAtIndex:0];
+	[queueSegmentedControl setWidth:40 forSegmentAtIndex:1];
+	queueSegmentedControl.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	queueSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
+    
+	UIBarButtonItem *segmentBarItem = [[[UIBarButtonItem alloc] initWithCustomView:queueSegmentedControl] autorelease];
+	//self.navigationItem.rightBarButtonItem = segmentBarItem;
+    _navigatedController.navigationItem.rightBarButtonItem = segmentBarItem;
+	defaultTintColor = [queueSegmentedControl.tintColor retain];	// keep track of this for later
+    
+    
+    
+	[self enableModifyButtons:NO];
+    
 	if (_navigatedController.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent || 
         _navigatedController.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque) 
 		queueSegmentedControl.tintColor = [UIColor darkGrayColor];
@@ -310,14 +350,11 @@
 	// e.g. self.myOutlet = nil;
 }
 
-
 #pragma mark Table view methods
-
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView 
 {
     return 1;
 }
-
 
 // Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
@@ -325,7 +362,6 @@
 	int tweetCount = [[TweetQueue sharedQueue] count];
     return tweetCount? tweetCount: 1;
 }
-
 
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -357,7 +393,8 @@
 	{
 		UILabel *label = (UILabel *)[cell viewWithTag:1];
 		NSString *text;
-		if([[TweetQueue sharedQueue] getMessage:&text andImageData:NULL movieURL:nil inReplyTo:nil atIndex:indexPath.row])
+        NSString *username;
+		if([[TweetQueue sharedQueue] getMessage:&text andImageData:NULL movieURL:nil inReplyTo:nil forUser:&username atIndex:indexPath.row])
 		{
 			CGRect cellFrame = [cell frame];
 			cellFrame.origin = CGPointMake(0, 0);
@@ -390,7 +427,6 @@
     return cell;
 }
 
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath 
 {
 	int tweetCount = [[TweetQueue sharedQueue] count];
@@ -404,7 +440,6 @@
 	UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
 	return cell.frame.size.height;
 }
-
 
 @end
 

@@ -421,7 +421,7 @@
 {
 	if(_isDirectMessage)
 	{
-		NewMessageController *msgView = [[NewMessageController alloc] initWithNibName:@"NewMessage" bundle:nil];
+		NewMessageController *msgView = [[NewMessageController alloc] init];
 		[self.navigationController pushViewController:msgView animated:YES];
 		[msgView setUser:[[_message objectForKey:@"sender"] objectForKey:@"screen_name"]];
 		[msgView release];
