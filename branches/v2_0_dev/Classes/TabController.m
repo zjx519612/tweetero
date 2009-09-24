@@ -96,7 +96,7 @@
     
 	theController = [self createViewController: [MyTweetViewController class] 
                                        nibName: @"UserMessageList" 
-                                   tabIconName: @"mytweets.tiff" 
+                                   tabIconName: @"mytweets.png" 
                                       tabTitle: @"My Tweets"];
     theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
@@ -104,7 +104,7 @@
     
 	theController = [self createViewController: [FollowersController class] 
                                        nibName: @"UserMessageList" 
-                                   tabIconName: @"followers.tiff" 
+                                   tabIconName: @"followers.png" 
                                       tabTitle: @"Followers"];
     theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
@@ -112,15 +112,15 @@
     
 	theController = [self createViewController: [FollowingController class] 
                                        nibName: @"UserMessageList" 
-                                   tabIconName: @"following.tiff" 
+                                   tabIconName: @"following.png" 
                                       tabTitle: @"Following"];
     theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
     [controllers addObject:theController.tabBarItem];
     
     theController = [self createViewController: [SearchController class]
-                                       nibName: @"UserMessageList"
-                                   tabIconName: @"about.tiff" 
+                                       nibName: @"SearchController"
+                                   tabIconName: @"search.png" 
                                       tabTitle: @"Search"];
     theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
@@ -128,7 +128,7 @@
     
 	theController = [self createViewController: [SettingsController class]
                                        nibName: @"SettingsView"
-                                   tabIconName: @"SettingsTabIcon.tiff"
+                                   tabIconName: @"settings.png"
                                       tabTitle: @"Settings"];
     theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
@@ -136,7 +136,7 @@
     
 	theController = [self createViewController: [AboutController class]
                                        nibName: @"About"
-                                   tabIconName: @"AboutColor.tiff"
+                                   tabIconName: @"about.png"
                                       tabTitle: @"About"];
     theController.tabBarItem.tag = tag++;
     [self addViewController:theController];

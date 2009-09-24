@@ -126,11 +126,15 @@ static AccountManager *accountManager = nil;
 
 - (void)addUser:(NSString *)userName password:(NSString *)password
 {
+    NSLog(@"AccountManager: addUser\n");
+    
     if (!userName || !password)
         return;
     
     if (([userName length] == 0) || ([password length]) == 0)
         return;
+    
+    NSLog(@"Create password data and save it to keychain manager\n");
     
     NSData *passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
     NSMutableDictionary *secItemEntry = [self prepareSecItemEntry:SEC_ATTR_SERVER user:userName];
@@ -146,18 +150,29 @@ static AccountManager *accountManager = nil;
     // Add new user data if update is failed.
     if (err != noErr)
     {
+        NSLog(@"Remove user\n");
         [self removeUser:userName];
         
+        NSLog(@"Add password to keychain\n");
         [secItemEntry setObject:passwordData forKey:(id)kSecValueData];
         err = SecItemAdd((CFDictionaryRef)secItemEntry, NULL);
 
         // Save username
         if (err == noErr)
         {
+            NSLog(@"Save user array\n");
             [_users addObject:userName];
             [[NSUserDefaults standardUserDefaults] setObject:_users forKey:ACCOUNT_MANAGER_KEY];
         }
     }
+    else
+    {
+        NSLog(@"Save user array\n");
+        [_users removeObject:userName];
+        [_users addObject:userName];
+        [[NSUserDefaults standardUserDefaults] setObject:_users forKey:ACCOUNT_MANAGER_KEY];
+    }
+    NSLog(@"AccountManage: finish addUser");
 }
 
 - (void)updateUser:(NSString *)userName newUserName:(NSString *)newUserName newPassword:(NSString *)password

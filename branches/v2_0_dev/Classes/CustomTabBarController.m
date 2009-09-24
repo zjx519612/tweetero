@@ -7,6 +7,10 @@
 //
 
 #import "CustomTabBarController.h"
+#import "SearchController.h"
+
+#include "util.h"
+#include "searchutil.h"
 
 const int kMoreBarItemTag = -1;
 const int kMaxBarItems = 5;
@@ -50,10 +54,9 @@ const int kTabBarHeight = 46;
             for (int i = 4; i < [items count]; i++)
                 [_moreItems addObject:[items objectAtIndex:i]];
             
-            _moreTable = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, kViewScreenWidth, kViewScreenHeight)];
+            _moreTable = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, kViewScreenWidth, kViewScreenHeight) style:UITableViewStylePlain];
             _moreTable.delegate = self;
             _moreTable.dataSource = self;
-            
             // Set tabBar items
             _tabBar.items = tabs;
             [tabs release];
@@ -92,6 +95,9 @@ const int kTabBarHeight = 46;
         _tabBar.selectedItem = [_tabBar.items objectAtIndex:0];
         [self tabBar:_tabBar didSelectItem:_tabBar.selectedItem];
     }
+    
+    if (_tabBar.selectedItem.tag == kMoreBarItemTag)
+        [_moreTable reloadData];
 }
 
 - (NSString *)addViewController:(UIViewController *)controller
@@ -142,42 +148,80 @@ const int kTabBarHeight = 46;
 #pragma mark UITableView DataSource
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 1;
+    return (getSavedSearchCount() > 0) ? 2 : 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [_moreItems count];
+    NSInteger count = 0;
+    
+    if (section == 0)
+        count = [_moreItems count];
+    else if (section == 1)
+        count = getSavedSearchCount();
+    return count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *kCellIdentifier = @"MoreViewCell";
- 
-    UITableViewCell *cell = nil;
-    UITabBarItem *tabItem = [_moreItems objectAtIndex:indexPath.row];
-    
-    if (tabItem)
-    {
+
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellIdentifier];
+
+    if (cell == nil)
         cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:kCellIdentifier] autorelease];
-        cell.textLabel.text =  tabItem.title;
-        cell.imageView.image = tabItem.image;
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    
+    if (indexPath.section == 0)
+    {
+        UITabBarItem *tabItem = [_moreItems objectAtIndex:indexPath.row];
+        
+        if (tabItem)
+        {
+            cell.textLabel.text =  tabItem.title;
+            cell.imageView.image = tabItem.image;
+        }
     }
+    else
+    {
+        NSArray *savedTerms = getSavedSearchArray();
+        if (savedTerms)
+            cell.textLabel.text = [savedTerms objectAtIndex:indexPath.row];
+    }
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    
     return cell;
 }
 
 #pragma mark UITableView Delegate
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITabBarItem *tabItem = [_moreItems objectAtIndex:indexPath.row];
-    if (tabItem)
+    if (indexPath.section == 0)
     {
-        UIViewController *controller = [self controllerForTabItem:tabItem];
-        if (controller)
-            [self.navigationController pushViewController:controller animated:YES];
+        UITabBarItem *tabItem = [_moreItems objectAtIndex:indexPath.row];
+        if (tabItem)
+        {
+            UIViewController *controller = [self controllerForTabItem:tabItem];
+            if (controller)
+                [self.navigationController pushViewController:controller animated:YES];
+        }
+    }
+    else if (indexPath.section == 1)
+    {
+        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        
+        SearchController *searchController = [[SearchController alloc] initWithNibName:@"SearchController" bundle:nil];
+        searchController.searchString = cell.textLabel.text;
+        [self.navigationController pushViewController:searchController animated:YES];
+        [searchController release];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section 
+{
+    if (section == 1)
+        return @"Saved Searches";
+    return nil;
 }
 
 @end

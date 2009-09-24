@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-@interface AccountController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface AccountController : UIViewController <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate>
 {
     IBOutlet UITableView *_tableAccounts;
 }
