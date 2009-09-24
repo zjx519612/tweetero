@@ -130,7 +130,7 @@
 
 - (IBAction)login:(id)sender;
 {
-	[LoginController showModal:self.navigationController];
+	//[LoginController showModal:self.navigationController];
 }
 
 

@@ -451,3 +451,7 @@ NSMutableURLRequest* tweeteroMutableURLRequest(NSURL* url)
 	return req;
 }
 
+BOOL isNullable(id obj)
+{
+    return (obj == nil || [NSNull null] == obj);
+}

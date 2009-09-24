@@ -52,18 +52,29 @@
     UIViewController *parentController = parent;
     
     parentController.navigationItem.title = @"Home";
+    
+    //UISegmentedControl *userActionButton = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Refresh",@"New", nil]];
+    //userActionButton.segmentedControlStyle = UISegmentedControlStyleBar;
+    //[userActionButton setImage:[UIImage imageNamed:@"chat.png"] forSegmentAtIndex:0];
+    //userActionButton.momentary = YES;
+    
+    
 	UIBarButtonItem *newMsgButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem: UIBarButtonSystemItemCompose
                                                                                   target: self
                                                                                   action: @selector(newMessage)];
 	parentController.navigationItem.rightBarButtonItem = newMsgButton;
 	[newMsgButton release];
     
+    //[userActionButton release];
     [self setRootNavigationController:parentController.navigationController];
 }
 
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
+    
+    //UIBarButtonItem *test = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:nil action:nil];
+    //[userActionButton setImage:test.image forSegmentAtIndex:0];
     /*
 	self.navigationItem.title = @"Tweetero Home";
 	
