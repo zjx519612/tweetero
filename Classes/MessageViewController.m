@@ -33,7 +33,7 @@
 #import "UserInfo.h"
 #import "TweetterAppDelegate.h"
 #include "util.h"
-#import "LoginController.h"
+#import "AccountController.h"
 #import "MGTwitterEngine.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import "TweetPlayer.h"
@@ -443,7 +443,7 @@
 	NSString* pass = [MGTwitterEngine password];
 	if(!login || !pass)
 	{
-		[LoginController showModal:self.navigationController];
+		[AccountController showAccountController:self.navigationController];
 		return;
 	}
 
@@ -529,7 +529,7 @@
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	
 	if(self.tabBarController.selectedViewController == self.navigationController && [error code] == 401)
-		[LoginController showModal:self.navigationController];
+        [AccountController showAccountController:self.navigationController];
 }
 
 @end

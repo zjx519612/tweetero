@@ -7,13 +7,26 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "MGTwitterEngineDelegate.h"
 
 @class MGTwitterEngine;
-@interface SearchController : UITableViewController <UISearchBarDelegate>
+
+@interface SearchController : UITableViewController <UISearchBarDelegate, MGTwitterEngineDelegate>
 {
-    MGTwitterEngine *_twitter;
-    UISearchBar *_searchBar;
-    UISearchDisplayController *_searchController;
+  @private
+    IBOutlet UISearchBar        *_searchBar;
+    MGTwitterEngine             *_twitter;
+    UISearchDisplayController   *_searchController;
+    NSArray                     *_result;
+    int                          _pageNum;
+    // Properties
+    NSString                    *searchString;
 }
+
+@property (nonatomic, copy) NSString *searchString;
+
+- (IBAction)clickActionTerm;
+
+- (void)clear;
 
 @end

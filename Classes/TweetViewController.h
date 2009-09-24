@@ -10,6 +10,7 @@
 #import "yFrogImageDownoader.h"
 #import "yFrogImageUploader.h"
 #import "MGConnectionWrap.h"
+#import "UserInfoView.h"
 
 // Content table sections indexes
 typedef enum {
@@ -44,25 +45,25 @@ typedef enum {
 @interface TweetViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, 
                                                    UIActionSheetDelegate, UIAlertViewDelegate,
                                                    ImageUploaderDelegate, ImageDownoaderDelegate,
-                                                   UIWebViewDelegate>
+                                                   UIWebViewDelegate, UserInfoViewDelegate>
 {
-    IBOutlet UISegmentedControl *tweetNavigate;
-    IBOutlet UITableView *contentTable;
-	UIActionSheet *_progressSheet;    
-    UIView *_headView;
-    UIWebView *_webView;
-    NSDictionary *_message;
-    NSMutableDictionary *_sections;
-    NSMutableDictionary *_imagesLinks;
-	NSMutableArray *_connectionsDelegates;
-    UIColor *_defaultTintColor;
-    TVMessageViewSuspendedOperations _suspendedOperation;
-	BOOL _isDirectMessage;
-	int _newLineCounter;
-    int _count;
-    int _currentMessageIndex;
-    id <TweetViewDelegate> _store;
-    MGTwitterEngine *_twitter;
+    IBOutlet UISegmentedControl         *tweetNavigate;
+    IBOutlet UITableView                *contentTable;
+	UIActionSheet                       *_progressSheet;    
+    UserInfoView                        *_headView;
+    UIWebView                           *_webView;
+    NSDictionary                        *_message;
+    NSMutableDictionary                 *_sections;
+    NSMutableDictionary                 *_imagesLinks;
+	NSMutableArray                      *_connectionsDelegates;
+    UIColor                             *_defaultTintColor;
+    TVMessageViewSuspendedOperations    _suspendedOperation;
+	BOOL                                _isDirectMessage;
+	int                                 _newLineCounter;
+    int                                 _count;
+    int                                 _currentMessageIndex;
+    id <TweetViewDelegate>              _store;
+    MGTwitterEngine                     *_twitter;
 }
 
 @property (nonatomic, retain) UIActionSheet *_progressSheet;
@@ -72,7 +73,7 @@ typedef enum {
 
 // Actions
 - (IBAction)tweetNavigate:(id)sender;
-- (IBAction)nameSelected;
+//- (IBAction)nameSelected;
 - (IBAction)replyTwit;
 - (IBAction)favoriteTwit;
 - (IBAction)forwardTwit;

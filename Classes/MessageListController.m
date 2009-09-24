@@ -44,7 +44,7 @@
 
 @synthesize rootNavigationController;
 
-- (void)setRootNavigationController:(UINavigationController *)controller;
+- (void)setRootNavigationController:(UINavigationController *)controller
 {
     if (_rootNavigationController != controller)
     {

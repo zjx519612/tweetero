@@ -33,6 +33,23 @@
 #import "AccountController.h"
 #include "util.h"
 
+@interface TweetQueueController (Private)
+
+- (void)enableModifyButtons:(BOOL)enable;
+
+@end
+
+@implementation TweetQueueController (Private)
+
+- (void)enableModifyButtons:(BOOL)enable
+{
+	[queueSegmentedControl setEnabled:enable forSegmentAtIndex:0];
+	[queueSegmentedControl setEnabled:enable forSegmentAtIndex:1];
+}
+
+@end
+
+
 @implementation TweetQueueController
 
 @synthesize progressSheet;
@@ -121,12 +138,6 @@
 	_connection = nil;
 	[defaultTintColor release];
     [super dealloc];
-}
-
-- (void)enableModifyButtons:(BOOL)enable
-{
-	[queueSegmentedControl setEnabled:enable forSegmentAtIndex:0];
-	[queueSegmentedControl setEnabled:enable forSegmentAtIndex:1];
 }
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex

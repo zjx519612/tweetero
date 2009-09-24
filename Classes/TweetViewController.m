@@ -15,17 +15,18 @@
 #import "UserInfo.h"
 #import "TweetterAppDelegate.h"
 #import "CustomImageView.h"
+#import "UserInfoView.h"
 #include "util.h"
 #import "LoginController.h"
 #import "MGTwitterEngine.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import "TweetPlayer.h"
-
+/*
 const int kHeadTagAvatar = 1;
 const int kHeadTagUserName = 2;
 const int kHeadTagScreenName = 3;
 const int kHeadTagLocation = 4;
-
+*/
 
 @interface TweetViewController (Private)
 
@@ -45,47 +46,9 @@ const int kHeadTagLocation = 4;
 
 - (void)createHeadView
 {
-    // Create view object
-    _headView = [[UIView alloc] init];
-    _headView.backgroundColor = [UIColor clearColor];
-    
-    // Load avatar image
-    CustomImageView *avatarView = [[CustomImageView alloc] initWithFrame:CGRectMake(15, 5, 10, 10)];
-    avatarView.tag = kHeadTagAvatar;
-    [_headView addSubview:avatarView];
-    [avatarView release];
-    
-    UILabel *label = nil;
-    
-    // User name label
-    label = [[UILabel alloc] initWithFrame:CGRectMake(70, 3, 100, 20)];
-    label.tag = kHeadTagUserName;
-    label.backgroundColor = [UIColor clearColor];
-    label.font = [UIFont boldSystemFontOfSize:13];
-    [_headView addSubview:label];
-    [label release];
-    
-    // User screen_name
-    label = [[UILabel alloc] initWithFrame:CGRectMake(70, 20, 100, 20)];
-    label.tag = kHeadTagScreenName;
-    label.backgroundColor = [UIColor clearColor];
-    label.font = [UIFont boldSystemFontOfSize:12];
-    [_headView addSubview:label];
-    [label release];
-    
-    // User location
-    label = [[UILabel alloc] initWithFrame:CGRectMake(70, 35, 100, 20)];
-    label.tag = kHeadTagLocation;
-    label.backgroundColor = [UIColor clearColor];
-    label.font = [UIFont systemFontOfSize:12];
-    [_headView addSubview:label];
-    [label release];
-    
-    // Detail button
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-    button.frame = CGRectMake(290, 27, 10, 10);
-    [button addTarget:self action:@selector(nameSelected) forControlEvents:UIControlEventTouchUpInside];
-    [_headView addSubview:button];
+    _headView = [[UserInfoView alloc] init];
+    _headView.delegate = self;
+    _headView.buttons = UserInfoButtonDetail;
 }
 
 - (void)updateViewTitle
@@ -117,24 +80,18 @@ const int kHeadTagLocation = 4;
         
         // Update user data
         NSDictionary *userData = [_message objectForKey:@"user"];
-        UILabel *label;
-        CustomImageView *avatarView;
         UIImage *avatarImage = [[ImageLoader sharedLoader] imageWithURL:[userData objectForKey:@"profile_image_url"]];
+
+        _headView.avatar = avatarImage;
+        _headView.username = [userData objectForKey:@"name"];
+        _headView.screenname = [NSString stringWithFormat:@"@%@", [[userData objectForKey:@"screen_name"] lowercaseString]];
         
-        // Set avatar image
-        avatarView = (CustomImageView*)[_headView viewWithTag:kHeadTagAvatar];
-        //avatarView.image = [avatarImage stretchableImageWithLeftCapWidth:20 topCapHeight:20];
-        avatarView.image = avatarImage;
-        avatarView.frame = CGRectMake(15, 5, avatarImage.size.width, avatarImage.size.height);
-        // Set user name
-        label = (UILabel*)[_headView viewWithTag:kHeadTagUserName];
-        label.text = [userData objectForKey:@"name"];
-        // Set screen name
-        label = (UILabel*)[_headView viewWithTag:kHeadTagScreenName];
-        label.text = [NSString stringWithFormat:@"@%@", [[userData objectForKey:@"screen_name"] lowercaseString]];
         // Set user location
-        label = (UILabel*)[_headView viewWithTag:kHeadTagLocation];
-        label.text = [userData objectForKey:@"location"];
+        id locationObject = [userData objectForKey:@"location"];
+        if (!isNullable(locationObject))
+            _headView.location = locationObject;
+        else
+            _headView.location = @"";
         
         // Reload content table
         [contentTable reloadData];
@@ -541,13 +498,6 @@ const int kHeadTagLocation = 4;
     [self updateSegmentButtonState];
 }
 
-- (IBAction)nameSelected 
-{
-    UserInfo *infoView = [[UserInfo alloc] initWithUserName:[[_message objectForKey:@"user"] objectForKey:@"screen_name"]];
-	[self.navigationController pushViewController:infoView animated:YES];
-	[infoView release];
-}
-
 - (IBAction)replyTwit
 {
 	if (_isDirectMessage)
@@ -637,6 +587,14 @@ const int kHeadTagLocation = 4;
     
 	// Movie playback is asynchronous, so this method returns immediately.
 	[theMovie play];
+}
+
+#pragma mark UserInfoView Delegate
+- (void)userDetailPressed
+{
+    UserInfo *infoView = [[UserInfo alloc] initWithUserName:[[_message objectForKey:@"user"] objectForKey:@"screen_name"]];
+	[self.navigationController pushViewController:infoView animated:YES];
+	[infoView release];
 }
 
 #pragma mark UIWebView Delegate
