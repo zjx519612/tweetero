@@ -15,7 +15,6 @@
   * It should be possible to follow/unfollow users
   * Make it localizable. Translate to Russian as example.
   * 'Submit coordinates to Yfrog API when posting
-  * Search Twitter (see Tweetie as example)
   * Thumbnails for yfrog posts in list view (like Twittelator Pro)
   * Video playback via Safari
   * Support OAUth
@@ -23,3 +22,5 @@
   * Remove "Re-tweet" button from Direct Message view.
   * Turning screen sideways should launch camera mode after which it should switch to new tweet creation (enable quick camera mode, 10 seconds)
   * Add nice icons to each menu item
+  * Use new [http://code.google.com/p/imageshackapi/wiki/StreamingAPI API] for uploading video
+  * Show progress bar while  uploading
