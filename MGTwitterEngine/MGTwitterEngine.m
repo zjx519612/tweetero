@@ -1564,20 +1564,6 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                            responseType:MGTwitterUsers];
 }
 
-- (NSString *)getFollowersForUser:(NSString *)username lite:(BOOL)flag
-{
-    NSString *path = [NSString stringWithFormat:@"statuses/followers/%@.%@", username, API_FORMAT];
-    
-    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
-    if (!flag) {
-        [params setObject:@"true" forKey:@"lite"]; // slightly bizarre, but correct.
-    }
-    
-    return [self _sendRequestWithMethod:nil path:path queryParameters:params body:nil 
-                            requestType:MGTwitterUserInfoRequest 
-                           responseType:MGTwitterUsers];
-}
-
 - (NSString *)getFeaturedUsers
 {
     NSString *path = [NSString stringWithFormat:@"statuses/featured.%@", API_FORMAT];
