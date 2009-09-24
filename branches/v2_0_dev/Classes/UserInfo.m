@@ -55,7 +55,6 @@
 	return self;
 }
 
-
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
@@ -163,35 +162,6 @@
 	[alert show];	
 	[alert release];
 }
-
-//-------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------
-- (void)traceDict:(NSDictionary*)dict
-{
-    NSEnumerator *keys = [dict keyEnumerator];
-    id key = nil;
-    while ((key = [keys nextObject]) != nil)
-    {
-        id obj = [dict objectForKey:key];
-        //NSLog(@"Test");
-
-        //if ([(NSString*)key compare:@"user"] == NSOrderedSame)
-        //    [self traceDict:obj];
-        
-        NSString *value;
-        if ([obj respondsToSelector:@selector(rangeOfString:)])
-            value = (NSString*)obj;
-        //else
-            //value = [NSString stringWithCString:NAMEOF([obj class])];
-        
-        NSLog(@"Key: %@ for: %@", (NSString*)key, value);
-    }
-    NSLog(@"\n");
-}
-//-------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------
-//-------------------------------------------------------------------------------------------
 
 - (void)miscInfoReceived:(NSArray *)miscInfo forRequest:(NSString *)connectionIdentifier
 {
@@ -306,11 +276,9 @@
 		[infoView loadHTMLString:info baseURL:nil];
 	}
 	
-	NSString* notifyOn = [userData objectForKey:@"notifications"];
+	id notifyOn = [userData objectForKey:@"notifications"];
 	if(notifyOn)
-	{
-		notifySwitch.on = [notifyOn isEqualToString:@"true"];
-	}
+		notifySwitch.on = [notifyOn boolValue];
 		
 	_gotInfo = YES;
 }
