@@ -27,6 +27,8 @@
 #ifndef _UTIL_H__
 #define _UTIL_H__
  
+//#define DEBUG 1
+
 void LogStringArray(NSArray* ar, NSString* descriptionString);//descriptionString may be NULL
 void LogStringSet(NSSet* set, NSString* descriptionString);//descriptionString may be NULL
 void LogDictionaryStringKeys(NSDictionary* dict, NSString* descriptionString);//descriptionString may be NULL
@@ -47,5 +49,6 @@ NSString *DecodeEntities(NSString *str);
 
 NSURLRequest* tweeteroURLRequest(NSURL* url);
 NSMutableURLRequest* tweeteroMutableURLRequest(NSURL* url);
+BOOL isNullable(id obj);
 
 #endif
