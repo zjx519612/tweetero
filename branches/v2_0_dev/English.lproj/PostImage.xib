@@ -2,14 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">528</int>
-		<string key="IBDocument.SystemVersion">9G55</string>
+		<string key="IBDocument.SystemVersion">9L31a</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
-		<string key="IBDocument.AppKitVersion">949.43</string>
+		<string key="IBDocument.AppKitVersion">949.54</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="1"/>
-			<integer value="13"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -40,7 +39,7 @@
 					<object class="IBUITextView" id="510192053">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">298</int>
-						<string key="NSFrame">{{9, 12}, {245, 180}}</string>
+						<string key="NSFrame">{{9, 12}, {245, 155}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<object class="NSColor" key="IBUIBackgroundColor">
 							<int key="NSColorSpace">3</int>
@@ -55,6 +54,7 @@
 						<bool key="IBUIDelaysContentTouches">NO</bool>
 						<bool key="IBUIBouncesZoom">NO</bool>
 						<string key="IBUIText"/>
+						<object class="IBUITextInputTraits" key="IBUITextInputTraits"/>
 					</object>
 					<object class="IBUIImageView" id="29108740">
 						<reference key="NSNextResponder" ref="191373211"/>
@@ -188,6 +188,15 @@
 							<reference ref="709463556"/>
 						</object>
 						<bool key="IBMomentary">YES</bool>
+					</object>
+					<object class="IBUIProgressView" id="92994831">
+						<reference key="NSNextResponder" ref="191373211"/>
+						<int key="NSvFlags">292</int>
+						<string key="NSFrame">{{9, 179}, {245, 9}}</string>
+						<reference key="NSSuperview" ref="191373211"/>
+						<bool key="IBUIOpaque">NO</bool>
+						<bool key="IBUIClipsSubviews">YES</bool>
+						<bool key="IBUIMultipleTouchEnabled">YES</bool>
 					</object>
 				</object>
 				<string key="NSFrameSize">{320, 436}</string>
@@ -396,6 +405,14 @@
 					</object>
 					<int key="connectionID">85</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">progress</string>
+						<reference key="source" ref="372490531"/>
+						<reference key="destination" ref="92994831"/>
+					</object>
+					<int key="connectionID">87</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -419,6 +436,7 @@
 							<reference ref="288398891"/>
 							<reference ref="575523371"/>
 							<reference ref="29108740"/>
+							<reference ref="92994831"/>
 						</object>
 						<reference key="parent" ref="360949347"/>
 					</object>
@@ -506,6 +524,11 @@
 						<reference key="object" ref="288398891"/>
 						<reference key="parent" ref="191373211"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">86</int>
+						<reference key="object" ref="92994831"/>
+						<reference key="parent" ref="191373211"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -531,18 +554,20 @@
 					<string>63.IBPluginDependency</string>
 					<string>78.IBPluginDependency</string>
 					<string>79.IBPluginDependency</string>
+					<string>86.IBPluginDependency</string>
 					<string>9.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>TwitEditorController</string>
 					<string>UIResponder</string>
-					<string>{{31, 428}, {320, 480}}</string>
+					<string>{{65, 379}, {320, 480}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>ImagePreview</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>ImagePickerController</string>
-					<string>{{-6, 56}, {320, 480}}</string>
+					<string>{{88, 156}, {320, 480}}</string>
+					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -577,7 +602,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">85</int>
+			<int key="maxID">87</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -638,6 +663,7 @@
 							<string>navItem</string>
 							<string>pickImage</string>
 							<string>postImageSegmentedControl</string>
+							<string>progress</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -651,6 +677,7 @@
 							<string>UINavigationItem</string>
 							<string>UISegmentedControl</string>
 							<string>UISegmentedControl</string>
+							<string>UIProgressView</string>
 						</object>
 					</object>
 					<reference key="sourceIdentifier" ref="955228434"/>
@@ -658,7 +685,8 @@
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
-		<string key="IBDocument.LastKnownRelativeProjectPath">../Tweetter.xcodeproj</string>
+		<string key="IBDocument.LastKnownRelativeProjectPath">../Tweetero.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
+		<string key="IBCocoaTouchPluginVersion">3.0</string>
 	</data>
 </archive>

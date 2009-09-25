@@ -59,6 +59,7 @@ enum _TwitEditorSuspendedOperations
     IBOutlet UITextView *messageText;
     IBOutlet ImagePickerController *imgPicker;
     IBOutlet UILabel *charsCount;
+    IBOutlet UIProgressView *progress;
 	BOOL			inTextEditingMode;
 
 	UIActionSheet *progressSheet;

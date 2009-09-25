@@ -25,18 +25,29 @@
 // 
 
 #import <UIKit/UIKit.h>
+#import "UserInfoView.h"
 
 @class MGTwitterEngine;
 @class CustomImageView;
 
-@interface UserInfo : UIViewController {
-    IBOutlet CustomImageView *avatarView;
-    IBOutlet UIView *controlView;
+enum {
+    USDescription,
+    USDevice,
+    USAction
+};
+
+enum {
+    UActionDirectMessageIndex,
+    UActionReplyIndex,
+    UActionRecentIndex,
+    UActionFollowersIndex
+};
+
+@interface UserInfo : UIViewController <UITableViewDelegate, UITableViewDataSource>
+{
     IBOutlet UIWebView *infoView;
-    IBOutlet UILabel *nameField;
-    IBOutlet UILabel *realNameField;
 	IBOutlet UISwitch *notifySwitch;
-	IBOutlet UIButton *sendDirectMessage;
+    
     IBOutlet UISegmentedControl *followButton;
     IBOutlet UIButton *followBtn;
     
@@ -45,6 +56,9 @@
 	NSString *_username;
     BOOL _following;
 	NSString *isUserReceivingUpdatesForConnectionID;
+    BOOL _isDirectMessage;
+    UserInfoView *_userInfoView;
+    NSMutableArray *_userTableSection;
 }
 - (id)initWithUserName:(NSString*)uname;
 - (IBAction)changeFollowing:(id)sender;

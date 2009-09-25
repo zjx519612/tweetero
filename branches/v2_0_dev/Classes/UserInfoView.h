@@ -31,6 +31,7 @@ typedef enum {
     int                          buttons;
     id <UserInfoViewDelegate>    delegate;
     UIButton                    *detailButton;
+    UISegmentedControl          *followSegment;
 }
 
 @property (nonatomic, copy)     NSString                    *username;
@@ -40,6 +41,9 @@ typedef enum {
 @property (nonatomic)           BOOL                         follow;
 @property (nonatomic)           int                          buttons;
 @property (nonatomic, retain)   id <UserInfoViewDelegate>    delegate;
+
+- (void)disableFollowingButton:(BOOL)disabled;
+- (void)hideFollowingButton:(BOOL)hide;
 
 @end
 
