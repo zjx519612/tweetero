@@ -85,13 +85,7 @@ const int kHeadTagLocation = 4;
         _headView.avatar = avatarImage;
         _headView.username = [userData objectForKey:@"name"];
         _headView.screenname = [NSString stringWithFormat:@"@%@", [[userData objectForKey:@"screen_name"] lowercaseString]];
-        
-        // Set user location
-        id locationObject = [userData objectForKey:@"location"];
-        if (!isNullable(locationObject))
-            _headView.location = locationObject;
-        else
-            _headView.location = @"";
+        _headView.location = [userData objectForKey:@"location"];
         
         // Reload content table
         [contentTable reloadData];
@@ -127,7 +121,10 @@ const int kHeadTagLocation = 4;
             messageView.editable = NO;
             messageView.scrollEnabled = YES;
             messageView.font = [UIFont systemFontOfSize:16.];
-            messageView.text = [_message objectForKey:@"text"];
+            if (!isNullable([_message objectForKey:@"text"]))
+                messageView.text = [_message objectForKey:@"text"];
+            else
+                messageView.text = nil;
             messageView.backgroundColor = [UIColor clearColor];
             //[cell.contentView addSubview:messageView];
             
@@ -137,20 +134,24 @@ const int kHeadTagLocation = 4;
             [cell.contentView addSubview:_webView];
             
             // Create label for date
-            NSString *formatedDate = [self formatDate:[_message objectForKey:@"created_at"]];
+            NSDate *theDate = [_message objectForKey:@"created_at"];
             NSString *msgSource = [_message objectForKey:@"source"];
             
-            NSString *link = getLinkWithTag(msgSource);
-            if (link)
-                msgSource = link;
-            UILabel *infoLabel = [[[UILabel alloc] init] autorelease];
-            infoLabel.frame = CGRectMake(15, 85, 200, 40);
-            infoLabel.numberOfLines = 2;
-            infoLabel.font = [UIFont systemFontOfSize:13.];
-            infoLabel.backgroundColor = [UIColor clearColor];
-            infoLabel.text = [NSString stringWithFormat:@"%@\nfrom %@", formatedDate, msgSource];
-            infoLabel.textColor = [UIColor grayColor];
-            [cell.contentView addSubview:infoLabel];
+            if (!isNullable(theDate) && !isNullable(msgSource))
+            {
+                NSString *formatedDate = [self formatDate:theDate];
+                NSString *link = getLinkWithTag(msgSource);
+                if (link)
+                    msgSource = link;
+                UILabel *infoLabel = [[[UILabel alloc] init] autorelease];
+                infoLabel.frame = CGRectMake(15, 85, 200, 40);
+                infoLabel.numberOfLines = 2;
+                infoLabel.font = [UIFont systemFontOfSize:13.];
+                infoLabel.backgroundColor = [UIColor clearColor];
+                infoLabel.text = [NSString stringWithFormat:@"%@\nfrom %@", formatedDate, msgSource];
+                infoLabel.textColor = [UIColor grayColor];
+                [cell.contentView addSubview:infoLabel];
+            }
             break;
         }
         // Actions cell
@@ -228,12 +229,15 @@ const int kHeadTagLocation = 4;
 	if(_suspendedOperation == TVForward || _suspendedOperation == TVRetwit)
 	{
 		body = [_message objectForKey:@"text"];
-		NSEnumerator *en = [[_imagesLinks allKeys] objectEnumerator];
-		NSString *link;
-		NSString* yFrogLink = nil;
-		while(link = [en nextObject])
-			if((yFrogLink = [_imagesLinks objectForKey:link]) && ![yFrogLink isEqual:[NSNull null]])
-				body = [body stringByReplacingOccurrencesOfString:link withString:yFrogLink];
+        if (!isNullable(body))
+        {
+            NSEnumerator *en = [[_imagesLinks allKeys] objectEnumerator];
+            NSString *link;
+            NSString* yFrogLink = nil;
+            while(link = [en nextObject])
+                if((yFrogLink = [_imagesLinks objectForKey:link]) && ![yFrogLink isEqual:[NSNull null]])
+                    body = [body stringByReplacingOccurrencesOfString:link withString:yFrogLink];
+        }
 	}
 	
 	if(_suspendedOperation == TVForward)
@@ -291,6 +295,9 @@ const int kHeadTagLocation = 4;
 	NSString *text = [_message objectForKey:@"text"];
 	NSString *html;
 	
+    if (isNullable(text))
+        return nil;
+    
 	NSArray *lines = [text componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 	NSString *line;
 	_newLineCounter = [lines count];
@@ -701,13 +708,13 @@ const int kHeadTagLocation = 4;
 {
     if (indexPath.section == TVSectionMessage)
         return 135.;
-    return 45.;
+    return 40.;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
     if (section == TVSectionMessage)
-        return 70.;
+        return 60.;
     return 0;
 }
 

@@ -36,6 +36,16 @@
 #import "FollowersController.h"
 #include "util.h"
 
+static NSString* kDescriptionCell = @"UserInfoDescriptionCell";
+static NSString* kDeviceCell = @"UserInfoDeviceCell";
+static NSString* kActionCell = @"UserInfoActionCell";
+
+@interface UserInfo (Private)
+- (void)initTableData;
+- (UITableViewCell*)createCellForIdentifier:(UITableView*)tableView reuseIdentifier:(NSString*)identifier;
+- (void)enableCellAtIndex:(NSInteger)row atSection:(NSInteger)section enabled:(BOOL)enable;
+@end
+
 @implementation UserInfo
 
 @synthesize isUserReceivingUpdatesForConnectionID;
@@ -50,20 +60,59 @@
 		_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
 		_username = [uname retain];
         _following = NO;
+        
+        _userInfoView = [[UserInfoView alloc] init];
+        _userTableSection = [[NSMutableArray alloc] init];
+        _userInfoView.buttons = UserInfoButtonFollow;
+        
+        if ([uname compare:[MGTwitterEngine username]] == NSOrderedSame)
+            [_userInfoView hideFollowingButton:YES];
+        [self initTableData];
 	}
 	
 	return self;
 }
 
+- (void)dealloc 
+{
+    [_userInfoView release];
+    [_userTableSection release];
+    
+	infoView.delegate = nil;
+	if(infoView.loading)
+	{
+		[infoView stopLoading];
+		[TweetterAppDelegate decreaseNetworkActivityIndicator];
+	}
+	int connectionsCount = [_twitter numberOfConnections];
+	[_twitter closeAllConnections];
+	[_twitter removeDelegate];
+	[_twitter release];
+	while(connectionsCount-- > 0)
+		[TweetterAppDelegate decreaseNetworkActivityIndicator];
+	
+	[_username release];
+	self.isUserReceivingUpdatesForConnectionID = nil;
+    [super dealloc];
+}
+
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-
-	sendDirectMessage.hidden = YES;
+    
+	//sendDirectMessage.hidden = YES;
+    _isDirectMessage = NO;
+    
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
 	self.isUserReceivingUpdatesForConnectionID = [_twitter isUser:_username receivingUpdatesFor:[MGTwitterEngine username]];
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
 	[_twitter getUserInformationFor:_username];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [self enableCellAtIndex:UActionDirectMessageIndex atSection:USAction enabled:_isDirectMessage];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -71,6 +120,12 @@
 	[super viewWillDisappear:animated];
 }
 
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
+
+#pragma mark Actions
 - (IBAction)changeFollowing:(id)sender
 {
     NSString *title = _following ? @"FOLLOWING" : @"STOP FOLLOWING";
@@ -81,16 +136,10 @@
 {
     NSString *ident = nil;
     if (_following)
-    {
-        // STOP FOLLOWING
-        ident = [_twitter disableUpdatesFor:_username];
-    }
+        ident = [_twitter disableUpdatesFor:_username]; // STOP FOLLOWING
     else
-    {
-        // FOLLOWING
-        ident = [_twitter enableUpdatesFor:_username];
-    }
-    followBtn.enabled = NO;
+        ident = [_twitter enableUpdatesFor:_username];  // FOLLOWING
+    [_userInfoView disableFollowingButton:YES];
 }
 
 // Show user followers
@@ -103,7 +152,6 @@
 
 - (IBAction)sendMessage 
 {
-	//NewMessageController *msgView = [[NewMessageController alloc] initWithNibName:@"NewMessage" bundle:nil];
     NewMessageController *msgView = [[NewMessageController alloc] init];
 	[self.navigationController pushViewController:msgView animated:YES];
 	[msgView setUser:_username];
@@ -126,40 +174,29 @@
 	[msgView release];
 }
 
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
-    // Release anything that's not essential, such as cached data
-}
-
-
-- (void)dealloc 
+- (IBAction)notifySwitchChanged
 {
-	infoView.delegate = nil;
-	if(infoView.loading)
-	{
-		[infoView stopLoading];
-		[TweetterAppDelegate decreaseNetworkActivityIndicator];
-	}
-	int connectionsCount = [_twitter numberOfConnections];
-	[_twitter closeAllConnections];
-	[_twitter removeDelegate];
-	[_twitter release];
-	while(connectionsCount-- > 0)
-		[TweetterAppDelegate decreaseNetworkActivityIndicator];
+	[TweetterAppDelegate increaseNetworkActivityIndicator];
+	if(notifySwitch.on)
+		[_twitter enableNotificationsFor:_username];
+	else
+		[_twitter disableNotificationsFor:_username];
 	
-	[_username release];
-	self.isUserReceivingUpdatesForConnectionID = nil;
-    [super dealloc];
+	[TweetterAppDelegate increaseNetworkActivityIndicator];
+	[_twitter getUserInformationFor:_username];
 }
 
+#pragma mark MGTwitterEngine Delegate
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Network Failure" message:[error localizedDescription]
-												   delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
-	[alert show];	
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Network Failure" 
+                                                    message: [error localizedDescription]
+												   delegate: self 
+                                          cancelButtonTitle: @"OK" 
+                                          otherButtonTitles: nil];
+	[alert show];
 	[alert release];
 }
 
@@ -171,59 +208,66 @@
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	NSDictionary *followData = [miscInfo objectAtIndex:0];
 	
-	BOOL friends = NO;
+	_isDirectMessage = YES;
     
 	id friendsObj = [followData objectForKey:@"friends"];
-	if(friendsObj)
-		friends = ![friendsObj boolValue];
-	sendDirectMessage.hidden = friends;
+	if(!isNullable(friendsObj))
+		_isDirectMessage = [friendsObj boolValue];
+    
+    [self enableCellAtIndex:UActionDirectMessageIndex atSection:USAction enabled:_isDirectMessage];
 }
 
 - (void)userInfoReceived:(NSArray *)userInfo forRequest:(NSString *)connectionIdentifier;
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	NSDictionary *userData = [userInfo objectAtIndex:0];
-	
-    followBtn.enabled = YES;
-    id following = [userData objectForKey:@"following"];
-    if (following)
-    {
-        _following = [following boolValue];
-        followBtn.titleLabel.text = _following ? NSLocalizedString(@"Unfollow", @"") : NSLocalizedString(@"Follow", @"");
-        followBtn.titleLabel.textAlignment = UITextAlignmentCenter;
-    }
-    
+
 	UIImage *avatar = [[ImageLoader sharedLoader] imageWithURL:[userData objectForKey:@"profile_image_url"]];
-	CGSize avatarViewSize = avatarView.frame.size;
+	CGSize avatarViewSize = CGSizeMake(48, 48);
 	if(avatar.size.width > avatarViewSize.width || avatar.size.height > avatarViewSize.height)
 		avatar = imageScaledToSize(avatar, avatarViewSize.width);
-	avatarView.image = avatar;
-	nameField.text = [userData objectForKey:@"screen_name"];
-	realNameField.text = [userData objectForKey:@"name"];
-	self.navigationItem.title = [userData objectForKey:@"screen_name"];
-	
-	
+    
+    // Update UserInfo header
+    _userInfoView.avatar = avatar;
+    _userInfoView.screenname = [userData objectForKey:@"screen_name"];
+	_userInfoView.username = [userData objectForKey:@"name"];
+    self.navigationItem.title = _userInfoView.screenname;
+    
+    _following = NO;
+    id following = [userData objectForKey:@"following"];
+    if (!isNullable(following))
+        _following = ![following boolValue];
+    _userInfoView.follow = _following;
+    [_userInfoView disableFollowingButton:NO];
+    
+	// Create description html
+	BOOL infoEmpty = YES;
+	NSString *item;
 	NSMutableString* info = [NSMutableString stringWithCapacity:256];
+    
 	[info appendFormat:@"<html><body style=\"width:%d\">", (int)infoView.frame.size.width - 10];
 	
-	NSString *item;
-	BOOL infoEmpty = YES;
-	
-	if(item = [userData objectForKey:@"description"])
+    // Append description string
+    item = [userData objectForKey:@"description"];
+	if(!isNullable(item) && [item length] > 0)
 	{
 		infoEmpty = NO;
 		[info appendString:item];
 		[info appendString:@"<br>"];
 	}
 	
-	if(item = [userData objectForKey:@"url"])
+    // Append url
+    item = [userData objectForKey:@"url"];
+	if(!isNullable(item))
 	{
 		infoEmpty = NO;
 		[info appendFormat:@"<a href=%@>%@</a>", item, item];
 		[info appendString:@"<br>"];
 	}
 	
-	if((item = [userData objectForKey:@"location"]) && [item length] != 0)
+    // Append location
+    item = [userData objectForKey:@"location"];
+	if(!isNullable(item) && [item length] != 0)
 	{
 		infoEmpty = NO;
 		NSScanner *scanner = [NSScanner scannerWithString:item];
@@ -236,7 +280,8 @@
 			textPart = [textPart substringToIndex:[textPart length] - 1];
 			[scanner setScanLocation:[scanner scanLocation] - 1];
 		}
-		
+		// Update head info view
+        _userInfoView.location = textPart;
 		[info appendString:textPart];
 		double x, y;
 		if(![scanner isAtEnd])
@@ -258,15 +303,22 @@
 				
 			}
 		}
-		
 		[info appendString:@"<br>"];
 	}
 	
+    // Hide infoView if user data not founded
+	if(infoEmpty)
+        [info appendString:@"User description is empty."];
+    [info appendString:@"</body></html>"];
+    infoView.scalesPageToFit = NO;
+    [infoView loadHTMLString:info baseURL:nil];
+
+    /*
 	if(infoEmpty)
 	{
-		CGRect infoframe = infoView.frame, ctrlframe = controlView.frame;
-		ctrlframe.origin = infoframe.origin;
-		controlView.frame = ctrlframe;
+		//CGRect infoframe = infoView.frame, ctrlframe = controlView.frame;
+		//ctrlframe.origin = infoframe.origin;
+		//controlView.frame = ctrlframe;
 		infoView.hidden = YES;
 	}
 	else
@@ -275,14 +327,16 @@
 		infoView.scalesPageToFit = NO;
 		[infoView loadHTMLString:info baseURL:nil];
 	}
-	
+	*/
+    
+    // Update notify switch
 	id notifyOn = [userData objectForKey:@"notifications"];
 	if(notifyOn)
 		notifySwitch.on = [notifyOn boolValue];
-		
 	_gotInfo = YES;
 }
 
+#pragma mark UIAlertView Delegate
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
 	if(!_gotInfo)
@@ -295,11 +349,11 @@
 	}
 }
 
+#pragma mark WebView Delegate
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
 }
-
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
@@ -323,17 +377,141 @@
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 }
 
-
-- (IBAction)notifySwitchChanged
+#pragma mark UITableView DataSource
+- (NSInteger)tableView:(UITableView *)table numberOfRowsInSection:(NSInteger)section
 {
-	[TweetterAppDelegate increaseNetworkActivityIndicator];
-	if(notifySwitch.on)
-		[_twitter enableNotificationsFor:_username];
-	else
-		[_twitter disableNotificationsFor:_username];
-	
-	[TweetterAppDelegate increaseNetworkActivityIndicator];
-	[_twitter getUserInformationFor:_username];
+    return [[_userTableSection objectAtIndex:section] count];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSString *cellIdent = nil;
+    
+    if (indexPath.section == USDescription)
+        cellIdent = kDescriptionCell;
+    else if (indexPath.section == USDevice)
+        cellIdent = kDeviceCell;
+    else if (indexPath.section == USAction)
+        cellIdent = kActionCell;
+    
+    UITableViewCell *cell = [self createCellForIdentifier:tableView reuseIdentifier:cellIdent];
+    
+    cell.textLabel.text = [[_userTableSection objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
+    return cell;
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return [_userTableSection count];;
+}
+
+#pragma mark UITableView Delegate
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == USDescription)
+        return infoView.frame.size.height + 1;
+    return 40;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    if (section == 0)
+        return 60;
+    return 0;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    if (section == USDescription)
+        return _userInfoView;
+    return nil;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == USAction)
+    {
+        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        if (cell.selectionStyle == UITableViewCellSelectionStyleNone)
+            return;
+        
+        switch (indexPath.row) 
+        {
+            // Send Direct Message
+            case UActionDirectMessageIndex:
+                [self sendMessage];
+                break;
+            // Send Public Reply
+            case UActionReplyIndex:
+                [self sendReply];
+                break;
+            // Show Recent Tweets
+            case UActionRecentIndex:
+                [self showTwitts];
+                break;
+            // Show User Followers
+            case UActionFollowersIndex:
+                [self followers];
+                break;
+            default:
+                break;
+        }
+    }
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+@end
+
+@implementation UserInfo (Private)
+
+- (void)initTableData
+{
+    [_userTableSection addObject:[NSArray arrayWithObject:@""]];
+    [_userTableSection addObject:[NSArray arrayWithObjects:@"Device Updates", nil]];
+    [_userTableSection addObject:[NSArray arrayWithObjects:
+                                                @"Send Direct Message",
+                                                @"Send Public Reply",
+                                                @"Recent Tweets",
+                                                @"Followers",
+                                                nil]];    
+}
+
+- (UITableViewCell*)createCellForIdentifier:(UITableView*)tableView reuseIdentifier:(NSString*)identifier
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    if (cell == nil)
+    {
+        cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:identifier] autorelease];
+        cell.textLabel.backgroundColor = [UIColor clearColor];
+        if ([identifier isEqual:kDescriptionCell])
+        {
+            infoView.frame = CGRectMake(10, 0, infoView.frame.size.width, infoView.frame.size.height);
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            [cell.contentView addSubview:infoView];
+        }
+        else if ([identifier isEqual:kDeviceCell])
+        {
+            notifySwitch.frame = CGRectMake(197, 6, 50, 30);
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            [cell.contentView addSubview:notifySwitch];
+        }
+        else if ([identifier isEqual:kActionCell])
+        {
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        }
+    }
+    return cell;
+}
+
+- (void)enableCellAtIndex:(NSInteger)row atSection:(NSInteger)section enabled:(BOOL)enable
+{
+    NSIndexPath *index = [NSIndexPath indexPathForRow:row inSection:section];
+    
+    UITableViewCell *cell = [(UITableView*)self.view cellForRowAtIndexPath:index];
+    if (cell)
+    {
+        cell.textLabel.enabled = enable;
+        cell.selectionStyle = enable ? UITableViewCellSelectionStyleBlue : UITableViewCellSelectionStyleNone;
+    }
 }
 
 @end

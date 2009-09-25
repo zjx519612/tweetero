@@ -60,6 +60,7 @@ const int kHeadTagLocation = 4;
         self.delegate = nil;
     }
     [detailButton release];
+    [followSegment release];
     [super dealloc];
 }
 
@@ -69,8 +70,13 @@ const int kHeadTagLocation = 4;
     UILabel *label = (UILabel*)[self viewWithTag:kHeadTagUserName];
     
     if (self.username)
+    {
         [username release];
-    username = [[NSString alloc] initWithString:name];
+        username = nil;
+    }
+    
+    if ((id)name != [NSNull null])
+        username = [[NSString alloc] initWithString:name];
     
     label.text = self.username;
     [self updateView];
@@ -81,8 +87,13 @@ const int kHeadTagLocation = 4;
     UILabel *label = (UILabel*)[self viewWithTag:kHeadTagScreenName];
     
     if (self.screenname)
+    {
         [screenname release];
-    screenname = [[NSString alloc] initWithString:name];
+        screenname = nil;
+    }
+    
+    if ((id)name != [NSNull null])
+        screenname = [[NSString alloc] initWithString:name];
     
     label.text = self.screenname;
     [self updateView];
@@ -93,8 +104,13 @@ const int kHeadTagLocation = 4;
     UILabel *label = (UILabel*)[self viewWithTag:kHeadTagLocation];
     
     if (self.location)
+    {
         [location release];
-    location = [[NSString alloc] initWithString:newLocation];
+        location = nil;
+    }
+    
+    if ((id)newLocation != [NSNull null])
+        location = [[NSString alloc] initWithString:newLocation];
     
     label.text = self.location;
     [self updateView];
@@ -105,21 +121,40 @@ const int kHeadTagLocation = 4;
     CustomImageView *avatarView = (CustomImageView*)[self viewWithTag:kHeadTagAvatar];
     
     if (self.avatar)
+    {
         [avatar release];
-    avatar = [image retain];
+        avatar = nil;
+    }
+    
+    if ((id)image != [NSNull null])
+        avatar = [image retain];
     
     avatarView.image = avatar;
-    avatarView.frame = CGRectMake(15, 5, avatar.size.width, avatar.size.height);
+    avatarView.frame = CGRectMake(10, 5, avatar.size.width, avatar.size.height);
+    
     [self updateView];
+}
+
+- (void)setFollow:(BOOL)isFollow
+{
+    follow = isFollow;
+    [followSegment setTitle:follow ? @"FOLLOW" : @"UNFOLLOW" forSegmentAtIndex:0];
 }
 
 - (void)setButtons:(int)button
 {
     buttons = button;
+    // Detail button
     if (buttons & UserInfoButtonDetail)
         [self addSubview:detailButton];
     else
         [detailButton removeFromSuperview];
+    
+    // Following button
+    if (button & UserInfoButtonFollow)
+        [self addSubview:followSegment];
+    else
+        [followSegment removeFromSuperview];
 }
 
 #pragma mark Actions
@@ -141,6 +176,17 @@ const int kHeadTagLocation = 4;
     }
 }
 
+#pragma mark Public methods
+- (void)disableFollowingButton:(BOOL)disabled
+{
+    [followSegment setEnabled:!disabled];
+}
+
+- (void)hideFollowingButton:(BOOL)hide
+{
+    [followSegment setHidden:hide];
+}
+
 @end
 
 @implementation UserInfoView (Private)
@@ -150,7 +196,7 @@ const int kHeadTagLocation = 4;
     self.backgroundColor = [UIColor clearColor];
     
     // Load avatar image
-    CustomImageView *avatarView = [[CustomImageView alloc] initWithFrame:CGRectMake(15, 5, 10, 10)];
+    CustomImageView *avatarView = [[CustomImageView alloc] initWithFrame:CGRectZero];
     avatarView.tag = kHeadTagAvatar;
     [self addSubview:avatarView];
     [avatarView release];
@@ -158,7 +204,7 @@ const int kHeadTagLocation = 4;
     UILabel *label = nil;
     
     // User name label
-    label = [[UILabel alloc] initWithFrame:CGRectMake(70, 3, 100, 20)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(65, 3, 200, 20)];
     label.tag = kHeadTagUserName;
     label.backgroundColor = [UIColor clearColor];
     label.font = [UIFont boldSystemFontOfSize:13];
@@ -166,7 +212,7 @@ const int kHeadTagLocation = 4;
     [label release];
     
     // User screen_name
-    label = [[UILabel alloc] initWithFrame:CGRectMake(70, 20, 100, 20)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(65, 20, 200, 20)];
     label.tag = kHeadTagScreenName;
     label.backgroundColor = [UIColor clearColor];
     label.font = [UIFont boldSystemFontOfSize:12];
@@ -174,7 +220,7 @@ const int kHeadTagLocation = 4;
     [label release];
     
     // User location
-    label = [[UILabel alloc] initWithFrame:CGRectMake(70, 35, 100, 20)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(65, 35, 200, 20)];
     label.tag = kHeadTagLocation;
     label.backgroundColor = [UIColor clearColor];
     label.font = [UIFont systemFontOfSize:12];
@@ -182,9 +228,16 @@ const int kHeadTagLocation = 4;
     [label release];
     
     // Detail button
-    detailButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+    detailButton = [[UIButton buttonWithType:UIButtonTypeDetailDisclosure] retain];
     detailButton.frame = CGRectMake(290, 27, 10, 10);
     [detailButton addTarget:self action:@selector(detailPressed) forControlEvents:UIControlEventTouchUpInside];
+    
+    // Following segment
+    followSegment = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"FOLLOW", nil]];
+    followSegment.segmentedControlStyle = UISegmentedControlStyleBar;
+    followSegment.momentary = YES;
+    followSegment.frame = CGRectMake(225, 24, 85, 30);
+    [followSegment addTarget:self action:@selector(followPressed) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)updateView
