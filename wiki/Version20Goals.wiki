@@ -3,23 +3,23 @@
 
 = Goals for version 2.0 =
 
-  * Support Multiple Twitter accounts
-  * "My Tweets" under tab "More"
-  * When opening tweets, make screen with up/down arrows on top and functions (reply, favorite, forward) under the message. There is a lot of space wasted and we could use to make it more fun.
-  * Round user Icons Just like Tweetie under Time Line
-  * Add Search Function and Saved Searches like Tweetie.
+  * Support Multiple Twitter accounts [DONE]
+  * "My Tweets" under tab "More" [DONE]
+  * When opening tweets, make screen with up/down arrows on top and functions (reply, favorite, forward) under the message. There is a lot of space wasted and we could use to make it more fun. [DONE]
+  * Round user Icons Just like Tweetie under Time Line [DONE]
+  * Add Search Function and Saved Searches like Tweetie. [DONE]
   * When Video is uploaded, add some progress indicator, maybe a line with kb/s between the keyboard and a message text field.
-  * To be able to browse other user followers.
-  * Should be able to send pictures and location URLs in direct messages as we do in regular ones.
-  * It should be possible to queue direct messages, like we do for regular
-  * It should be possible to follow/unfollow users
+  * To be able to browse other user followers. [DONE]
+  * Should be able to send pictures and location URLs in direct messages as we do in regular ones. [DONE]
+  * It should be possible to queue direct messages, like we do for regular [DONE]
+  * It should be possible to follow/unfollow users [DONE]
   * Make it localizable. Translate to Russian as example.
   * 'Submit coordinates to Yfrog API when posting
   * Thumbnails for yfrog posts in list view (like Twittelator Pro)
   * Video playback via Safari
   * Support OAUth
   * Use In-App Email sending form
-  * Remove "Re-tweet" button from Direct Message view.
+  * Remove "Re-tweet" button from Direct Message view. [DONE]
   * Turning screen sideways should launch camera mode after which it should switch to new tweet creation (enable quick camera mode, 10 seconds)
   * Add nice icons to each menu item
   * Use new [http://code.google.com/p/imageshackapi/wiki/StreamingAPI API] for uploading video
