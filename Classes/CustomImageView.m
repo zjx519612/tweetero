@@ -11,12 +11,14 @@
 @implementation CustomImageView
 
 @synthesize image;
+@synthesize frameType;
 
 - (id)initWithFrame:(CGRect)frame 
 {
     if (self = [super initWithFrame:frame]) 
     {
         // Initialization code
+        self.frameType = CIRoudrectFrameType;
         self.image = nil;
         self.backgroundColor = [UIColor clearColor];
     }
@@ -26,18 +28,22 @@
 - (void)drawRect:(CGRect)rect
 {
     // Drawing code
-    float radius = 5.0f;
-
-    CGContextRef context = UIGraphicsGetCurrentContext();
     
-    CGContextBeginPath(context);
-    CGContextMoveToPoint(context, CGRectGetMinX(rect) + radius, CGRectGetMinY(rect));
-    CGContextAddArc(context, CGRectGetMaxX(rect) - radius, CGRectGetMinY(rect) + radius, radius, 3 * M_PI / 2, 0, 0);
-    CGContextAddArc(context, CGRectGetMaxX(rect) - radius, CGRectGetMaxY(rect) - radius, radius, 0, M_PI / 2, 0);
-    CGContextAddArc(context, CGRectGetMinX(rect) + radius, CGRectGetMaxY(rect) - radius, radius, M_PI / 2, M_PI, 0);
-    CGContextAddArc(context, CGRectGetMinX(rect) + radius, CGRectGetMinY(rect) + radius, radius, M_PI, 3 * M_PI / 2, 0);
-    CGContextClosePath(context);
-    CGContextClip(context);
+    if (self.frameType == CIRoudrectFrameType)
+    {
+        float radius = 5.0f;
+
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        
+        CGContextBeginPath(context);
+        CGContextMoveToPoint(context, CGRectGetMinX(rect) + radius, CGRectGetMinY(rect));
+        CGContextAddArc(context, CGRectGetMaxX(rect) - radius, CGRectGetMinY(rect) + radius, radius, 3 * M_PI / 2, 0, 0);
+        CGContextAddArc(context, CGRectGetMaxX(rect) - radius, CGRectGetMaxY(rect) - radius, radius, 0, M_PI / 2, 0);
+        CGContextAddArc(context, CGRectGetMinX(rect) + radius, CGRectGetMaxY(rect) - radius, radius, M_PI / 2, M_PI, 0);
+        CGContextAddArc(context, CGRectGetMinX(rect) + radius, CGRectGetMinY(rect) + radius, radius, M_PI, 3 * M_PI / 2, 0);
+        CGContextClosePath(context);
+        CGContextClip(context);
+    }
     
     // Draw image
     if (self.image)
@@ -47,14 +53,22 @@
 
 - (void)dealloc 
 {
-    [image autorelease];
+    if (image)
+        [image release];
     [super dealloc];
 }
 
 - (void)setImage:(UIImage *)theImage
 {
-    [image autorelease];
+    if (image)
+        [image release];
     image = [theImage retain];
+    [self setNeedsDisplay];
+}
+
+- (void)setFrameType:(int)ftype
+{
+    frameType = ftype;
     [self setNeedsDisplay];
 }
 

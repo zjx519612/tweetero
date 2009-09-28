@@ -60,6 +60,7 @@ enum _TwitEditorSuspendedOperations
     IBOutlet ImagePickerController *imgPicker;
     IBOutlet UILabel *charsCount;
     IBOutlet UIProgressView *progress;
+    IBOutlet UILabel *progressStatus;
 	BOOL			inTextEditingMode;
 
 	UIActionSheet *progressSheet;
@@ -90,6 +91,8 @@ enum _TwitEditorSuspendedOperations
 	
 	NSURL*					pickedVideo;
 	UIImage*				pickedPhoto;
+    
+    int                     _dataSize;
 }
 
 - (id)init;
@@ -99,6 +102,9 @@ enum _TwitEditorSuspendedOperations
 - (IBAction)insertLocationAction;
 - (IBAction)cancel;
 - (void)grabImage;
+
+- (void)progressClear;
+- (void)progressUpdate:(NSInteger)bytesWritten;
 
 - (void)setRetwit:(NSString*)body whose:(NSString*)username;
 - (void)setReplyToMessage:(NSDictionary*)message;
@@ -126,6 +132,8 @@ enum _TwitEditorSuspendedOperations
 
 - (void)startUploadingOfPickedMediaIfNeed;
 - (void)uploadedImage:(NSString*)yFrogURL sender:(ImageUploader*)sender;
+- (void)uploadedDataSize:(NSInteger)size;
+- (void)uploadedProccess:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten;
 
 - (void)retainActivityIndicator;
 - (void)releaseActivityIndicator;

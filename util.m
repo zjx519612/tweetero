@@ -209,8 +209,54 @@ int isImageNeedToConvert(UIImage* testImage, BOOL *needToResize, BOOL *needToRot
 		return -1;
 }
 
+NSArray* linksFromText(NSString *text)
+{
+    if (isNullable(text))
+        return nil;
+    
+    NSMutableArray *links = [NSMutableArray array];
+    
+    NSArray *lines = [text componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+    NSString *line;
+    
+    NSEnumerator *en = [lines objectEnumerator];
+    while(line = [en nextObject])
+    {
+        NSArray *words = [line componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        NSEnumerator *en = [words objectEnumerator];
+        NSString *word;
+        while(word = [en nextObject])
+        {
+            if([word hasPrefix:@"http://"] || [word hasPrefix:@"https://"] || [word hasPrefix:@"www"])
+            {
+                [links addObject:word];
+            }
+        }
+    }
+    
+    return links;
+}
 
-
+NSString* yFrogLinkFromText(NSString *text)
+{
+    NSArray *links = linksFromText(text);
+    NSString *yFrogLink = nil;
+    
+    if (links && [links count] > 0)
+    {
+        int i, count = [links count];
+        for (i = 0; i < count; ++i)
+        {
+            yFrogLink = ValidateYFrogLink([links objectAtIndex:i]);
+            if (yFrogLink)
+            {
+                yFrogLink = [NSString stringWithFormat:@"%@:small", yFrogLink];
+                break;
+            }
+        }
+    }
+    return yFrogLink;
+}
 
 NSString* ValidateYFrogLink(NSString *yfrogUrl)
 {
