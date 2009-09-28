@@ -8,11 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
+typedef enum {
+    CIDefaultFrameType,
+    CIRoudrectFrameType
+} CustomImageViewFrameType;
+
 @interface CustomImageView : UIView
 {
     UIImage *image;
+    int frameType;
 }
 
 @property (nonatomic, retain) UIImage *image;
+@property (nonatomic) int frameType;
 
 @end

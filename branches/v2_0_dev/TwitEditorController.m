@@ -200,6 +200,7 @@
 	messageTextWillIgnoreNextViewAppearing = NO;
 	twitWasChangedManually = NO;
 	_queueIndex = -1;
+    [self progressClear];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setQueueTitle) name:@"QueueChanged" object:nil];
 }
 
@@ -294,6 +295,10 @@
 {
     //img = nil;
     //url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"TestYfrog" ofType:@"mov"]];
+    
+    // PROGRESS
+    [self progressClear];
+    
 	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
 	twitWasChangedManually = YES;
 	messageTextWillIgnoreNextViewAppearing = YES;
@@ -663,6 +668,40 @@
 	
 }
 */
+- (void)progressClear
+{
+    _dataSize = 0;
+    [progressStatus setText:@""];
+    [progress setProgress:0];
+}
+
+- (void)progressUpdate:(NSInteger)bytesWritten
+{
+    float delta = (float)bytesWritten / (float)_dataSize;
+    
+    [progress setProgress:delta];
+    
+    NSString *sizeText;
+    NSString *suffix = @"bytes";
+    
+    float denominator = 1.0f;
+    if (_dataSize / 1024 > 0)
+    {
+        denominator = 1024;
+        if ((_dataSize % 1024) / 1024 > 0)
+        {
+            denominator += 1024;
+            suffix = @"Mb";
+        }
+        else
+            suffix = @"Kb";
+    }
+    
+    
+    sizeText = [NSString stringWithFormat:@"%.1f of %.1f %@", bytesWritten / denominator, _dataSize / denominator, suffix];
+    [progressStatus setText:sizeText];
+}
+
 - (IBAction)attachImagesActions:(id)sender
 {
 	[self grabImage];
@@ -925,6 +964,9 @@
 		
 		if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"RemoveImageTitle", @"")])
 		{
+            // PROGRESS
+            [self progressClear];
+            
 			twitWasChangedManually = YES;
 			[self setImage:nil movie:nil];
 			if(connectionDelegate)
@@ -1075,6 +1117,18 @@
 			[alert release];
 		}
 	}
+}
+
+- (void)uploadedDataSize:(NSInteger)size
+{
+    _dataSize = size;
+}
+
+- (void)uploadedProccess:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten
+{
+    //float delta = (float)(totalBytesWritten) / (float)_dataSize;
+    //[progress setProgress:delta];
+    [self progressUpdate:totalBytesWritten];
 }
 
 #pragma mark MGTwitterEngineDelegate methods

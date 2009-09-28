@@ -26,7 +26,8 @@
 
 #ifndef _UTIL_H__
 #define _UTIL_H__
- 
+
+#define max(a, b)   ((a) > (b) ? (a) : (b))
 //#define DEBUG 1
 
 void LogStringArray(NSArray* ar, NSString* descriptionString);//descriptionString may be NULL
@@ -40,7 +41,8 @@ UIActionSheet * ShowActionSheet(NSString* title, id <UIActionSheetDelegate> dele
 UIImage* imageScaledToSize(UIImage* image, int maxDimension);
 int isImageNeedToConvert(UIImage* testImage, BOOL *needToResize, BOOL *needToRotate);
 
-
+NSArray* linksFromText(NSString *text);
+NSString* yFrogLinkFromText(NSString *text);
 NSString* ValidateYFrogLink(NSString *url);
 BOOL isVideoLink(NSString *yfrogUrl);
 NSString* getLinkWithTag(NSString *tag);

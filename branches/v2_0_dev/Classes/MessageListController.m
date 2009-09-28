@@ -34,11 +34,12 @@
 #include "util.h"
 #include "TweetViewController.h"
 
-#define NAME_TAG 1
-#define TIME_TAG 2
-#define IMAGE_TAG 3
-#define TEXT_TAG 4
-#define ROW_HEIGHT 70
+#define NAME_TAG            1
+#define TIME_TAG            2
+#define IMAGE_TAG           3
+#define TEXT_TAG            4
+#define YFROG_IMAGE_TAG     5
+#define ROW_HEIGHT          70
 
 @implementation MessageListController
 
@@ -143,14 +144,20 @@
 }
 
 
-#define IMAGE_SIDE 48
-#define BORDER_WIDTH 5
-#define TEXT_OFFSET_X (BORDER_WIDTH * 2 + IMAGE_SIDE)
-#define LABEL_HEIGHT 20
-#define LABEL_WIDTH 130
-#define TEXT_WIDTH (320 - TEXT_OFFSET_X - BORDER_WIDTH)
-#define TEXT_OFFSET_Y (BORDER_WIDTH * 2 + LABEL_HEIGHT)
-#define TEXT_HEIGHT (ROW_HEIGHT - TEXT_OFFSET_Y - BORDER_WIDTH)
+#define IMAGE_SIDE              48
+#define BORDER_WIDTH            5
+
+#define TEXT_OFFSET_X           (BORDER_WIDTH * 2 + IMAGE_SIDE)
+#define TEXT_OFFSET_Y           (BORDER_WIDTH * 2 + LABEL_HEIGHT)
+#define TEXT_WIDTH              (320 - TEXT_OFFSET_X - BORDER_WIDTH) - YFROG_IMAGE_WIDTH - BORDER_WIDTH
+#define TEXT_HEIGHT             (ROW_HEIGHT - TEXT_OFFSET_Y - BORDER_WIDTH)
+
+#define LABEL_HEIGHT            20
+#define LABEL_WIDTH             130
+
+#define YFROG_IMAGE_X           TEXT_OFFSET_X + TEXT_WIDTH + BORDER_WIDTH
+#define YFROG_IMAGE_Y           TEXT_OFFSET_Y
+#define YFROG_IMAGE_WIDTH       48
 
 - (UITableViewCell *)tableviewCellWithReuseIdentifier:(NSString *)identifier 
 {
@@ -167,7 +174,7 @@
 	if([identifier isEqualToString:@"TwittListCell"])
 	{
 		CGRect rect;
-			
+        
 		rect = CGRectMake(0.0, 0.0, 320.0, ROW_HEIGHT);
 		
 		UITableViewCell *cell = [[[UITableViewCell alloc] initWithFrame:rect reuseIdentifier:identifier] autorelease];
@@ -224,6 +231,13 @@
 		
 		[label release];
 		
+        CustomImageView *yFrogImage = [[CustomImageView alloc] initWithFrame:CGRectMake(YFROG_IMAGE_X, YFROG_IMAGE_Y, YFROG_IMAGE_WIDTH, YFROG_IMAGE_WIDTH)];
+        yFrogImage.frameType = CIDefaultFrameType;
+        yFrogImage.tag = YFROG_IMAGE_TAG;
+        yFrogImage.backgroundColor = [UIColor clearColor];
+        [cell.contentView addSubview:yFrogImage];
+        [yFrogImage release];
+        
 		return cell;
 	}
 	
@@ -270,15 +284,38 @@
 			userData = [messageData objectForKey:@"sender"];
 		
 		CGRect cellFrame = [cell frame];
-		//Set message text
+		
+        // Load yFrog thumbnail
+        CustomImageView *yFrogImage = (CustomImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
+        
+        NSString *yFrogLink = yFrogLinkFromText([messageData objectForKey:@"text"]);
+        int yFrogImageHeight = 0;
+        if (yFrogLink)
+        {
+            UIImage *image = [[ImageLoader sharedLoader] imageWithURL:yFrogLink];
+            if (image.size.width > YFROG_IMAGE_WIDTH || image.size.height > YFROG_IMAGE_WIDTH)
+                image = imageScaledToSize(image, YFROG_IMAGE_WIDTH);
+            yFrogImage.image = image;
+            yFrogImageHeight = YFROG_IMAGE_WIDTH;
+        }
+        else
+        {
+            yFrogImage.image = nil;
+        }
+        
+        //Set message text
 		UILabel *label;
 		label = (UILabel *)[cell viewWithTag:TEXT_TAG];
 		label.text = DecodeEntities([messageData objectForKey:@"text"]);
-		[label setFrame:CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH, TEXT_HEIGHT)];
+		[label setFrame:CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH + (YFROG_IMAGE_WIDTH - yFrogImageHeight), TEXT_HEIGHT)];
 		[label sizeToFit];
-		if(label.frame.size.height > TEXT_HEIGHT)
+        
+        
+		if(label.frame.size.height > TEXT_HEIGHT || yFrogImageHeight > TEXT_HEIGHT)
 		{
-			cellFrame.size.height = ROW_HEIGHT + label.frame.size.height - TEXT_HEIGHT;
+            int max = max(label.frame.size.height, yFrogImageHeight);
+            int cell_h = ROW_HEIGHT + max /*label.frame.size.height*/ - TEXT_HEIGHT;
+			cellFrame.size.height = cell_h;
 		}
 		else
 		{

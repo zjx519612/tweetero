@@ -135,10 +135,10 @@
 	
 	[req setHTTPBody:postBody];
 
+    [delegate uploadedDataSize:[postBody length]];
+    
 	[self retain];
-	self.connection = [[NSURLConnection alloc] initWithRequest:req 
-												  delegate:self 
-										  startImmediately:YES];
+	self.connection = [[NSURLConnection alloc] initWithRequest:req delegate:self startImmediately:YES];
 	if (!self.connection) 
 	{
 		[delegate uploadedImage:nil sender:self];
@@ -233,6 +233,11 @@
     [self release];
 }
 
+- (void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten 
+                                      totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite
+{
+    [delegate uploadedProccess:bytesWritten totalBytesWritten:totalBytesWritten];
+}
 
 - (NSCachedURLResponse *) connection:(NSURLConnection *)connection 
                    willCacheResponse:(NSCachedURLResponse *)cachedResponse
