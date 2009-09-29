@@ -27,6 +27,29 @@
 #include "util.h"
 #import "MGTwitterEngine.h"
 
+void traceDict(NSDictionary *dict)
+{
+    NSEnumerator *keys = [dict keyEnumerator];
+    id key = nil;
+    while ((key = [keys nextObject]) != nil)
+    {
+        id obj = [dict objectForKey:key];
+        
+        NSString *keyStr;
+        if ([key isKindOfClass:[NSString class]])
+            keyStr = key;
+        else
+            keyStr = [NSString stringWithCString:NAMEOF(key)];
+        
+        NSString *valStr;
+        if ([obj isKindOfClass:[NSString class]])
+            valStr = obj;
+        else
+            valStr = [NSString stringWithCString:NAMEOF(key)];
+        NSLog(@"%@: %@\n", keyStr, valStr);
+    }
+}
+
 void LogStringArray(NSArray* ar, NSString* descriptionString)
 {
 #ifdef DEBUG

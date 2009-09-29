@@ -30,6 +30,7 @@
 #define max(a, b)   ((a) > (b) ? (a) : (b))
 //#define DEBUG 1
 
+void traceDict(NSDictionary *dict);
 void LogStringArray(NSArray* ar, NSString* descriptionString);//descriptionString may be NULL
 void LogStringSet(NSSet* set, NSString* descriptionString);//descriptionString may be NULL
 void LogDictionaryStringKeys(NSDictionary* dict, NSString* descriptionString);//descriptionString may be NULL

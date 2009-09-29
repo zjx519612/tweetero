@@ -41,6 +41,7 @@
 	BOOL _loading;
 	NSString *_errorDesc;
     UINavigationController *_rootNavigationController;
+    NSMutableDictionary *_yFrogImages;
 }
 
 @property (nonatomic, retain) UINavigationController *rootNavigationController;
