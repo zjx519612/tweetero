@@ -39,6 +39,7 @@
 		0073C082106A498A006A0D62 /* MGTwitterUsersYAJLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C07B106A498A006A0D62 /* MGTwitterUsersYAJLParser.m */; };
 		0073C083106A498A006A0D62 /* MGTwitterYAJLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C07D106A498A006A0D62 /* MGTwitterYAJLParser.m */; };
 		0073C0B8106A54D7006A0D62 /* searchutil.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C0B7106A54D7006A0D62 /* searchutil.m */; };
+		0088208D107251AC0055FC91 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0088208C107251AC0055FC91 /* MessageUI.framework */; };
 		00999DC910567D1D003906C7 /* TweetViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00999DC810567D1D003906C7 /* TweetViewController.m */; };
 		00999E801056A04E003906C7 /* Reply.png in Resources */ = {isa = PBXBuildFile; fileRef = 00999E7F1056A04E003906C7 /* Reply.png */; };
 		009E75A11068F59E007B2275 /* FollowersController.m in Sources */ = {isa = PBXBuildFile; fileRef = 009E75A01068F59E007B2275 /* FollowersController.m */; };
@@ -177,6 +178,7 @@
 		0073C07D106A498A006A0D62 /* MGTwitterYAJLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGTwitterYAJLParser.m; sourceTree = "<group>"; };
 		0073C0B6106A54D7006A0D62 /* searchutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = searchutil.h; sourceTree = "<group>"; };
 		0073C0B7106A54D7006A0D62 /* searchutil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = searchutil.m; sourceTree = "<group>"; };
+		0088208C107251AC0055FC91 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		00999DC710567D1D003906C7 /* TweetViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetViewController.h; sourceTree = "<group>"; };
 		00999DC810567D1D003906C7 /* TweetViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweetViewController.m; sourceTree = "<group>"; };
 		00999E7F1056A04E003906C7 /* Reply.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Reply.png; path = Resource/Images/Reply.png; sourceTree = "<group>"; };
@@ -323,6 +325,7 @@
 				AA987B840F6DF22600BE95C2 /* CoreLocation.framework in Frameworks */,
 				D9A1D0CA0F75DE790055E311 /* Security.framework in Frameworks */,
 				D9F3D74D0FE87CEE0007619E /* MediaPlayer.framework in Frameworks */,
+				0088208D107251AC0055FC91 /* MessageUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -545,6 +548,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0088208C107251AC0055FC91 /* MessageUI.framework */,
 				D9F3D74C0FE87CEE0007619E /* MediaPlayer.framework */,
 				D9A1D0C90F75DE790055E311 /* Security.framework */,
 				AA987B830F6DF22600BE95C2 /* CoreLocation.framework */,

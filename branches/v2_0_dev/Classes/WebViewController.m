@@ -35,10 +35,21 @@
 	if(self)
 	{
 		_request = [request retain];
+        _content = nil;
 		self.hidesBottomBarWhenPushed = YES;
 	}
 	
 	return self;
+}
+
+- (id)initWithHTML:(NSString*)content
+{
+    self = [self initWithRequest:nil];
+    if (self)
+    {
+        _content = [[NSString alloc] initWithString:content];
+    }
+    return self;
 }
 
 - (void)dealloc
@@ -56,7 +67,12 @@
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-	[webView loadRequest:_request];
+    
+    if (_request)
+        [webView loadRequest:_request];
+    else if (_content)
+        [webView loadHTMLString:_content baseURL:nil];
+    
 	self.navigationItem.title = @"Loading...";
 	// important for view orientation rotation
 	self.view.autoresizesSubviews = YES;

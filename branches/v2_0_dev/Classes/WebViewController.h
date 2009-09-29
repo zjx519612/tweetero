@@ -32,7 +32,10 @@
     IBOutlet UIWebView* webView;
 	
 	NSURLRequest* _request;
+    NSString* _content;
 }
 
 - (id)initWithRequest:(NSURLRequest*)request;
+- (id)initWithHTML:(NSString*)content;
+
 @end

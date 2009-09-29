@@ -242,21 +242,41 @@ const int kHeadTagLocation = 4;
 	
 	if(_suspendedOperation == TVForward)
 	{
-		BOOL success = NO;
-		NSString *mailto = [NSString stringWithFormat:@"mailto:?&subject=%@&body=%%26lt%%3B%@%%26gt%%3B", 
-							[NSLocalizedString(@"Mail Subject: Forwarding of a twit", @"") stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding],
-							[body stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]
-							];
-        
-		success = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:mailto]];
-		if(!success)
-		{
-			UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Failed!", @"") message:NSLocalizedString(@"Failed to send a mail.", @"")
-														   delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-			[alert show];	
-			[alert release];
+        NSString *subject = NSLocalizedString(@"Mail Subject: Forwarding of a twit", @"");
+
+        Class mailClass = NSClassFromString(@"MFMailComposeViewController");
+        if ([mailClass canSendMail])
+        {
+            MFMailComposeViewController *mail = [[MFMailComposeViewController alloc] init];
+            NSString *mailBody = [NSString stringWithFormat:@"<%@>", body];
+            
+            mail.mailComposeDelegate = self;
+            [mail setMessageBody:mailBody isHTML:NO];
+            [mail setSubject:subject];
+            
+            [self presentModalViewController:mail animated:YES];
+            [mail release];
+        }
+        else
+        {
+            BOOL success = NO;
+            
+            NSString *mailto = [NSString stringWithFormat:@"mailto:?&subject=%@&body=%%26lt%%3B%@%%26gt%%3B", 
+                                                [subject stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding], 
+                                                [body stringByAddingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
+            
+            success = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:mailto]];
+            if(!success)
+            {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Failed!", @"") 
+                                                                message: NSLocalizedString(@"Failed to send a mail.", @"")
+                                                               delegate: nil 
+                                                      cancelButtonTitle: @"OK" 
+                                                      otherButtonTitles: nil];
+                [alert show];	
+                [alert release];
+            }
 		}
-		
 	}	
 	else if(_suspendedOperation == TVRetwit)
 	{
@@ -287,7 +307,7 @@ const int kHeadTagLocation = 4;
 	if(canOperate)
 		[self implementOperationIfPossible];
 	else
-		self._progressSheet = ShowActionSheet(NSLocalizedString(@"Copying images to yFrog server...", @""), self, NSLocalizedString(@"Cancel", @""), self.tabBarController.view);
+		self._progressSheet = ShowActionSheet(NSLocalizedString(@"Copying images to yFrog server...", @""), self, NSLocalizedString(@"Cancel", @""), self.view);
 }
 
 - (NSString*)makeHTMLMessage
@@ -336,7 +356,15 @@ const int kHeadTagLocation = 4;
 				else
 				{
 					[_imagesLinks setObject:word forKey:word];
-					word = [NSString  stringWithFormat:@"<br><a href=%@><img src=%@.th.jpg></a><br>", yFrogURL, yFrogURL];
+                    if (isVideoLink(yFrogURL))
+                    {
+                        NSString *videoSrc = [yFrogURL stringByAppendingString:@":iphone"];
+                        word = [NSString stringWithFormat:@"<br><video poster=\"%@.th.jpg\" src=\"%@\"></video>", yFrogURL, videoSrc];
+                    }
+                    else
+                    {
+                        word = [NSString  stringWithFormat:@"<br><a href=%@><img src=%@.th.jpg></a><br>", yFrogURL, yFrogURL];
+                    }
 					_newLineCounter += 6;
 				}
 			}
@@ -547,29 +575,9 @@ const int kHeadTagLocation = 4;
 	[alert release];
 }
 
-- (void)receivedImage:(UIImage*)image sender:(ImageDownoader*)sender
-{
-	[_connectionsDelegates removeObject:sender];
-	if(image)
-	{
-		ImageUploader * uploader = [[ImageUploader alloc] init];
-		[_connectionsDelegates addObject:uploader];
-		[uploader postImage:image delegate:self userData:sender.origURL];
-		[uploader release];
-	}
-	[self implementOperationIfPossible];
-}
-
-- (void)uploadedImage:(NSString*)yFrogURL sender:(ImageUploader*)sender
-{
-	[_connectionsDelegates removeObject:sender];
-	if(yFrogURL)
-		[_imagesLinks setObject:yFrogURL forKey:sender.userData];
-	[self implementOperationIfPossible];
-}
-
 -(void)movieFinishedCallback:(NSNotification*)aNotification
 {
+    /*
     MPMoviePlayerController* theMovie = [aNotification object];
     
     [[NSNotificationCenter defaultCenter] removeObserver: self
@@ -577,10 +585,12 @@ const int kHeadTagLocation = 4;
                                                   object: theMovie];
     // Release the movie instance created in playMovieAtURL:
     [theMovie release];
+     */
 }
 
 - (void)playMovie:(NSString*)movieURL
 {
+    /*
 	MPMoviePlayerController* theMovie = [[TweetPlayer alloc] initWithContentURL:
                                          [NSURL URLWithString:[movieURL stringByAppendingString:@":iphone"]]];
 	theMovie.scalingMode = MPMovieScalingModeAspectFit;
@@ -594,6 +604,38 @@ const int kHeadTagLocation = 4;
     
 	// Movie playback is asynchronous, so this method returns immediately.
 	[theMovie play];
+     */
+}
+
+#pragma mark ImageDownoader Delegate
+- (void)receivedImage:(UIImage*)image sender:(ImageDownoader*)sender
+{
+	[_connectionsDelegates removeObject:sender];
+	if(image)
+	{
+		ImageUploader * uploader = [[ImageUploader alloc] init];
+		[_connectionsDelegates addObject:uploader];
+		[uploader postImage:image delegate:self userData:sender.origURL];
+		[uploader release];
+	}
+	[self implementOperationIfPossible];
+}
+
+#pragma mark ImageUploader Delegate
+- (void)uploadedImage:(NSString*)yFrogURL sender:(ImageUploader*)sender
+{
+	[_connectionsDelegates removeObject:sender];
+	if(yFrogURL)
+		[_imagesLinks setObject:yFrogURL forKey:sender.userData];
+	[self implementOperationIfPossible];
+}
+
+- (void)uploadedDataSize:(NSInteger)size
+{
+}
+
+- (void)uploadedProccess:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten
+{
 }
 
 #pragma mark UserInfoView Delegate
@@ -602,6 +644,12 @@ const int kHeadTagLocation = 4;
     UserInfo *infoView = [[UserInfo alloc] initWithUserName:[[_message objectForKey:@"user"] objectForKey:@"screen_name"]];
 	[self.navigationController pushViewController:infoView animated:YES];
 	[infoView release];
+}
+
+#pragma mark MFMailComposeViewController Delegate
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
+{    
+    [self dismissModalViewControllerAnimated:YES];
 }
 
 #pragma mark UIWebView Delegate

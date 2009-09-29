@@ -7,6 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MessageUI/MessageUI.h>
+#import <MessageUI/MFMailComposeViewController.h>
+
 #import "yFrogImageDownoader.h"
 #import "yFrogImageUploader.h"
 #import "MGConnectionWrap.h"
@@ -45,7 +48,8 @@ typedef enum {
 @interface TweetViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, 
                                                    UIActionSheetDelegate, UIAlertViewDelegate,
                                                    ImageUploaderDelegate, ImageDownoaderDelegate,
-                                                   UIWebViewDelegate, UserInfoViewDelegate>
+                                                   UIWebViewDelegate, UserInfoViewDelegate,
+                                                   MFMailComposeViewControllerDelegate>
 {
     IBOutlet UISegmentedControl         *tweetNavigate;
     IBOutlet UITableView                *contentTable;

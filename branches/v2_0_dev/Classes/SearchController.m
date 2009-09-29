@@ -165,15 +165,36 @@
     
     NSArray *newResult = _result;
     if (newResult)
-        newResult = [[_result arrayByAddingObjectsFromArray:tempArray] retain];
+    {
+        _result = [[newResult arrayByAddingObjectsFromArray:tempArray] retain];
+        [newResult release];
+    }
     else
-        newResult = [tempArray retain];
-    
-    if (_result) 
-        [_result release];
-    _result = newResult;
+    {
+        _result = [tempArray retain];
+    }
 
     [self reloadData];
+    /*
+     
+     NSArray *prevRes = _result;
+     if (prevRes)
+     {
+     _result = [[prevRes arrayByAddingObjectsFromArray:tempArray] retain];
+     NSMutableArray *rows = [NSMutableArray arrayWithCapacity:[tempArray count]];
+     for (int i = [prevRes count]; i < [_result count]; ++i)
+     [rows addObject:[NSIndexPath indexPathForRow:i inSection:0]];
+     if ([rows count] > 0)
+     [(UITableView*)self.view insertRowsAtIndexPaths:rows withRowAnimation:YES];
+     [prevRes release];
+     }
+     else
+     {
+     _result = [tempArray retain];
+     }
+     [self reloadData];
+     
+     */
     [_searchBar resignFirstResponder];
 }
 

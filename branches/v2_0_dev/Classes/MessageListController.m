@@ -41,6 +41,10 @@
 #define YFROG_IMAGE_TAG     5
 #define ROW_HEIGHT          70
 
+@interface MessageListController (Proivate)
+- (void)updateYFrogImages;
+@end
+
 @implementation MessageListController
 
 @synthesize rootNavigationController;
@@ -80,6 +84,8 @@
 
 	[_messages release];
 	
+    if (_yFrogImages)
+        [_yFrogImages release];
 	
 	if(_errorDesc)
 		[_errorDesc release];
@@ -286,8 +292,9 @@
 		CGRect cellFrame = [cell frame];
 		
         // Load yFrog thumbnail
+
         CustomImageView *yFrogImage = (CustomImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
-        
+        /*        
         NSString *yFrogLink = yFrogLinkFromText([messageData objectForKey:@"text"]);
         int yFrogImageHeight = 0;
         if (yFrogLink)
@@ -296,6 +303,19 @@
             if (image.size.width > YFROG_IMAGE_WIDTH || image.size.height > YFROG_IMAGE_WIDTH)
                 image = imageScaledToSize(image, YFROG_IMAGE_WIDTH);
             yFrogImage.image = image;
+            yFrogImageHeight = YFROG_IMAGE_WIDTH;
+        }
+        else
+        {
+            yFrogImage.image = nil;
+        }
+        */
+        
+        int yFrogImageHeight = 0;
+        id image = (_yFrogImages) ? [_yFrogImages objectForKey:[messageData objectForKey:@"id"]] : nil;
+        if (image && (image != [NSNull null]))
+        {
+            yFrogImage.image = (UIImage*)image;
             yFrogImageHeight = YFROG_IMAGE_WIDTH;
         }
         else
@@ -432,29 +452,6 @@
 	}
 }
 
-- (void)traceDict:(NSDictionary*)dict
-{
-    NSEnumerator *keys = [dict keyEnumerator];
-    id key = nil;
-    while ((key = [keys nextObject]) != nil)
-    {
-        id obj = [dict objectForKey:key];
-        //NSLog(@"Test");
-        NSLog(@"Key: %@ for: ", (NSString*)key);
-        if ([(NSString*)key compare:@"user"] == NSOrderedSame)
-            [self traceDict:obj];
-        
-        if ([obj respondsToSelector:@selector(rangeOfString:)])
-        {
-            NSLog((NSString*)obj);
-        }
-        else
-        {
-            NSLog(@"NOT STRING");
-        }
-    }
-}
-
 // DEBUG Methods -------------------------------------------------------------------------------------------------------------------
 #pragma mark TweetViewDelegate
 - (int)messageCount
@@ -517,6 +514,7 @@
 	{
 		[_messages release];
 		_messages = nil;
+        [self updateYFrogImages];
 	}
 	
 	[self.tableView reloadData];
@@ -562,6 +560,7 @@
 		[messages release];
 	}
 	
+    [self updateYFrogImages];
 	[self releaseActivityIndicator];
 	
 	if(self.navigationItem.leftBarButtonItem)
@@ -626,7 +625,7 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 		[messages release];
 	}
 	
-	
+	[self updateYFrogImages];
 	[self releaseActivityIndicator];
 	
 	if(self.navigationItem.leftBarButtonItem)
@@ -660,6 +659,10 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 	_lastMessage = NO;
 	_pagenum = 1;
 	
+    //if (_yFrogImages)
+    //    [_yFrogImages release];
+    //_yFrogImages = nil;
+    
 	if(_messages)
 	{
 		[_messages release];
@@ -692,3 +695,45 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 
 @end
 
+@implementation MessageListController (Private)
+
+- (void)updateYFrogImages
+{
+    if (_messages)
+    {
+        if (!_yFrogImages)
+            _yFrogImages = [[NSMutableDictionary alloc] init];
+        
+        NSDictionary *message;
+        NSEnumerator *en = [_messages objectEnumerator];
+        while ((message = (NSDictionary *)[en nextObject]))
+        {
+            id key = [message objectForKey:@"id"];
+            if ([_yFrogImages objectForKey:key] == nil)
+            {
+                NSString *yFrogLink = yFrogLinkFromText([message objectForKey:@"text"]);
+                if (yFrogLink)
+                {
+                    UIImage *image = [[ImageLoader sharedLoader] imageWithURL:yFrogLink];
+                    if (image)
+                    {
+                        if (image.size.width > YFROG_IMAGE_WIDTH || image.size.height > YFROG_IMAGE_WIDTH)
+                            image = imageScaledToSize(image, YFROG_IMAGE_WIDTH);
+                        [_yFrogImages setObject:image forKey:key];
+                    }
+                    else
+                    {
+                        [_yFrogImages setObject:[NSNull null] forKey:key];
+                    }
+                }
+            }
+        }
+    }
+    else if (_yFrogImages)
+    {
+        [_yFrogImages release];
+        _yFrogImages = nil;
+    }
+}
+
+@end
