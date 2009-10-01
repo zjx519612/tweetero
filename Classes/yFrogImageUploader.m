@@ -164,7 +164,6 @@
 		[delegate uploadedImage:nil sender:self];
 		return;
 	}
-		
 
 	[self postData:imageJPEGData contentType:JPEG_CONTENT_TYPE];
 }
@@ -179,9 +178,16 @@
 		[delegate uploadedImage:nil sender:self];
 		return;
 	}
-		
-
-	[self postData:movieData contentType:MP4_CONTENT_TYPE];
+    
+	[TweetterAppDelegate increaseNetworkActivityIndicator];
+    
+    [self retain];
+    ISVideoUploadEngine *videoUploadEngine = [[ISVideoUploadEngine alloc] initWithData:movieData delegate:self];
+    if (![videoUploadEngine upload])
+        [self release];
+    [videoUploadEngine release];
+    
+	//[self postData:movieData contentType:MP4_CONTENT_TYPE];
 }
 
 - (void)convertImageThreadAndStartUpload:(UIImage*)image
@@ -311,5 +317,37 @@
 	return canceled;
 }
 
+#pragma mark ISVideoUploadEngine Delegate
+- (void)didStartUploading:(ISVideoUploadEngine *)engine totalSize:(NSUInteger)size
+{
+    [delegate uploadedDataSize:size];
+}
+
+- (void)didFinishUploading:(ISVideoUploadEngine *)engine videoUrl:(NSString *)link
+{
+	[TweetterAppDelegate decreaseNetworkActivityIndicator];
+	[delegate uploadedImage:link sender:self];
+    [self release];
+}
+
+- (void)didFailWithErrorMessage:(ISVideoUploadEngine *)engine errorMessage:(NSString *)error
+{
+	[TweetterAppDelegate decreaseNetworkActivityIndicator];
+	[delegate uploadedImage:nil sender:self];
+    [self release];
+}
+
+- (void)didFinishUploadingChunck:(ISVideoUploadEngine *)engine uploadedSize:(NSUInteger)totalUploadedSize totalSize:(NSUInteger)size
+{
+    [delegate uploadedProccess:totalUploadedSize totalBytesWritten:totalUploadedSize];
+}
+
+- (void)didStopUploading:(ISVideoUploadEngine *)engine
+{
+}
+
+- (void)didResumeUploading:(ISVideoUploadEngine *)engine
+{
+}
 
 @end
