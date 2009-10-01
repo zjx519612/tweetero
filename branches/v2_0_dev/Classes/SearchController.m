@@ -90,6 +90,8 @@
 {
     NSString *searchStr = [NSString stringWithString:_searchBar.text];
     
+    //[_twitter twitterDestroySearch:1934118];
+    
     if (presentAtSavedSearchTerms(searchStr))
         removeSearchTerm(searchStr);
     else

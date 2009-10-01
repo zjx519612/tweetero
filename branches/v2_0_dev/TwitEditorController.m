@@ -715,6 +715,11 @@
 	ImageUploader * uploader = [[ImageUploader alloc] init];
 	self.connectionDelegate = uploader;
 	[self retainActivityIndicator];
+    
+    //NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"mp4"];
+    //[uploader postMP4Data:[NSData dataWithContentsOfFile:path] delegate:self userData:pickedPhoto];
+    //return;
+    
 	if(pickedPhoto)
 		[uploader postImage:pickedPhoto delegate:self userData:pickedPhoto];
 	else

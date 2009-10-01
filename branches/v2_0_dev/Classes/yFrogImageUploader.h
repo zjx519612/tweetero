@@ -26,6 +26,7 @@
 
 #import <Foundation/Foundation.h>
 #import "TwitterConnectionProtocol.h"
+#import "ISVideoUploadEngine.h"
 
 @class ImageUploader;
 
@@ -39,7 +40,7 @@
 
 
 
-@interface ImageUploader : NSObject <TwitterConnectionProtocol>
+@interface ImageUploader : NSObject <TwitterConnectionProtocol, ISVideoUploadEngineDelegate>
 {
 	NSMutableData*	result;
 	id <ImageUploaderDelegate> delegate;

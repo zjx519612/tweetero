@@ -41,6 +41,8 @@
 #import "MyTweetViewController.h"
 #import "AccountController.h"
 
+#import "ISVideoUploadEngine.h"
+
 static int NetworkActivityIndicatorCounter = 0;
 
 @implementation TweetterAppDelegate
@@ -51,6 +53,16 @@ static int NetworkActivityIndicatorCounter = 0;
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application 
 {
+    /*
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"mp4"];
+    NSData *uploadData = [NSData dataWithContentsOfFile:path];
+    ISVideoUploadEngine *uploadEngine = [[ISVideoUploadEngine alloc] initWithData:uploadData];
+    
+    [uploadEngine upload];
+    [uploadEngine release];
+    return;
+    */
+    
 	NSDictionary *appDefaults = [[NSDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 	[appDefaults release];

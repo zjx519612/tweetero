@@ -20,6 +20,7 @@ typedef enum _MGTwitterRequestType {
 #if YAJL_AVAILABLE
 	MGTwitterSearchRequest			= 9, // a search request
 #endif
+    MGTwitterSearchManage           = 10,
 } MGTwitterRequestType;
 
 typedef enum _MGTwitterResponseType {
