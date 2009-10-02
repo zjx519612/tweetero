@@ -129,7 +129,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 - (IBAction)changeFollowing:(id)sender
 {
     NSString *title = _following ? @"FOLLOWING" : @"STOP FOLLOWING";
-    [followButton setTitle:title forSegmentAtIndex:0];
+    [followButton setTitle:NSLocalizedString(title, @"") forSegmentAtIndex:0];
 }
 
 - (IBAction)follow
@@ -191,10 +191,10 @@ static NSString* kActionCell = @"UserInfoActionCell";
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Network Failure" 
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Network Failure", @"")
                                                     message: [error localizedDescription]
 												   delegate: self 
-                                          cancelButtonTitle: @"OK" 
+                                          cancelButtonTitle: NSLocalizedString(@"OK", @"")
                                           otherButtonTitles: nil];
 	[alert show];
 	[alert release];
@@ -308,7 +308,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 	
     // Hide infoView if user data not founded
 	if(infoEmpty)
-        [info appendString:@"User description is empty."];
+        [info appendString:NSLocalizedString(@"User description is empty.", @"")];
     [info appendString:@"</body></html>"];
     infoView.scalesPageToFit = NO;
     [infoView loadHTMLString:info baseURL:nil];
@@ -466,12 +466,12 @@ static NSString* kActionCell = @"UserInfoActionCell";
 - (void)initTableData
 {
     [_userTableSection addObject:[NSArray arrayWithObject:@""]];
-    [_userTableSection addObject:[NSArray arrayWithObjects:@"Device Updates", nil]];
+    [_userTableSection addObject:[NSArray arrayWithObjects:NSLocalizedString(@"Device Updates", @""), nil]];
     [_userTableSection addObject:[NSArray arrayWithObjects:
-                                                @"Send Direct Message",
-                                                @"Send Public Reply",
-                                                @"Recent Tweets",
-                                                @"Followers",
+                                                NSLocalizedString(@"Send Direct Message", @""),
+                                                NSLocalizedString(@"Send Public Reply", @""),
+                                                NSLocalizedString(@"Recent Tweets", @""),
+                                                NSLocalizedString(@"Followers", @""),
                                                 nil]];    
 }
 

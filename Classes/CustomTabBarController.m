@@ -121,7 +121,7 @@ const int kTabBarHeight = 46;
     
     if (item.tag == kMoreBarItemTag)
     {
-        self.navigationItem.title = @"More";
+        self.navigationItem.title = NSLocalizedString(@"More", @"");
         self.navigationItem.rightBarButtonItem = nil;
         [_contentView addSubview:_moreTable];
     }
@@ -220,7 +220,7 @@ const int kTabBarHeight = 46;
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section 
 {
     if (section == 1)
-        return @"Saved Searches";
+        return NSLocalizedString(@"Saved Searches", @"");
     return nil;
 }
 

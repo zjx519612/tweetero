@@ -34,7 +34,7 @@
 {
     UIViewController *parentController = parent;
     
-    parentController.navigationItem.title = @"Direct Messages";
+    parentController.navigationItem.title = NSLocalizedString(@"Direct Messages", @"");
     
 	UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem: UIBarButtonSystemItemRefresh
                                                                                   target: self
@@ -66,12 +66,12 @@
 
 - (NSString*)noMessagesString
 {
-	return @"No Direct Messages";
+	return NSLocalizedString(@"No Direct Messages", @"");
 }
 
 - (NSString*)loadingMessagesString
 {
-	return @"Loading Direct Messages...";
+	return NSLocalizedString(@"Loading Direct Messages...", @"");
 }
 
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count

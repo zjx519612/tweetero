@@ -53,7 +53,7 @@ const int kHeadTagLocation = 4;
 
 - (void)updateViewTitle
 {
-    self.title = [NSString stringWithFormat:@"%i of %i", _currentMessageIndex + 1, _count];
+    self.title = [NSString stringWithFormat:NSLocalizedString(@"%i of %i", @""), _currentMessageIndex + 1, _count];
 }
 
 - (void)activeCurrentMessage
@@ -148,7 +148,7 @@ const int kHeadTagLocation = 4;
                 infoLabel.numberOfLines = 2;
                 infoLabel.font = [UIFont systemFontOfSize:13.];
                 infoLabel.backgroundColor = [UIColor clearColor];
-                infoLabel.text = [NSString stringWithFormat:@"%@\nfrom %@", formatedDate, msgSource];
+                infoLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%@\nfrom %@", @""), formatedDate, msgSource];
                 infoLabel.textColor = [UIColor grayColor];
                 [cell.contentView addSubview:infoLabel];
             }
@@ -271,7 +271,7 @@ const int kHeadTagLocation = 4;
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Failed!", @"") 
                                                                 message: NSLocalizedString(@"Failed to send a mail.", @"")
                                                                delegate: nil 
-                                                      cancelButtonTitle: @"OK" 
+                                                      cancelButtonTitle: NSLocalizedString(@"OK", @"")
                                                       otherButtonTitles: nil];
                 [alert show];	
                 [alert release];
@@ -412,16 +412,16 @@ const int kHeadTagLocation = 4;
         NSMutableArray *sectionContent = nil;
         
         // Message
-        sectionContent = [NSMutableArray arrayWithObject:@"Message"];
+        sectionContent = [NSMutableArray arrayWithObject:NSLocalizedString(@"Message", @"")];
         [_sections setObject:sectionContent forKey:[NSNumber numberWithInt:TVSectionMessage]];
         // Action
         sectionContent = [NSMutableArray array];
-        [sectionContent addObject:@"Reply"];
-        [sectionContent addObject:@"Favorite"];
-        [sectionContent addObject:@"Forward"];
+        [sectionContent addObject:NSLocalizedString(@"Reply", @"")];
+        [sectionContent addObject:NSLocalizedString(@"Favorite", @"")];
+        [sectionContent addObject:NSLocalizedString(@"Forward", @"")];
         [_sections setObject:sectionContent forKey:[NSNumber numberWithInt:TVSectionGeneralActions]];
         // Delete action
-        sectionContent = [NSMutableArray arrayWithObject:@"Delete"];
+        sectionContent = [NSMutableArray arrayWithObject:NSLocalizedString(@"Delete", @"")];
         [_sections setObject:sectionContent forKey:[NSNumber numberWithInt:TVSectionDelete]];
         
         [self createHeadView];
@@ -566,11 +566,11 @@ const int kHeadTagLocation = 4;
 
 - (IBAction)deleteTwit
 {
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Do you wish to delete this tweet?" 
-                                                    message: @"This operation cannot be undone"
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Do you wish to delete this tweet?", @"") 
+                                                    message: NSLocalizedString(@"This operation cannot be undone", @"")
 												   delegate: self 
-                                          cancelButtonTitle: @"Cancel" 
-                                          otherButtonTitles: @"OK", nil];
+                                          cancelButtonTitle: NSLocalizedString(@"Cancel", @"") 
+                                          otherButtonTitles: NSLocalizedString(@"OK", @""), nil];
 	[alert show];
 	[alert release];
 }

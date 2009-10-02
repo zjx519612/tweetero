@@ -200,6 +200,7 @@
 	messageTextWillIgnoreNextViewAppearing = NO;
 	twitWasChangedManually = NO;
 	_queueIndex = -1;
+    _canShowCamera = NO;
     [self progressClear];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setQueueTitle) name:@"QueueChanged" object:nil];
 }
@@ -216,6 +217,15 @@
 - (id)init
 {
 	return [self initWithNibName:@"PostImage" bundle:nil];
+}
+
+- (id)initInCameraMode
+{
+    if ((self = [self init]))
+    {
+        _canShowCamera = YES;
+    }
+    return self;
 }
 
 -(void)dismissProgressSheetIfExist
@@ -698,7 +708,7 @@
     }
     
     
-    sizeText = [NSString stringWithFormat:@"%.1f of %.1f %@", bytesWritten / denominator, _dataSize / denominator, suffix];
+    sizeText = [NSString stringWithFormat:NSLocalizedString(@"%.1f of %.1f %@", @""), bytesWritten / denominator, _dataSize / denominator, suffix];
     [progressStatus setText:sizeText];
 }
 
@@ -715,11 +725,11 @@
 	ImageUploader * uploader = [[ImageUploader alloc] init];
 	self.connectionDelegate = uploader;
 	[self retainActivityIndicator];
-    
-    //NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"mp4"];
-    //[uploader postMP4Data:[NSData dataWithContentsOfFile:path] delegate:self userData:pickedPhoto];
-    //return;
-    
+#if 0
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"mp4"];
+    [uploader postMP4Data:[NSData dataWithContentsOfFile:path] delegate:self userData:pickedPhoto];
+    return;
+#endif
 	if(pickedPhoto)
 		[uploader postImage:pickedPhoto delegate:self userData:pickedPhoto];
 	else
@@ -1045,6 +1055,22 @@
 	[self setNavigatorButtons];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    if (_canShowCamera)
+    {
+        _canShowCamera = NO;
+        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
+        {
+            imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+            if([imgPicker respondsToSelector:@selector(setMediaTypes:)])
+                [imgPicker performSelector:@selector(setMediaTypes:) withObject:[NSArray arrayWithObject:K_UI_TYPE_MOVIE]];
+            [self presentModalViewController:imgPicker animated:YES];
+        }
+    }
+}
+
 - (void)popController
 {
 	[self setImage:nil movie:nil];
@@ -1196,8 +1222,11 @@
 		return;
 	}
 	
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"The message is not sent" message:@"Your changes will be lost"
-												   delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"The message is not sent", @"") 
+                                                    message:NSLocalizedString(@"Your changes will be lost", @"")
+												   delegate:self 
+                                          cancelButtonTitle:NSLocalizedString(@"Cancel", @"") 
+                                          otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
 	alert.tag = PHOTO_DO_CANCEL_ALERT_TAG;
 	[alert show];
 	[alert release];

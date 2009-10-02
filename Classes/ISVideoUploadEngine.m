@@ -28,6 +28,7 @@
 - (void)doPhase:(int)phaseCode;
 - (void)sendInitData;
 - (void)uploadNextChunk;
+- (void)resumeUpload;
 - (void)clearResult;
 - (BOOL)openConnection:(NSURLRequest *)request;
 - (NSString *)errorMessage;
@@ -97,7 +98,7 @@
     [delegate didStopUploading:self];
     
     // Resume upload
-    [self doPhase:ISUploadPhaseProcessError];
+    [self doPhase:ISUploadPhaseResumeUpload];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -131,7 +132,11 @@
     {
         NSHTTPURLResponse *httpResp = (NSHTTPURLResponse*)response;
         statusCode = [httpResp statusCode];
-        if (statusCode == 202 && phase == ISUploadPhaseUploadData)
+        
+        if (phase == ISUploadPhaseResumeUpload)
+        {
+        }
+        else if (phase == ISUploadPhaseUploadData && statusCode == 202)
         {
             [delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[uploadData length]];
             [self uploadNextChunk];
@@ -142,7 +147,22 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-    [result appendData:data];
+    if (phase == ISUploadPhaseResumeUpload)
+    {
+        char *ptr = (char *)malloc([data length] + 1);
+        memcpy(ptr, [data bytes], [data length]);
+        *(ptr + [data length]) = 0;
+        
+        NSString *str = [NSString stringWithCString:ptr];
+        currentDataLocation = [str intValue];
+        //currentDataLocation = 0;
+        [delegate didResumeUploading:self];
+        [self doPhase:ISUploadPhaseUploadData];
+    }
+    else
+    {
+        [result appendData:data];
+    }
 }
 
 #pragma mark Parser functions
@@ -201,6 +221,9 @@
         case ISUploadPhaseUploadData:
             [delegate didStartUploading:self totalSize:[uploadData length]];
             [self uploadNextChunk];
+            break;
+        case ISUploadPhaseResumeUpload:
+            [self resumeUpload];
             break;
         case ISUploadPhaseProcessError:
             [delegate didFailWithErrorMessage:self errorMessage:[self errorMessage]];
@@ -293,6 +316,15 @@
     currentDataLocation += range.length;
 }
 
+- (void)resumeUpload
+{
+    NSMutableURLRequest *request = tweeteroMutableURLRequest([NSURL URLWithString:self.getLengthUrl]);
+    
+    BOOL validConnection = [self openConnection:request];
+    if (!validConnection)
+        [self doPhase:ISUploadPhaseProcessError];
+}
+
 - (void)clearResult
 {
     [result setLength:0];
@@ -311,17 +343,17 @@
     switch (statusCode)
     {
         case 0: 
-            return @"Not Error";
+            return NSLocalizedString(@"Not Error", @"");
         case 404: 
-            return @"URL you are requesting is not found or command is not recognized";
+            return NSLocalizedString(@"URL you are requesting is not found or command is not recognized", @"");
         case 405: 
-            return @"Method you are calling is not supported";
+            return NSLocalizedString(@"Method you are calling is not supported", @"");
         case 400: 
-            return @"Your request is bad formed, for example: missing or wrong UUID, invalid content-length.";
+            return NSLocalizedString(@"Your request is bad formed, for example: missing or wrong UUID, invalid content-length.", @"");
         case 403: 
-            return @"Wrong developer key";
+            return NSLocalizedString(@"Wrong developer key", @"");
         default:
-            return @"Unknown error";
+            return NSLocalizedString(@"Unknown error", @"");
     }
 }
 

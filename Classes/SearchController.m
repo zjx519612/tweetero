@@ -280,7 +280,7 @@
         if (isMore)
         {
             UILabel *more = [[UILabel alloc] initWithFrame:CGRectMake(135, 30, 200, 20)];
-            more.text = @"More...";
+            more.text = NSLocalizedString(@"More...", @"");
             more.backgroundColor = [UIColor clearColor];
             [cell.contentView addSubview:more];
             [more release];            
@@ -329,7 +329,7 @@
 {
     static int i = 0;
     
-    NSString *title = [NSString stringWithFormat:@"USER_INFO : %i", i++];
+    NSString *title = [NSString stringWithFormat:NSLocalizedString(@"USER_INFO : %i", @""), i++];
     LogDictionaryStringKeys(result, title);
     
     CustomImageView *avatar = (CustomImageView*)[cell viewWithTag:TAG_IMAGE];

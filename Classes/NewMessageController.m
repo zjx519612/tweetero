@@ -194,8 +194,11 @@
 		return;
 	}
 	
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"The message is not sent" message:@"Your changes will be lost"
-												   delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"The message is not sent", @"") 
+                                                    message:NSLocalizedString(@"Your changes will be lost", @"")
+												   delegate:self 
+                                          cancelButtonTitle:NSLocalizedString(@"Cancel", @"") 
+                                          otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
 	[alert show];
 	[alert release];
 		
@@ -226,8 +229,11 @@
 	[cancelButton setEnabled:YES];
 	
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Failed!" message:[error localizedDescription]
-												   delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Failed!", @"") 
+                                                    message:[error localizedDescription]
+												   delegate:nil 
+                                          cancelButtonTitle:NSLocalizedString(@"OK", @"") 
+                                          otherButtonTitles:nil];
 	[alert show];	
 	[alert release];
 }
@@ -236,7 +242,7 @@
 - (void)setUser:(NSString*)user
 {
 	_user = [user retain];
-	toField.text = [NSString stringWithFormat:@"Direct Message to %@", _user];
+	toField.text = [NSString stringWithFormat:NSLocalizedString(@"Direct Message to %@", @""), _user];
 }
 
 

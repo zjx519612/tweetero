@@ -392,7 +392,7 @@
 	else
 	{
 		//cell.text = @"Load More...";
-        cellLabel.text = @"Load More...";
+        cellLabel.text = NSLocalizedString(@"Load More...", @"");
 	}
 }
 

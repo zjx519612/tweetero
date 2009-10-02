@@ -53,44 +53,51 @@ static int NetworkActivityIndicatorCounter = 0;
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application 
 {
-    /*
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"mp4"];
-    NSData *uploadData = [NSData dataWithContentsOfFile:path];
-    ISVideoUploadEngine *uploadEngine = [[ISVideoUploadEngine alloc] initWithData:uploadData];
-    
-    [uploadEngine upload];
-    [uploadEngine release];
-    return;
-    */
-    
 	NSDictionary *appDefaults = [[NSDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 	[appDefaults release];
 
-    //if ([MGTwitterEngine username] != nil)
-    {
-        AccountController *accountController = [[AccountController alloc] init];
-        navigationController = [[NavigationRotateController alloc] initWithRootViewController:accountController];
-        [accountController release];
-        [window addSubview:navigationController.view];
-    }
-    //else
-    {
-        //[self setupPortraitUserInterface];
-        //[window addSubview:tabBarController.view];
-    }
+    AccountController *accountController = [[AccountController alloc] init];
+    navigationController = [[NavigationRotateController alloc] initWithRootViewController:accountController];
+    [accountController release];
+    [window addSubview:navigationController.view];
+
 	[[LocationManager locationManager] startUpdates];
 	
 	[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRotate:) name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
 - (void)dealloc 
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [tabBarController release];
     [window release];
     [super dealloc];
 }
 
+- (void)didRotate:(NSNotification*)notification
+{
+    @try
+    {
+        NSLog(@"top - %@ modal - %@", [NSString stringWithCString:NAMEOF(navigationController.topViewController)],
+              [NSString stringWithCString:NAMEOF(navigationController.modalViewController)]);
+        
+        if (![navigationController.topViewController isKindOfClass:[TwitEditorController self]] && 
+            ![navigationController.modalViewController isKindOfClass:[UIImagePickerController self]])
+        {
+            TwitEditorController *editor = [[TwitEditorController alloc] initInCameraMode];
+            [navigationController pushViewController:editor animated:YES];
+            [editor release];
+        }
+    }
+    @catch (...)
+    {
+    }
+}
+
+#pragma mark Class methods implementation
 + (UINavigationController *)rootNavigationController
 {
     return [(TweetterAppDelegate*)[UIApplication sharedApplication] navigationController];
