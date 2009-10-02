@@ -238,7 +238,7 @@
 	if(!success)
 	{
 		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Failed!", @"") message:NSLocalizedString(@"Failed to send a mail.", @"")
-													   delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+													   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles: nil];
 		[alert show];	
 		[alert release];
 	}

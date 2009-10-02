@@ -93,9 +93,11 @@ enum _TwitEditorSuspendedOperations
 	UIImage*				pickedPhoto;
     
     int                     _dataSize;
+    BOOL                    _canShowCamera;
 }
 
 - (id)init;
+- (id)initInCameraMode;
 
 - (void)postImageAction;
 - (void)postImageLaterAction;

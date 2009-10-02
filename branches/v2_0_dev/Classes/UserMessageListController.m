@@ -58,12 +58,12 @@
 
 - (NSString*)noMessagesString
 {
-	return @"No Tweets";
+	return NSLocalizedString(@"No Tweets", @"");
 }
 
 - (NSString*)loadingMessagesString
 {
-	return @"Loading Tweets...";
+	return NSLocalizedString(@"Loading Tweets...", @"");
 }
 
 @end

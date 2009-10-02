@@ -73,7 +73,7 @@
     else if (_content)
         [webView loadHTMLString:_content baseURL:nil];
     
-	self.navigationItem.title = @"Loading...";
+	self.navigationItem.title = NSLocalizedString(@"Loading...", @"");
 	// important for view orientation rotation
 	self.view.autoresizesSubviews = YES;
 	self.view.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
@@ -93,7 +93,7 @@
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-	self.navigationItem.title = @"Failed";
+	self.navigationItem.title = NSLocalizedString(@"Failed", @"");
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView

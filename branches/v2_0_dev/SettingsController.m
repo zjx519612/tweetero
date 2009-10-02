@@ -143,13 +143,13 @@
 {
 	if([MGTwitterEngine username] && [MGTwitterEngine password])
 	{
-		loginInfo.text = [NSString stringWithFormat:@"You are logged in to Twitter as %@", [MGTwitterEngine username]];
-		[loginButton setTitle:@"Change Account" forState:0];
+		loginInfo.text = [NSString stringWithFormat:NSLocalizedString(@"You are logged in to Twitter as %@", @""), [MGTwitterEngine username]];
+		[loginButton setTitle:NSLocalizedString(@"Change Account", @"") forState:0];
 	}
 	else
 	{
-		loginInfo.text = @"You are not logged in to Twitter";
-		[loginButton setTitle:@"Log In" forState:0];
+		loginInfo.text = NSLocalizedString(@"You are not logged in to Twitter", @"");
+		[loginButton setTitle:NSLocalizedString(@"Log In", @"") forState:0];
 	}
 	
 }

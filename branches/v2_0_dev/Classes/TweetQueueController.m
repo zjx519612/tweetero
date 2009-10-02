@@ -159,11 +159,11 @@
 	if(!index || index.row < 0 || index.row >= [[TweetQueue sharedQueue] count])
 		return;
 
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: @"Do you wish to delete this tweet?" 
-                                                    message: @"This operation cannot be undone"
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Do you wish to delete this tweet?", @"")
+                                                    message: NSLocalizedString(@"This operation cannot be undone", @"")
 												   delegate: self 
-                                          cancelButtonTitle: @"Cancel" 
-                                          otherButtonTitles: @"OK", nil];
+                                          cancelButtonTitle: NSLocalizedString(@"Cancel", @"")
+                                          otherButtonTitles: NSLocalizedString(@"OK", @""), nil];
 	[alert show];
 	[alert release];
 }
@@ -430,7 +430,7 @@
 	{
 		cell.textLabel.textAlignment = UITextAlignmentCenter;
 		cell.textLabel.font = [UIFont systemFontOfSize:16];
-		cell.textLabel.text = @"No Unsent Tweets";
+		cell.textLabel.text = NSLocalizedString(@"No Unsent Tweets", @"");
 	}
 	
 	cell.contentView.backgroundColor = indexPath.row % 2? [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1]: [UIColor whiteColor];

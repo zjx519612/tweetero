@@ -12,6 +12,7 @@ typedef enum {
     ISUploadPhaseNone,
     ISUploadPhaseStart,
     ISUploadPhaseUploadData,
+    ISUploadPhaseResumeUpload,
     ISUploadPhaseProcessError,
     ISUploadPhaseFinish
 } ISUploadEnginePhaseType;

@@ -501,8 +501,11 @@
 
 - (IBAction)deleteTwit
 {
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Do you wish to delete this tweet?" message:@"This operation cannot be undone"
-												   delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK", nil];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Do you wish to delete this tweet?", @"")
+                                                    message:NSLocalizedString(@"This operation cannot be undone", @"")
+												   delegate:self 
+                                          cancelButtonTitle:NSLocalizedString(@"Cancel", @"") 
+                                          otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
 	[alert show];
 	[alert release];
 }

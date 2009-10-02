@@ -51,7 +51,7 @@
 {
     UIViewController *parentController = parent;
     
-    parentController.navigationItem.title = @"Home";
+    parentController.navigationItem.title = NSLocalizedString(@"Home",@"");
     
     //UISegmentedControl *userActionButton = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Refresh",@"New", nil]];
     //userActionButton.segmentedControlStyle = UISegmentedControlStyleBar;
@@ -117,12 +117,12 @@
 
 - (NSString*)noMessagesString
 {
-	return @"No Tweets";
+	return NSLocalizedString(@"No Tweets", @"");
 }
 
 - (NSString*)loadingMessagesString
 {
-	return @"Loading Tweets...";
+	return NSLocalizedString(@"Loading Tweets...", @"");
 }
 
 - (void)newMessage

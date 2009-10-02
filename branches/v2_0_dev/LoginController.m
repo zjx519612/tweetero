@@ -85,7 +85,7 @@
 
  	self.navigationItem.rightBarButtonItem = loginButton;
     self.navigationItem.leftBarButtonItem = cancelButton;
-	self.navigationItem.title = @"Twitter Account";
+	self.navigationItem.title = NSLocalizedString(@"Twitter Account", @"");
     
     [loginField setText:_currentUsername];
     [passwordField setText:_currentPassword];

@@ -40,6 +40,7 @@
 		0073C082106A498A006A0D62 /* MGTwitterUsersYAJLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C07B106A498A006A0D62 /* MGTwitterUsersYAJLParser.m */; };
 		0073C083106A498A006A0D62 /* MGTwitterYAJLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C07D106A498A006A0D62 /* MGTwitterYAJLParser.m */; };
 		0073C0B8106A54D7006A0D62 /* searchutil.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C0B7106A54D7006A0D62 /* searchutil.m */; };
+		0075C6BD107610FB003A655F /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0075C6BC107610FB003A655F /* defaults.plist */; };
 		0088208D107251AC0055FC91 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0088208C107251AC0055FC91 /* MessageUI.framework */; };
 		00999DC910567D1D003906C7 /* TweetViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00999DC810567D1D003906C7 /* TweetViewController.m */; };
 		00999E801056A04E003906C7 /* Reply.png in Resources */ = {isa = PBXBuildFile; fileRef = 00999E7F1056A04E003906C7 /* Reply.png */; };
@@ -78,7 +79,6 @@
 		AA87A64C0F76B4AA00AB8F4B /* ImageView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA87A6480F76B4AA00AB8F4B /* ImageView.xib */; };
 		AA87A64D0F76B4AA00AB8F4B /* UserInfo.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA87A64A0F76B4AA00AB8F4B /* UserInfo.xib */; };
 		AA87F6860F71E7EA00D7A2C0 /* yFrogImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = AA87F6850F71E7EA00D7A2C0 /* yFrogImageUploader.m */; };
-		AA8919070F6DD1BB00E4F79D /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA8919060F6DD1BB00E4F79D /* defaults.plist */; };
 		AA987B840F6DF22600BE95C2 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA987B830F6DF22600BE95C2 /* CoreLocation.framework */; };
 		AA9A0DDC0F7C486500F9E2DC /* About.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA9A0DDA0F7C486500F9E2DC /* About.xib */; };
 		AA9A0DE10F7C48C200F9E2DC /* AboutController.m in Sources */ = {isa = PBXBuildFile; fileRef = AA9A0DE00F7C48C200F9E2DC /* AboutController.m */; };
@@ -240,7 +240,7 @@
 		AA87F6460F71D9D300D7A2C0 /* TwitterConnectionProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwitterConnectionProtocol.h; sourceTree = SOURCE_ROOT; };
 		AA87F6840F71E7EA00D7A2C0 /* yFrogImageUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yFrogImageUploader.h; path = Classes/yFrogImageUploader.h; sourceTree = SOURCE_ROOT; };
 		AA87F6850F71E7EA00D7A2C0 /* yFrogImageUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = yFrogImageUploader.m; path = Classes/yFrogImageUploader.m; sourceTree = SOURCE_ROOT; };
-		AA8919060F6DD1BB00E4F79D /* defaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = defaults.plist; sourceTree = SOURCE_ROOT; };
+		AA8919060F6DD1BB00E4F79D /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = English; path = English.lproj/defaults.plist; sourceTree = "<group>"; };
 		AA987B830F6DF22600BE95C2 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		AA9A0DDB0F7C486500F9E2DC /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/About.xib; sourceTree = "<group>"; };
 		AA9A0DDF0F7C48C200F9E2DC /* AboutController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutController.h; sourceTree = "<group>"; };
@@ -540,7 +540,7 @@
 				003CEB3E1074DD080057B045 /* test.mp4 */,
 				AAC3B7B00F6F380C008C9AF8 /* Images */,
 				00DDB2ED105E9D890020C9C1 /* TweetView.xib */,
-				AA8919060F6DD1BB00E4F79D /* defaults.plist */,
+				0075C6BC107610FB003A655F /* defaults.plist */,
 				AA9A0DDA0F7C486500F9E2DC /* About.xib */,
 				AA87A6480F76B4AA00AB8F4B /* ImageView.xib */,
 				498D96CE0F62EFA9004E1B20 /* Login.xib */,
@@ -689,7 +689,7 @@
 				D983D4920F66AB660069E0F6 /* NewMessage.xib in Resources */,
 				D9480DFD0F6883C500818977 /* WebView.xib in Resources */,
 				492662B00F6D7C9E00782FFD /* SettingsView.xib in Resources */,
-				AA8919070F6DD1BB00E4F79D /* defaults.plist in Resources */,
+				0075C6BD107610FB003A655F /* defaults.plist in Resources */,
 				49BC09E10F700514007A8F82 /* yFrogTabIcon.tiff in Resources */,
 				49BC09E20F700514007A8F82 /* SettingsTabIcon.tiff in Resources */,
 				49BC09E30F700514007A8F82 /* HomeTabIcon.tiff in Resources */,
@@ -813,6 +813,14 @@
 				0021EB2F1063A351001B8218 /* English */,
 			);
 			name = SearchController.xib;
+			sourceTree = "<group>";
+		};
+		0075C6BC107610FB003A655F /* defaults.plist */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AA8919060F6DD1BB00E4F79D /* English */,
+			);
+			name = defaults.plist;
 			sourceTree = "<group>";
 		};
 		00DDB2EA105E9D6D0020C9C1 /* AccountController.xib */ = {

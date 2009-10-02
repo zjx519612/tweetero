@@ -138,7 +138,7 @@ const int kHeadTagLocation = 4;
 - (void)setFollow:(BOOL)isFollow
 {
     follow = isFollow;
-    [followSegment setTitle:follow ? @"FOLLOW" : @"UNFOLLOW" forSegmentAtIndex:0];
+    [followSegment setTitle:follow ? NSLocalizedString(@"FOLLOW", @"") : NSLocalizedString(@"UNFOLLOW", @"") forSegmentAtIndex:0];
 }
 
 - (void)setButtons:(int)button
@@ -233,7 +233,7 @@ const int kHeadTagLocation = 4;
     [detailButton addTarget:self action:@selector(detailPressed) forControlEvents:UIControlEventTouchUpInside];
     
     // Following segment
-    followSegment = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"FOLLOW", nil]];
+    followSegment = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:NSLocalizedString(@"FOLLOW", @""), nil]];
     followSegment.segmentedControlStyle = UISegmentedControlStyleBar;
     followSegment.momentary = YES;
     followSegment.frame = CGRectMake(225, 24, 85, 30);

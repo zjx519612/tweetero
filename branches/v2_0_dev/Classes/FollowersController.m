@@ -173,12 +173,12 @@
 
 - (NSString*)noUsersString
 {
-	return @"No Followers";
+	return NSLocalizedString(@"No Followers", @"");
 }
 
 - (NSString*)loadingMessagesString
 {
-	return @"Loading the List of Followers...";
+	return NSLocalizedString(@"Loading the List of Followers...", @"");
 }
 
 - (void)configureCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath 
@@ -211,7 +211,7 @@
 	} 
 	else
 	{
-		cell.textLabel.text = @"Load More...";
+		cell.textLabel.text = NSLocalizedString(@"Load More...", @"");
 	}
 }
 
@@ -373,12 +373,12 @@
 
 - (NSString*)noUsersString
 {
-	return @"No Followers";
+	return NSLocalizedString(@"No Followers", @"");
 }
 
 - (NSString*)loadingMessagesString
 {
-	return @"Loading the List of Followers...";
+	return NSLocalizedString(@"Loading the List of Followers...", @"");
 }
 
 - (void)loadFollowers
@@ -417,12 +417,12 @@
 
 - (NSString*)noUsersString
 {
-	return @"No Following Users";
+	return NSLocalizedString(@"No Following Users", @"");
 }
 
 - (NSString*)loadingMessagesString
 {
-	return @"Loading the List of Following Users...";
+	return NSLocalizedString(@"Loading the List of Following Users...", @"");
 }
 
 - (void)loadFollowers
