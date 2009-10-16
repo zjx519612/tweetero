@@ -6,8 +6,7 @@
 //  Copyright 2009 Codeminders. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "MGTwitterEngine.h"
+#include "MGTwitterEngineAddIn.h"
 
 @interface MGTwitterEngine (UserFollowers)
 

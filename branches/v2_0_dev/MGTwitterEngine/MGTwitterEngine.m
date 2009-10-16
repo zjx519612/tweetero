@@ -719,10 +719,13 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 								  responseType:responseType URL:URL deliveryOptions:_deliveryOptions];
 			break;
         case MGTwitterSearchResults:
+        {
+            char *ptr = (char *)[jsonData bytes];
  			[MGTwitterSearchYAJLParser parserWithJSON:jsonData delegate:self 
 						  connectionIdentifier:identifier requestType:requestType 
 								  responseType:responseType URL:URL deliveryOptions:_deliveryOptions];
 			break;
+        }
        default:
             break;
     }
@@ -1716,50 +1719,6 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 	
     return [self _sendRequestWithMethod:nil path:path queryParameters:params body:nil 
                             requestType:MGTwitterSearchRequest 
-                           responseType:MGTwitterSearchResults];
-}
-
-- (NSString *)getSearchSavedResult:(int)pageNum count:(int)count
-{
-    NSString *path = [NSString stringWithFormat:@"saved_searches.%@", API_FORMAT];
-    
-    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
-	if (pageNum > 0) {
-        [params setObject:[NSString stringWithFormat:@"%d", pageNum] forKey:@"page"];
-    }
-    if (count > 0) {
-        [params setObject:[NSString stringWithFormat:@"%d", count] forKey:@"rpp"];
-    }
-	
-    return [self _sendRequestWithMethod:nil path:path queryParameters:params body:nil 
-                            requestType:MGTwitterSearchManage 
-                           responseType:MGTwitterSearchResults];
-    
-}
-
-- (NSString *)twitterSaveSearch:(NSString *)query
-{
-    NSString *path = [NSString stringWithString:@"saved_searches/create"];
-    
-    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
-	if (query) {
-		[params setObject:query forKey:@"query"];
-	}
-    
-    return [self _sendRequestWithMethod:HTTP_POST_METHOD path:path queryParameters:params body:nil 
-                            requestType:MGTwitterSearchManage 
-                           responseType:MGTwitterSearchResults];
-}
-
-- (NSString *)twitterDestroySearch:(int)queryID
-{
-    NSString *path = [NSString stringWithString:@"saved_searches/destroy"];
-    
-    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
-    [params setObject:[NSString stringWithFormat:@"%d", queryID] forKey:@"id"];
-    
-    return [self _sendRequestWithMethod:HTTP_POST_METHOD path:path queryParameters:params body:nil 
-                            requestType:MGTwitterSearchManage 
                            responseType:MGTwitterSearchResults];
 }
 
