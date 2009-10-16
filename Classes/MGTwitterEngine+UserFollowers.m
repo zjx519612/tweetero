@@ -8,12 +8,6 @@
 
 #import "MGTwitterEngine+UserFollowers.h"
 
-#if YAJL_AVAILABLE
-#   define API_FORMAT @"json"
-#else
-#   define API_FORMAT @"xml"
-#endif
-
 @implementation MGTwitterEngine (UserFollowers)
 
 - (NSString *)getFollowersForUser:(NSString *)username lite:(BOOL)flag

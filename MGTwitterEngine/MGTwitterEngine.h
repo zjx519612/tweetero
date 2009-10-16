@@ -205,12 +205,6 @@
 
 - (NSString *)getSearchResultsForQuery:(NSString *)query sinceID:(int)updateID startingAtPage:(int)pageNum count:(int)count; // search
 
-- (NSString *)getSearchSavedResult:(int)pageNum count:(int)count;
-
-- (NSString *)twitterSaveSearch:(NSString *)query;
-
-- (NSString *)twitterDestroySearch:(int)queryID;
-
 // Trends method - http://apiwiki.twitter.com/Search+API+Documentation#Trends
 
 - (NSString *)getTrends; // trends
