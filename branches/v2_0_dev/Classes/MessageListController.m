@@ -187,8 +187,6 @@
 		
 		//Userpic view
 		rect = CGRectMake(BORDER_WIDTH, (ROW_HEIGHT - IMAGE_SIDE) / 2.0, IMAGE_SIDE, IMAGE_SIDE);
-		
-        //UIImageView *imageView = [[UIImageView alloc] initWithFrame:rect];
         CustomImageView *imageView = [[CustomImageView alloc] initWithFrame:rect];
 		imageView.tag = IMAGE_TAG;
 		[cell.contentView addSubview:imageView];
@@ -267,10 +265,9 @@
 	if([self noMessages])
 	{
 		if(_errorDesc)
-			cellLabel.text = _errorDesc; //cell.text = _errorDesc;
+			cellLabel.text = _errorDesc;
 		else
             cellLabel.text = _loading? [self loadingMessagesString]: [self noMessagesString];
-			//cell.text = _loading? [self loadingMessagesString]: [self noMessagesString];
 		return;
 	}
     
@@ -292,24 +289,7 @@
 		CGRect cellFrame = [cell frame];
 		
         // Load yFrog thumbnail
-
         CustomImageView *yFrogImage = (CustomImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
-        /*        
-        NSString *yFrogLink = yFrogLinkFromText([messageData objectForKey:@"text"]);
-        int yFrogImageHeight = 0;
-        if (yFrogLink)
-        {
-            UIImage *image = [[ImageLoader sharedLoader] imageWithURL:yFrogLink];
-            if (image.size.width > YFROG_IMAGE_WIDTH || image.size.height > YFROG_IMAGE_WIDTH)
-                image = imageScaledToSize(image, YFROG_IMAGE_WIDTH);
-            yFrogImage.image = image;
-            yFrogImageHeight = YFROG_IMAGE_WIDTH;
-        }
-        else
-        {
-            yFrogImage.image = nil;
-        }
-        */
         
         int yFrogImageHeight = 0;
         id image = (_yFrogImages) ? [_yFrogImages objectForKey:[messageData objectForKey:@"id"]] : nil;
@@ -330,21 +310,18 @@
 		[label setFrame:CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH + (YFROG_IMAGE_WIDTH - yFrogImageHeight), TEXT_HEIGHT)];
 		[label sizeToFit];
         
-        
-		if(label.frame.size.height > TEXT_HEIGHT || yFrogImageHeight > TEXT_HEIGHT)
+        int max_h = max(label.frame.size.height, yFrogImageHeight);
+		if(max_h > TEXT_HEIGHT)
 		{
-            int max = max(label.frame.size.height, yFrogImageHeight);
-            int cell_h = ROW_HEIGHT + max /*label.frame.size.height*/ - TEXT_HEIGHT;
+            int cell_h = ROW_HEIGHT + max_h - TEXT_HEIGHT;
 			cellFrame.size.height = cell_h;
 		}
 		else
 		{
 			cellFrame.size.height = ROW_HEIGHT;
 		}
-		
 		[cell setFrame:cellFrame];
-
-		
+        
 		//Set message date and time
 		NSCalendarUnit unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit;
 		label = (UILabel *)[cell viewWithTag:TIME_TAG];
@@ -376,12 +353,7 @@
 			label.text = [dateFormatter stringFromDate:createdAt];
 		}
 		
-				
 		//Set userpic
-		
-        //UIImageView *imageView = (UIImageView *)[cell viewWithTag:IMAGE_TAG];
-		//imageView.image = nil;
-		//[[ImageLoader sharedLoader] setImageWithURL:[userData objectForKey:@"profile_image_url"] toView:imageView];
 		CustomImageView *imageView = (CustomImageView *)[cell viewWithTag:IMAGE_TAG];
         imageView.image = [[ImageLoader sharedLoader] imageWithURL:[userData objectForKey:@"profile_image_url"]];
         
@@ -391,7 +363,6 @@
 	} 
 	else
 	{
-		//cell.text = @"Load More...";
         cellLabel.text = NSLocalizedString(@"Load More...", @"");
 	}
 }
@@ -410,7 +381,7 @@
     [self configureCell:cell forIndexPath:indexPath];
 	
 	cell.contentView.backgroundColor = indexPath.row % 2? [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1]: [UIColor whiteColor];
-	
+    
     return cell;
 }
 
@@ -536,6 +507,7 @@
 	{
 		if([statuses count] > 0)
 			_messages = [statuses retain];
+        [self updateYFrogImages];
 		[self.tableView reloadData];
 	}
 	else
@@ -558,9 +530,9 @@
 		}
 		
 		[messages release];
+        [self updateYFrogImages];
 	}
-	
-    [self updateYFrogImages];
+    
 	[self releaseActivityIndicator];
 	
 	if(self.navigationItem.leftBarButtonItem)
@@ -699,11 +671,13 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 
 - (void)updateYFrogImages
 {
+    NSLog(NSStringFromSelector(_cmd));
+    
     if (_messages)
     {
         if (!_yFrogImages)
             _yFrogImages = [[NSMutableDictionary alloc] init];
-        
+
         NSDictionary *message;
         NSEnumerator *en = [_messages objectEnumerator];
         while ((message = (NSDictionary *)[en nextObject]))

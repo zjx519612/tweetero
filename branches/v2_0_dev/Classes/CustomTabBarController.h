@@ -7,15 +7,21 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SearchProvider.h"
 
-@interface CustomTabBarController : UIViewController <UITabBarDelegate, UITableViewDelegate, UITableViewDataSource>
+@class MGTwitterEngine;
+
+@interface CustomTabBarController : UIViewController <UITabBarDelegate, UITableViewDelegate, UITableViewDataSource, SearchProviderDelegate>
 {
-    UITabBar *_tabBar;
+    UITabBar            *_tabBar;
     NSMutableDictionary *_viewControllers;
-    NSMutableArray *_moreItems;
-    UIView *_contentView;
-    UITableView *_moreTable;
+    NSMutableArray      *_moreItems;
+    UIView              *_contentView;
+    UITableView         *_moreTable;
+    SearchProvider      *_searchProvider;
 }
+
+@property (nonatomic, retain) SearchProvider *searchProvider;
 
 - (id)init;
 - (void)dealloc;
@@ -23,3 +29,10 @@
 - (UIViewController *)controllerForTabItem:(UITabBarItem *)item;
 
 @end
+
+@interface UIViewController (CustomTabBarController)
+
+@property(nonatomic,retain) UITabBarItem *tabBarItem;
+
+@end
+

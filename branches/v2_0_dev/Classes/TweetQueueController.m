@@ -66,6 +66,11 @@
 	return title;
 }
 
+- (NSString*)getTitle
+{
+    return [TweetQueueController queueTitle];
+}
+
 - (void)reloadTablesInSubview:(UIView*)parentView
 {
 	for (UIView* view in parentView.subviews) 
@@ -147,6 +152,8 @@
 		NSIndexPath *index = [self.tableView indexPathForSelectedRow];
 		[[TweetQueue sharedQueue] deleteMessage:index.row];
 		
+        self.tabBarItem.title = [TweetQueueController queueTitle];
+        
 		[self enableModifyButtons:NO];
 		[self.tableView deselectRowAtIndexPath:index animated:NO];
 		[self.tableView reloadData];

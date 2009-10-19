@@ -7,6 +7,8 @@
 //
 
 #import "CustomImageView.h"
+#import "ImageLoader.h"
+#import "util.h"
 
 @implementation CustomImageView
 
@@ -70,6 +72,49 @@
 {
     frameType = ftype;
     [self setNeedsDisplay];
+}
+
+@end
+
+/*****************************************************************
+ *
+ * ActiveImageView class implementation
+ *
+ *****************************************************************/
+@implementation ActiveImageView
+
+@synthesize imageUrl = _imageUrl;
+@synthesize width = _width;
+@synthesize height = _height;
+
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    _indictator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    return self;
+}
+
+- (void)dealloc
+{
+    [_indictator release];
+    [super dealloc];
+}
+
+- (void)update
+{
+    if (self.imageUrl == nil)
+        return;
+    
+    [self addSubview:_indictator];
+    [_indictator startAnimating];
+    
+    UIImage *theImage = [[ImageLoader sharedLoader] imageWithURL:self.imageUrl];
+    if (theImage.size.width > self.width || theImage.size.height > self.height)
+        theImage = imageScaledToSize(theImage, self.width);
+    self.image = theImage;
+    
+    [_indictator stopAnimating];
+    [_indictator removeFromSuperview];
 }
 
 @end

@@ -15,7 +15,8 @@ typedef enum {
     SPInvalidValue = -1,
     SPUpdateState,
     SPSavedSearch,
-    SPSearchData
+    SPSearchData,
+    SPSearchDidSaved
 } SPNotificationValue;
 
 @interface SearchProvider : NSObject <MGTwitterEngineDelegate>
