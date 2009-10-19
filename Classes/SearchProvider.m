@@ -83,10 +83,11 @@
 // Save query string in tweeter
 - (void)saveQuery:(NSString *)query forId:(int)queryId
 {
-    NSNumber *value = [NSNumber numberWithInt:queryId];
-
-    [_twitter searchSaveQuery:query];
-    [_queries setObject:value forKey:query];
+   if (![self hasQuery:query])
+    {
+        NSString *identifier = [_twitter searchSaveQuery:query];
+        [self setNotificationValue:SPSearchDidSaved forIdentifier:identifier];
+    }
 }
 
 // Remove saved search query
@@ -98,6 +99,7 @@
     {
         [_twitter searchDestroyQuery:queryId];
         [_queries removeObjectForKey:query];
+        [self updateQueries:nil];
     }
 }
 
@@ -112,6 +114,7 @@
         {
             [_twitter searchDestroyQuery:queryId];
             [_queries removeObjectForKey:query];
+            [self updateQueries:nil];
         }
     }
 }
@@ -156,6 +159,9 @@
     
     switch (notification) 
     {
+        case SPSearchDidSaved:
+            [self updateQueries:searchResults];
+            break;
         case SPSearchData:
             if (self.delegate && [self.delegate respondsToSelector:@selector(searchDidEnd:forQuery:)])
             {
@@ -272,7 +278,7 @@
 - (NSString *)queryForIdentifier:(NSString *)identifier
 {
     NSArray *value = [_twitterConnection objectForKey:identifier];
-    if (value == nil && [value count] < 2)
+    if (value == nil || [value count] < 2)
         return nil;
     return [value objectAtIndex:1];
 }
@@ -287,14 +293,16 @@
     @synchronized(self)
     {
         // Update queries
-        for (NSDictionary *search in data)
+        if (data != nil)
         {
-            NSString *query = [NSString stringWithString:[search objectForKey:@"query"]];
-            int queryId = [[search objectForKey:@"id"] intValue];
-            
-            [_queries setObject:[NSNumber numberWithInt:queryId] forKey:query];
+            for (NSDictionary *search in data)
+            {
+                NSString *query = [NSString stringWithString:[search objectForKey:@"query"]];
+                int queryId = [[search objectForKey:@"id"] intValue];
+                
+                [_queries setObject:[NSNumber numberWithInt:queryId] forKey:query];
+            }
         }
-        
         // Notificate delegate object about changing
         if (self.delegate && [self.delegate respondsToSelector:@selector(searchProviderDidUpdated)])
         {

@@ -30,6 +30,8 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    
+    [self updateTabItemTitle];
     /*
     UIBarButtonItem *newMsgButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem: UIBarButtonSystemItemCompose
                                                                                   target: self
@@ -45,6 +47,17 @@
 	TwitEditorController *editController = [[TwitEditorController alloc] init];
 	[self.navigationController pushViewController:editController animated:YES];
 	[editController release];
+}
+
+- (void)updateTabItemTitle
+{
+    for (UITabBarItem *item in [_tabBar items])
+    {
+        id controller = [self controllerForTabItem:item];
+        
+        if ([controller respondsToSelector:@selector(getTitle)])
+            item.title = [controller performSelector:@selector(getTitle)];
+    }
 }
 
 #pragma mark Parent Methods

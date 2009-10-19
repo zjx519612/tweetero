@@ -42,6 +42,7 @@
 - (void)MessageUploadFinished:(BOOL)uploaded  sender:(MessageUploader *)sender;
 + (NSString*)queueTitle;
 - (void)setQueueTitle;
+- (NSString*)getTitle;
 
 @property (nonatomic, retain) UIActionSheet *progressSheet;
 @property (nonatomic, retain) id <TwitterConnectionProtocol> _connection;

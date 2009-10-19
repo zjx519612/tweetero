@@ -7,16 +7,17 @@
 //
 
 #import "CustomTabBarController.h"
+#import "MGTwitterEngine.h"
 #import "SearchController.h"
+#import "AppController.h"
 
 #include "util.h"
-#include "searchutil.h"
 
-const int kMoreBarItemTag = -1;
-const int kMaxBarItems = 5;
-const int kViewScreenWidth = 320;
+const int kMoreBarItemTag   = -1;
+const int kMaxBarItems      = 5;
+const int kViewScreenWidth  = 320;
 const int kViewScreenHeight = 370;
-const int kTabBarHeight = 46;
+const int kTabBarHeight     = 46;
 
 @interface CustomTabBarController (Private)
 - (NSString *)makeKeyForItem:(UITabBarItem *)item;
@@ -24,6 +25,8 @@ const int kTabBarHeight = 46;
 @end
 
 @implementation CustomTabBarController
+
+@synthesize searchProvider = _searchProvider;
 
 - (id)init
 {
@@ -57,6 +60,7 @@ const int kTabBarHeight = 46;
             _moreTable = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, kViewScreenWidth, kViewScreenHeight) style:UITableViewStylePlain];
             _moreTable.delegate = self;
             _moreTable.dataSource = self;
+            
             // Set tabBar items
             _tabBar.items = tabs;
             [tabs release];
@@ -74,6 +78,12 @@ const int kTabBarHeight = 46;
 
 - (void)dealloc
 {
+    if (self.searchProvider)
+    {
+        self.searchProvider.delegate = nil;
+        self.searchProvider = nil;
+    }
+    
     _tabBar.delegate = nil;
     if (_moreTable)
     {
@@ -81,6 +91,7 @@ const int kTabBarHeight = 46;
         [_moreTable release];
         [_moreItems release];
     }
+
     [_tabBar release];
     [_contentView release];
     [_viewControllers release];
@@ -97,9 +108,18 @@ const int kTabBarHeight = 46;
     }
     
     if (_tabBar.selectedItem.tag == kMoreBarItemTag)
+    {
         [_moreTable reloadData];
+    }
+    self.searchProvider = [[AppController instance] searchProviderWithDelegate:self];
+    [self.searchProvider update];
 }
 
+/*
+ * addViewController
+ *
+ * Add controller to dictionary. Retunrn key for added controller.
+ */
 - (NSString *)addViewController:(UIViewController *)controller
 {
     NSString *key = [self makeKeyForItem:controller.tabBarItem];
@@ -107,39 +127,58 @@ const int kTabBarHeight = 46;
     return key;
 }
 
+/*
+ * controllerForTabItem
+ *
+ * Return controller object for tabitem.
+ */
 - (UIViewController *)controllerForTabItem:(UITabBarItem *)item
 {
     NSString *key = [self makeKeyForItem:item];
     return [_viewControllers objectForKey:key];
 }
 
+#pragma mark SearchProvider Delgate methods
+- (void)searchProviderDidUpdated
+{
+    [_moreTable reloadData];
+}
+
 #pragma mark UITabBar Delegate
 - (void)tabBar:(UITabBar *)tabBar didSelectItem:(UITabBarItem *)item
 {
+    // Clear all subviews in main view
     for (UIView *child in _contentView.subviews)
         [child removeFromSuperview];
     
     if (item.tag == kMoreBarItemTag)
     {
+        // Show More table
         self.navigationItem.title = NSLocalizedString(@"More", @"");
         self.navigationItem.rightBarButtonItem = nil;
+
         [_contentView addSubview:_moreTable];
     }
     else
     {
+        // Get controller for current tab and show it view on top.
         UIViewController *controller = [self controllerForTabItem:item];
 
         if (controller)
         {
+            // Update navigation bar
             self.navigationItem.title = controller.title;
+            self.navigationItem.rightBarButtonItem = nil;
+            
             if ([controller respondsToSelector:@selector(setRootNavigationController:)])
                 [controller performSelector:@selector(setRootNavigationController:) withObject:self.navigationController];
             
-            self.navigationItem.rightBarButtonItem = nil;
             if ([controller respondsToSelector:@selector(viewControllerDidActivate:)])
                 [controller performSelector:@selector(viewControllerDidActivate:) withObject:self];
             
+            // Add controller view to content view.
             controller.view.frame = CGRectMake(0, 0, kViewScreenWidth, kViewScreenHeight);
+            controller.tabBarItem = item;
            [_contentView addSubview:controller.view];
         }
     }
@@ -148,18 +187,16 @@ const int kTabBarHeight = 46;
 #pragma mark UITableView DataSource
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return (getSavedSearchCount() > 0) ? 2 : 1;
+    return ([self.searchProvider allQueries] && ([self.searchProvider allQueries] > 0)) ? 2 : 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSInteger count = 0;
-    
     if (section == 0)
-        count = [_moreItems count];
+        return [_moreItems count];
     else if (section == 1)
-        count = getSavedSearchCount();
-    return count;
+        return [[self.searchProvider allQueries] count];
+    return 0;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -171,6 +208,7 @@ const int kTabBarHeight = 46;
     if (cell == nil)
         cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:kCellIdentifier] autorelease];
     
+    // Controller cells
     if (indexPath.section == 0)
     {
         UITabBarItem *tabItem = [_moreItems objectAtIndex:indexPath.row];
@@ -181,11 +219,11 @@ const int kTabBarHeight = 46;
             cell.imageView.image = tabItem.image;
         }
     }
+    // Saved search cells
     else
     {
-        NSArray *savedTerms = getSavedSearchArray();
-        if (savedTerms)
-            cell.textLabel.text = [savedTerms objectAtIndex:indexPath.row];
+        cell.imageView.image = nil;
+        cell.textLabel.text = [[self.searchProvider allQueries] objectAtIndex:indexPath.row];
     }
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
@@ -209,8 +247,8 @@ const int kTabBarHeight = 46;
     {
         UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
         
-        SearchController *searchController = [[SearchController alloc] initWithNibName:@"SearchController" bundle:nil];
-        searchController.searchString = cell.textLabel.text;
+        NSAssert(cell != nil, @"Cell is nil");
+        SearchController *searchController = [[SearchController alloc] initWithQuery:cell.textLabel.text];
         [self.navigationController pushViewController:searchController animated:YES];
         [searchController release];
     }

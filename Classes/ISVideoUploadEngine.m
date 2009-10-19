@@ -13,7 +13,7 @@
 #define IsValidStatusCode(s)        (((s) == 200) || ((s) == 201) || ((s) == 202))
 
 #define IMAGESHACK_API_START        @"http://render.imageshack.us/renderapi/start"
-
+#define kTweeteroDevKey             @""
 
 #define ImageInfoRootName           @"imginfo"
 #define UploadInfoRootName          @"uploadInfo"

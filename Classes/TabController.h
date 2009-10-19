@@ -15,4 +15,6 @@
 
 - (IBAction)clickNewMessage;
 
+- (void)updateTabItemTitle;
+
 @end

@@ -186,7 +186,7 @@
     if (!tableView.editing)
     {
         NSString *userName = [[AccountManager manager] userName:indexPath.row];
-     
+        
         // Login with user
         [[AccountManager manager] login:userName];
         [self showTabController];
