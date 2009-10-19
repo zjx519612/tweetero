@@ -273,7 +273,7 @@ NSString* yFrogLinkFromText(NSString *text)
             yFrogLink = ValidateYFrogLink([links objectAtIndex:i]);
             if (yFrogLink)
             {
-                yFrogLink = [NSString stringWithFormat:@"%@:small", yFrogLink];
+                yFrogLink = [NSString stringWithFormat:@"%@.th.jpg", yFrogLink]; //:small
                 break;
             }
         }
