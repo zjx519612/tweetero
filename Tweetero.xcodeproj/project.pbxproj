@@ -48,6 +48,7 @@
 		009CB0E7107396DA00E48555 /* ISVideoUploadEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 009CB0E6107396DA00E48555 /* ISVideoUploadEngine.m */; };
 		009E75A11068F59E007B2275 /* FollowersController.m in Sources */ = {isa = PBXBuildFile; fileRef = 009E75A01068F59E007B2275 /* FollowersController.m */; };
 		00CA903C107F896600A198AC /* MGTwitterEngine+Search.m in Sources */ = {isa = PBXBuildFile; fileRef = 00CA903B107F896600A198AC /* MGTwitterEngine+Search.m */; };
+		00CB30C4108C822700B03CD8 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00CB30C3108C822700B03CD8 /* AppController.m */; };
 		00DDA861105F9798008AE91E /* TabController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDA860105F9798008AE91E /* TabController.m */; };
 		00DDA8A8105FA927008AE91E /* AccountManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDA8A7105FA927008AE91E /* AccountManager.m */; };
 		00DDB1DF105E7B030020C9C1 /* CustomImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDB1DE105E7B030020C9C1 /* CustomImageView.m */; };
@@ -199,6 +200,8 @@
 		00CA9038107F88D100A198AC /* MGTwitterEngineAddIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGTwitterEngineAddIn.h; path = Classes/MGTwitterEngineAddIn.h; sourceTree = "<group>"; };
 		00CA903A107F896600A198AC /* MGTwitterEngine+Search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "MGTwitterEngine+Search.h"; path = "Classes/MGTwitterEngine+Search.h"; sourceTree = "<group>"; };
 		00CA903B107F896600A198AC /* MGTwitterEngine+Search.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "MGTwitterEngine+Search.m"; path = "Classes/MGTwitterEngine+Search.m"; sourceTree = "<group>"; };
+		00CB30C2108C822700B03CD8 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
+		00CB30C3108C822700B03CD8 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; };
 		00DDA85F105F9798008AE91E /* TabController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TabController.h; sourceTree = "<group>"; };
 		00DDA860105F9798008AE91E /* TabController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TabController.m; sourceTree = "<group>"; };
 		00DDA8A6105FA927008AE91E /* AccountManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountManager.h; sourceTree = "<group>"; };
@@ -456,25 +459,14 @@
 		00B69FD21061193D005E8DF6 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				00CB31AD108CB31F00B03CD8 /* MoreTab */,
 				0048606C108895AC00409013 /* Tabs */,
+				00DDA85F105F9798008AE91E /* TabController.h */,
+				00DDA860105F9798008AE91E /* TabController.m */,
 				00DDB2F5105E9E190020C9C1 /* AccountController.m */,
 				00DDB2F6105E9E190020C9C1 /* AccountController.h */,
 				D9CCC4D10F5CDAEA009CACBB /* LoginController.h */,
 				D9CCC4D20F5CDAEA009CACBB /* LoginController.m */,
-				00DDA85F105F9798008AE91E /* TabController.h */,
-				00DDA860105F9798008AE91E /* TabController.m */,
-				0049472A10594BCB00C6B2B2 /* MyTweetViewController.h */,
-				0049472B10594BCB00C6B2B2 /* MyTweetViewController.m */,
-				009E759F1068F59E007B2275 /* FollowersController.h */,
-				009E75A01068F59E007B2275 /* FollowersController.m */,
-				492662B40F6D7D3F00782FFD /* SettingsController.h */,
-				492662B50F6D7D3F00782FFD /* SettingsController.m */,
-				0021EACB106394B3001B8218 /* SearchController.h */,
-				0021EACC106394B3001B8218 /* SearchController.m */,
-				AA9A0DDF0F7C48C200F9E2DC /* AboutController.h */,
-				AA9A0DE00F7C48C200F9E2DC /* AboutController.m */,
-				D959B7980F65A1FE00CBBA1A /* MessageViewController.h */,
-				D959B7990F65A1FF00CBBA1A /* MessageViewController.m */,
 				D91B26120F7499AD009E1A8E /* NavigationRotateController.h */,
 				D91B26130F7499AD009E1A8E /* NavigationRotateController.m */,
 				D9480DF70F68834400818977 /* WebViewController.h */,
@@ -491,6 +483,8 @@
 				D9F4C2230F6AE68E006D4F2E /* ImageViewController.m */,
 				D93537190F7099630005DA7D /* UserMessageListController.h */,
 				D935371A0F7099630005DA7D /* UserMessageListController.m */,
+				D959B7980F65A1FE00CBBA1A /* MessageViewController.h */,
+				D959B7990F65A1FF00CBBA1A /* MessageViewController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -505,6 +499,23 @@
 				00CA903B107F896600A198AC /* MGTwitterEngine+Search.m */,
 			);
 			name = MGTwitterEngineAddIns;
+			sourceTree = "<group>";
+		};
+		00CB31AD108CB31F00B03CD8 /* MoreTab */ = {
+			isa = PBXGroup;
+			children = (
+				0049472A10594BCB00C6B2B2 /* MyTweetViewController.h */,
+				0049472B10594BCB00C6B2B2 /* MyTweetViewController.m */,
+				009E759F1068F59E007B2275 /* FollowersController.h */,
+				009E75A01068F59E007B2275 /* FollowersController.m */,
+				492662B40F6D7D3F00782FFD /* SettingsController.h */,
+				492662B50F6D7D3F00782FFD /* SettingsController.m */,
+				0021EACB106394B3001B8218 /* SearchController.h */,
+				0021EACC106394B3001B8218 /* SearchController.m */,
+				AA9A0DDF0F7C48C200F9E2DC /* AboutController.h */,
+				AA9A0DE00F7C48C200F9E2DC /* AboutController.m */,
+			);
+			name = MoreTab;
 			sourceTree = "<group>";
 		};
 		080E96DDFE201D6D7F000001 /* Classes */ = {
@@ -534,6 +545,8 @@
 				AA87F6460F71D9D300D7A2C0 /* TwitterConnectionProtocol.h */,
 				00485FE0108869DE00409013 /* SearchProvider.h */,
 				00485FE1108869DE00409013 /* SearchProvider.m */,
+				00CB30C2108C822700B03CD8 /* AppController.h */,
+				00CB30C3108C822700B03CD8 /* AppController.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -845,6 +858,7 @@
 				009CB0E7107396DA00E48555 /* ISVideoUploadEngine.m in Sources */,
 				00CA903C107F896600A198AC /* MGTwitterEngine+Search.m in Sources */,
 				00485FE2108869DE00409013 /* SearchProvider.m in Sources */,
+				00CB30C4108C822700B03CD8 /* AppController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
