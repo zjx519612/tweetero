@@ -33,6 +33,10 @@ typedef enum {
 // Allocate and return SearchProvider object. Object is autoreleased.
 + (SearchProvider *)providerWithDelegate:(id)delegate;
 
++ (SearchProvider *)sharedProviderUsingDelegate:(id)delegate;
+
++ (SearchProvider *)sharedProviderRelease;
+
 - (id)initWithDelegate:(id)delegate;
 
 // Update object

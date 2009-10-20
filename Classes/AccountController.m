@@ -84,13 +84,17 @@
     [super dealloc];
 }
 
+//#define LOGIN_DEBUG 1
+
 - (void)viewDidLoad
 {
     if (_tableAccounts)
         [_tableAccounts reloadData];
 
+#ifndef LOGIN_DEBUG
     if ([AccountManager loggedUserName])
         [self showTabController];
+#endif
 }
 
 #pragma mark Actions

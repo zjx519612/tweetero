@@ -35,6 +35,9 @@
     IBOutlet id passwordField;
 	IBOutlet id rememberSwitch;
 	IBOutlet id iconView;
+    IBOutlet id authTypeSegment;
+    IBOutlet UIView *accountView;
+    IBOutlet UIView *oAuthView;
     
     NSString *_currentUsername;
     NSString *_currentPassword;
@@ -44,5 +47,7 @@
 
 - (IBAction)cancel:(id)sender;
 - (IBAction)login:(id)sender;
+- (IBAction)changeAuthTypeClick:(id)sender;
+- (IBAction)oAuthOKClick;
 
 @end

@@ -39,3 +39,7 @@
 - (id)initWithHTML:(NSString*)content;
 
 @end
+
+@interface OAuthWebController : WebViewController
+
+@end

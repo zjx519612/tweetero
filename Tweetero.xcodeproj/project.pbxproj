@@ -48,7 +48,6 @@
 		009CB0E7107396DA00E48555 /* ISVideoUploadEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 009CB0E6107396DA00E48555 /* ISVideoUploadEngine.m */; };
 		009E75A11068F59E007B2275 /* FollowersController.m in Sources */ = {isa = PBXBuildFile; fileRef = 009E75A01068F59E007B2275 /* FollowersController.m */; };
 		00CA903C107F896600A198AC /* MGTwitterEngine+Search.m in Sources */ = {isa = PBXBuildFile; fileRef = 00CA903B107F896600A198AC /* MGTwitterEngine+Search.m */; };
-		00CB30C4108C822700B03CD8 /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00CB30C3108C822700B03CD8 /* AppController.m */; };
 		00DDA861105F9798008AE91E /* TabController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDA860105F9798008AE91E /* TabController.m */; };
 		00DDA8A8105FA927008AE91E /* AccountManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDA8A7105FA927008AE91E /* AccountManager.m */; };
 		00DDB1DF105E7B030020C9C1 /* CustomImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDB1DE105E7B030020C9C1 /* CustomImageView.m */; };
@@ -200,8 +199,6 @@
 		00CA9038107F88D100A198AC /* MGTwitterEngineAddIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGTwitterEngineAddIn.h; path = Classes/MGTwitterEngineAddIn.h; sourceTree = "<group>"; };
 		00CA903A107F896600A198AC /* MGTwitterEngine+Search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "MGTwitterEngine+Search.h"; path = "Classes/MGTwitterEngine+Search.h"; sourceTree = "<group>"; };
 		00CA903B107F896600A198AC /* MGTwitterEngine+Search.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "MGTwitterEngine+Search.m"; path = "Classes/MGTwitterEngine+Search.m"; sourceTree = "<group>"; };
-		00CB30C2108C822700B03CD8 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
-		00CB30C3108C822700B03CD8 /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; };
 		00DDA85F105F9798008AE91E /* TabController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TabController.h; sourceTree = "<group>"; };
 		00DDA860105F9798008AE91E /* TabController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TabController.m; sourceTree = "<group>"; };
 		00DDA8A6105FA927008AE91E /* AccountManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountManager.h; sourceTree = "<group>"; };
@@ -545,8 +542,6 @@
 				AA87F6460F71D9D300D7A2C0 /* TwitterConnectionProtocol.h */,
 				00485FE0108869DE00409013 /* SearchProvider.h */,
 				00485FE1108869DE00409013 /* SearchProvider.m */,
-				00CB30C2108C822700B03CD8 /* AppController.h */,
-				00CB30C3108C822700B03CD8 /* AppController.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -858,7 +853,6 @@
 				009CB0E7107396DA00E48555 /* ISVideoUploadEngine.m in Sources */,
 				00CA903C107F896600A198AC /* MGTwitterEngine+Search.m in Sources */,
 				00485FE2108869DE00409013 /* SearchProvider.m in Sources */,
-				00CB30C4108C822700B03CD8 /* AppController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
