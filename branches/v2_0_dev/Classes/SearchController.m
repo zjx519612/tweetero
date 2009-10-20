@@ -10,7 +10,6 @@
 #import "SearchController.h"
 #import "CustomImageView.h"
 #import "ImageLoader.h"
-#import "AppController.h"
 #include "util.h"
 
 // Tag identifire
@@ -85,7 +84,7 @@
 {
     [super viewDidAppear:animated];
     
-    self.searchProvider = [[AppController instance] searchProviderWithDelegate:self];
+    self.searchProvider = [SearchProvider sharedProviderUsingDelegate:self];
     
     _pageNum = START_AT_PAGE;
     _searchBar.text = self.query;

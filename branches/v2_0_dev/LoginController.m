@@ -26,6 +26,7 @@
 
 #import "LoginController.h"
 #import "MGTwitterEngine.h"
+#import "WebViewController.h"
 
 @implementation LoginController
 
@@ -38,9 +39,10 @@
     }
     return self;
 }
+
 - (id)initWithUserData:(NSString *)userName password:(NSString *)password
 {
-    if ((self = [super initWithNibName:@"Login" bundle:nil]))
+    if ((self = [self init]))
     {
         _currentUsername = [userName retain];
         _currentPassword = [password retain];
@@ -79,13 +81,48 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
+#define AccountSegmentIndex     0
+#define OAuthSegmentIndex       1
+
+- (IBAction)changeAuthTypeClick:(id)sender
+{
+    UISegmentedControl *segmentSender = (UISegmentedControl*)sender;
+    
+    if (segmentSender)
+    {
+        // Select authentification via login/password.
+        if (segmentSender.selectedSegmentIndex == AccountSegmentIndex)
+        {
+            self.view = accountView;
+            self.navigationItem.rightBarButtonItem.enabled = YES;
+        }
+        // Selecte authentification via OAuth. Load twitter.com in inapp web browser.
+        else if (segmentSender.selectedSegmentIndex == OAuthSegmentIndex)
+        {
+            self.view = oAuthView;
+            self.navigationItem.rightBarButtonItem.enabled = NO;
+        }
+    }
+}
+
+- (IBAction)oAuthOKClick
+{
+    NSURLRequest *twitterUrlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://twitter.com"]];
+    
+    OAuthWebController *web = [[OAuthWebController alloc] initWithRequest:twitterUrlRequest];
+    [self.navigationController pushViewController:web animated:YES];
+    [web release];
+}
+
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-
+    
+    accountView = self.view;
+    
  	self.navigationItem.rightBarButtonItem = loginButton;
     self.navigationItem.leftBarButtonItem = cancelButton;
-	self.navigationItem.title = NSLocalizedString(@"Twitter Account", @"");
+    self.navigationItem.titleView = authTypeSegment;
     
     [loginField setText:_currentUsername];
     [passwordField setText:_currentPassword];

@@ -9,8 +9,6 @@
 #import "CustomTabBarController.h"
 #import "MGTwitterEngine.h"
 #import "SearchController.h"
-#import "AppController.h"
-
 #include "util.h"
 
 const int kMoreBarItemTag   = -1;
@@ -84,6 +82,8 @@ const int kTabBarHeight     = 46;
         self.searchProvider = nil;
     }
     
+    [SearchProvider sharedProviderRelease];
+    
     _tabBar.delegate = nil;
     if (_moreTable)
     {
@@ -111,7 +111,7 @@ const int kTabBarHeight     = 46;
     {
         [_moreTable reloadData];
     }
-    self.searchProvider = [[AppController instance] searchProviderWithDelegate:self];
+    self.searchProvider = [SearchProvider sharedProviderUsingDelegate:self];
     [self.searchProvider update];
 }
 

@@ -24,6 +24,9 @@
 
 @implementation SearchProvider
 
+// Instance of shared search provider
+static SearchProvider *sharedProvider = nil;
+
 @synthesize twitter = _twitter;
 @synthesize delegate = _delegate;
 
@@ -31,6 +34,25 @@
 {
     SearchProvider *provider = [[SearchProvider alloc] initWithDelegate:delegate];
     return [provider autorelease];
+}
+
++ (SearchProvider *)sharedProviderUsingDelegate:(id)delegate
+{
+    if (sharedProvider == nil)
+        sharedProvider = [[SearchProvider alloc] initWithDelegate:delegate];
+    else
+        sharedProvider.delegate = delegate;
+    return sharedProvider;
+}
+
++ (SearchProvider *)sharedProviderRelease
+{
+    if (sharedProvider)
+    {
+        [sharedProvider setDelegate:nil];
+        [sharedProvider release];
+        sharedProvider = nil;
+    }
 }
 
 - (id)init

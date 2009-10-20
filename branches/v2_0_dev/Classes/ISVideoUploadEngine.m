@@ -46,6 +46,8 @@
 
 - (id)initWithData:(NSData *)theData delegate:(id<ISVideoUploadEngineDelegate>) dlgt
 {
+    NSAssert([kTweeteroDevKey length] == 0, @"Dev key is empty");
+    
     if ((self = [super init]))
     {
         uploadData = [theData retain];
