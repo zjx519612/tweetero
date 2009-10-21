@@ -31,6 +31,7 @@
 #import "UserInfo.h"
 #import "TweetterAppDelegate.h"
 #import "CustomImageView.h"
+#include "util.h"
 
 #define NAME_TAG            1
 #define REAL_NAME_TAG       2
@@ -248,9 +249,32 @@
 	if(indexPath.row < [_users count])
 	{
 		id userInfo = [_users objectAtIndex:indexPath.row];
-		UserInfo *infoView = [[UserInfo alloc] initWithUserName:[userInfo objectForKey:@"screen_name"]];
-		[self.navigationController pushViewController:infoView animated:YES];
-		[infoView release];
+        if (isNullable(userInfo))
+            return;
+        
+        BOOL isProtected = NO;
+        
+        id protectedValue = [userInfo objectForKey:@"protected"];
+        if (!isNullable(protectedValue))
+            isProtected = [protectedValue boolValue];
+        
+        if (!isProtected)
+        {
+            UserInfo *infoView = [[UserInfo alloc] initWithUserName:[userInfo objectForKey:@"screen_name"]];
+            [self.navigationController pushViewController:infoView animated:YES];
+            [infoView release];
+        }
+        else
+        {
+            // Show alert view. User data protected
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"User Info", @"") 
+                                                            message:NSLocalizedString(@"User data are protected!", @"") 
+                                                           delegate:nil
+                                                  cancelButtonTitle:NSLocalizedString(@"OK", @"") 
+                                                  otherButtonTitles:nil];
+            [alert show];
+            [alert release];
+        }
 	}
 }
 

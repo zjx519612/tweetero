@@ -81,15 +81,15 @@ static int NetworkActivityIndicatorCounter = 0;
 {
     @try
     {
-        NSLog(@"top - %@ modal - %@", [NSString stringWithCString:NAMEOF(navigationController.topViewController)],
-              [NSString stringWithCString:NAMEOF(navigationController.modalViewController)]);
-        
         if (![navigationController.topViewController isKindOfClass:[TwitEditorController self]] && 
             ![navigationController.modalViewController isKindOfClass:[UIImagePickerController self]])
         {
-            TwitEditorController *editor = [[TwitEditorController alloc] initInCameraMode];
-            [navigationController pushViewController:editor animated:YES];
-            [editor release];
+            if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
+            {
+                TwitEditorController *editor = [[TwitEditorController alloc] initInCameraMode];
+                [navigationController pushViewController:editor animated:YES];
+                [editor release];
+            }
         }
     }
     @catch (...)

@@ -56,6 +56,7 @@ enum {
 	NSString *_username;
     BOOL _following;
 	NSString *isUserReceivingUpdatesForConnectionID;
+    NSString *userInfoConnectionID;
     BOOL _isDirectMessage;
     UserInfoView *_userInfoView;
     NSMutableArray *_userTableSection;
@@ -69,6 +70,7 @@ enum {
 - (IBAction)showTwitts;
 - (IBAction)notifySwitchChanged;
 
-@property (nonatomic, retain) NSString *isUserReceivingUpdatesForConnectionID;
+@property (nonatomic, copy) NSString *isUserReceivingUpdatesForConnectionID;
+@property (nonatomic, copy) NSString *userInfoConnectionID;
 
 @end
