@@ -278,6 +278,7 @@
 	NSString *multipartContentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@", boundary];
     
     [request setHTTPMethod:@"POST"];
+	[request setTimeoutInterval:HTTPUploadTimeout];
     [request setValue:multipartContentType forHTTPHeaderField:@"Content-type"];
     [request setHTTPBody:body];
     

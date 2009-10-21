@@ -39,13 +39,15 @@
 {
     // Navigate tab controller
     TabController *controller = [[TabController alloc] init];
-    [self.navigationController pushViewController:controller animated:YES];
+    [self.navigationController pushViewController:controller animated:self.canAnimate];
     [controller release];
 }
 
 @end
 
 @implementation AccountController
+
+@synthesize canAnimate;
 
 + (void)showAccountController:(UINavigationController*)navigationController
 {
@@ -72,6 +74,7 @@
         
         self.navigationItem.title = NSLocalizedString(@"Accounts", @"");
         _tableAccounts = nil;
+        self.canAnimate = YES;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveAccountNotification:) name:@"AccountDataChanged" object:nil];
     }
@@ -86,6 +89,11 @@
 
 //#define LOGIN_DEBUG 1
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    self.canAnimate = YES;
+}
+
 - (void)viewDidLoad
 {
     if (_tableAccounts)
@@ -93,7 +101,10 @@
 
 #ifndef LOGIN_DEBUG
     if ([AccountManager loggedUserName])
+    {
+        self.canAnimate = NO;
         [self showTabController];
+    }
 #endif
 }
 

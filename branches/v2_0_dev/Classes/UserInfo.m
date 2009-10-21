@@ -49,6 +49,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 @implementation UserInfo
 
 @synthesize isUserReceivingUpdatesForConnectionID;
+@synthesize userInfoConnectionID;
 
 - (id)initWithUserName:(NSString*)uname
 {
@@ -58,7 +59,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 	{
 		_gotInfo = NO;
 		_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
-		_username = [uname retain];
+		_username = [uname copy];
         _following = NO;
         
         _userInfoView = [[UserInfoView alloc] init];
@@ -93,6 +94,8 @@ static NSString* kActionCell = @"UserInfoActionCell";
 	
 	[_username release];
 	self.isUserReceivingUpdatesForConnectionID = nil;
+    self.userInfoConnectionID = nil;
+    
     [super dealloc];
 }
 
@@ -106,7 +109,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
 	self.isUserReceivingUpdatesForConnectionID = [_twitter isUser:_username receivingUpdatesFor:[MGTwitterEngine username]];
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
-	[_twitter getUserInformationFor:_username];
+	self.userInfoConnectionID = [_twitter getUserInformationFor:_username];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -219,6 +222,9 @@ static NSString* kActionCell = @"UserInfoActionCell";
 
 - (void)userInfoReceived:(NSArray *)userInfo forRequest:(NSString *)connectionIdentifier;
 {
+    if (![self.userInfoConnectionID isEqualToString:connectionIdentifier])
+        return;
+    
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	NSDictionary *userData = [userInfo objectAtIndex:0];
 

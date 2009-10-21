@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#define HTTPUploadTimeout   300
+
 typedef enum {
     ISUploadPhaseNone,
     ISUploadPhaseStart,
