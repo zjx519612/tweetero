@@ -1,0 +1,108 @@
+﻿/* English File */
+
+"Post Image" = "Post Image";
+"New Tweet" = "Новый твит";
+"yFrog" = "yFrog";
+"Library or camera" = "Where do you want to get Photo?";
+"Use photo camera" = "Сделайть фото";
+"Use library" = "Choose Existing Media";
+"Use video camera" = "Запись видео";
+// "Use video library" = "Choose Existing Video";
+"Cancel" = "Отмена";
+"Clear" = "Очистить";
+"Save" = "Сохранить";
+"Upload Image to yFrog" = "Загрузка на yFrog";
+"Send twit on Twitter" = "Отправить новый Tweet";
+"Settings" = "Настройки";
+"Mail Subject: yFrog Image" = "yFrog Image";
+"Mail Subject: Forwarding of a twit" = "Forwarding a Tweet";
+"Mail Subject: Forwarding of an image" = "Forwarding a Picture";
+"Reply" = "Ответить";
+"Forward" = "Forward";
+"Re-Twit" = "Re-Twit";
+"Uploading..." = "Загрузка...";
+"Failed!" = "Ошибка!";
+"Failed to create connection." = "Невозможно открыть соединение.";
+"Failed to send a mail." = "Невозможно отправить письмо.";
+"Failed to download the image." = "Невозможно загрузить картинку.";
+"Copying images to yFrog server..." = "Копируем картинку в YFrog ...";
+"YFrog image URL placeholder" = "http://yfrog.com/image.jpg";
+"YFrog video URL placeholder" = "http://yfrog.us/video.mp4";
+"Back" = "Назад";
+"Done" = "Завершить";
+"Send" = "Отправить";
+"OK" = "OK";
+"Error occure during uploading of image" = "Error has occured while uploading";
+"AvailableCharsFormat" = "%d characters of %d remaining";
+
+"LocationLinkFormat" = "Location: %@";
+//"You can not add image" = "You can not add a picture";
+//"You can not add location" = "You can not add the location link";
+//"Remove some chars" = "Not enough characters remained. You need %d characters to insert a picture.";
+
+"You can not send message" = "You can not send the message";
+"Cant to send too long message" = "The message is too long. It should be up to 140 characters.";
+
+"Picture Saved" = "Picture Saved";
+"The picture has been added to your Photos" = "The picture has been added to your Photos";
+
+//"You can not save message" = "You can not save message";
+"Error occure during message saving" = "Error occure during message saving";
+"Error occure while sending the message" = "Error occure while sending the message";
+"Error occure while reading the message" = "Error occure while reading the message";
+
+"Uploading the messages to Twitter..." = "Uploading the messages to Twitter...";
+
+// Tabs titles
+"Home" = "Home";
+"Post" = "Отправить";
+"Replies" = "Mentions";
+"Messages" = "Сообщения";
+"Pending Tweets" = "Очередь";
+"Followers" = "Последователи";
+"Following" = "Following";
+"Settings" = "Настройки";
+"About" = "О программе";
+
+"AboutVerFormat" = "ver. %@";
+"QueueTitleFormat" = "Очередь (%d)";
+
+"QueueButtonTitleFormat" = "Очередь (%d)";
+"EmptyQueueButtonTitleFormat" = "Очередь";
+
+"RemoveImageTitle" = "Удалить изображение";
+
+"Location service is not available on the device" = "Location services are disabled";
+"You can to enable Location Services on the device" = "You can enable Location Services the device Settings (Settings > General > Location Services)";
+
+"Location service was turn off in settings" = "Location Tracking is disabled";
+"You can to enable Location Services in the application settings" = "Do you want to enable Location Tracking?";
+
+"Location undefined" = "Can't retrieve a current location";
+"Location is still undefined" = "Please try again later";
+
+"Locations for this application was denied" = "Location Services for this application are disabled";
+"You can to enable Location Services by throw down settings" = "You can enable the Location Services in the device Settings application (Settings > General > Reset > Reset Location Warnings)";
+
+"ReTwitFormat" = "RT @%@: %@"; // RT @USERNAME: BODY
+
+"Processing image..." = "Processing image...";
+
+"No Replies" = "No Mentions";
+"Loading Replies..." = "Loading Mentions...";
+
+// Account controller string definitions
+"Accounts" = "Учетная запись";
+"Edit" = "Редактироваь";
+
+"Follow" = "Следовать";
+"Unfollow" = "Покинуть";
+
+// MailResponse strings
+"Canceled" = "Отменено";
+"Failed" = "Ошикба";
+"Sent" = "Письмо было отправлено";
+"Saved" = "Письмо было сохранено";
+
+"User Info" = "Информация";
+"User data are protected!" = "Данные пользователя защищены!";

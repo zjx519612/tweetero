@@ -21,25 +21,18 @@
 #import "MGTwitterEngine.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import "TweetPlayer.h"
-/*
-const int kHeadTagAvatar = 1;
-const int kHeadTagUserName = 2;
-const int kHeadTagScreenName = 3;
-const int kHeadTagLocation = 4;
-*/
 
 @interface TweetViewController (Private)
-
 - (void)createHeadView;
+- (void)createFooterView;
 - (void)updateViewTitle;
 - (void)activeCurrentMessage;
 - (void)updateSegmentButtonState;
-- (UITableViewCell*)createCellWithSection:(TVSectionIndex)section forIndex:(NSInteger)index;
+- (UITableViewCell*)createCellWithSection:(UITableView*)tableView sectionIndex:(int)section forIndex:(NSInteger)index;
 - (NSString*)formatDate:(NSDate*)date;
 - (void)implementOperationIfPossible;
 - (void)copyImagesToYFrog;
 - (NSString*)makeHTMLMessage;
-
 @end
 
 @implementation TweetViewController (Private)
@@ -49,6 +42,22 @@ const int kHeadTagLocation = 4;
     _headView = [[UserInfoView alloc] init];
     _headView.delegate = self;
     _headView.buttons = UserInfoButtonDetail;
+}
+
+- (void)createFooterView
+{
+    if (_footerView)
+        [_footerView release];
+    _footerView = [[UIView alloc] init];
+    
+    UILabel *infoLabel = [[[UILabel alloc] init] autorelease];
+    infoLabel.frame = CGRectMake(15, 0, 200, 40);
+    infoLabel.numberOfLines = 2;
+    infoLabel.tag = 1;
+    infoLabel.font = [UIFont systemFontOfSize:13.];
+    infoLabel.backgroundColor = [UIColor clearColor];
+    infoLabel.textColor = [UIColor grayColor];
+    [_footerView addSubview:infoLabel];
 }
 
 - (void)updateViewTitle
@@ -87,6 +96,9 @@ const int kHeadTagLocation = 4;
         _headView.screenname = [NSString stringWithFormat:@"@%@", [[userData objectForKey:@"screen_name"] lowercaseString]];
         _headView.location = [userData objectForKey:@"location"];
         
+        if (_footerView)
+            [(UILabel*)[_footerView viewWithTag:1] setText:nil];
+        
         // Reload content table
         [contentTable reloadData];
     }
@@ -94,84 +106,64 @@ const int kHeadTagLocation = 4;
 
 - (void)updateSegmentButtonState
 {
-    [tweetNavigate setEnabled:(_currentMessageIndex != 0) forSegmentAtIndex:TVSegmentButtonUp];
-    [tweetNavigate setEnabled:(_currentMessageIndex != (_count - 1)) forSegmentAtIndex:TVSegmentButtonDown];
+    [tweetNavigate setEnabled:(_currentMessageIndex != 0) forSegmentAtIndex:kPrevTwitSegmentIndex];
+    [tweetNavigate setEnabled:(_currentMessageIndex != (_count - 1)) forSegmentAtIndex:kNextTwitSegmentIndex];
 }
 
-- (UITableViewCell*)createCellWithSection:(TVSectionIndex)section forIndex:(NSInteger)index
+- (UITableViewCell*)createCellWithSection:(UITableView*)tableView sectionIndex:(int)section forIndex:(NSInteger)index;
 {
-    static NSString *CellIdentifier = @"TweetViewCellIdentifier";
+    static NSString *MessageCellIdentifier = @"TweetViewMessageCell";
+    static NSString *ActionCellIdentifier = @"TweetViewActionCell";
     
-    UITableViewCell *cell = [[[UITableViewCell alloc] initWithStyle: UITableViewCellStyleDefault 
-                                                    reuseIdentifier: CellIdentifier] autorelease];
+    NSString *cellIdent = (section == kMessageTableSection ? MessageCellIdentifier : ActionCellIdentifier);
     
-    NSArray *content = [_sections objectForKey:[NSNumber numberWithInt:section]];
-    UILabel *textLabel = [cell textLabel];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdent];
     
-    switch (section)
+    if (!cell)
     {
-        // Message cell
-        case TVSectionMessage:
+        cell = [[[UITableViewCell alloc] initWithStyle: UITableViewCellStyleDefault reuseIdentifier: cellIdent] autorelease];
+        
+        if (section == kMessageTableSection)
         {
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            
-            // Create text view for message
-            UITextView *messageView = [[[UITextView alloc] init] autorelease];
-            messageView.frame = CGRectMake(5, 0, 290, 85);
-            messageView.editable = NO;
-            messageView.scrollEnabled = YES;
-            messageView.font = [UIFont systemFontOfSize:16.];
-            if (!isNullable([_message objectForKey:@"text"]))
-                messageView.text = [_message objectForKey:@"text"];
-            else
-                messageView.text = nil;
-            messageView.backgroundColor = [UIColor clearColor];
-            //[cell.contentView addSubview:messageView];
-            
-            _webView.frame = CGRectMake(15, 5, 280, 85);
+
+            _webView.frame = CGRectMake(10, 5, 280, 235);
             _webView.backgroundColor = [UIColor clearColor];
             _webView.scalesPageToFit = NO;
+            
             [cell.contentView addSubview:_webView];
-            
-            // Create label for date
-            NSDate *theDate = [_message objectForKey:@"created_at"];
-            NSString *msgSource = [_message objectForKey:@"source"];
-            
-            if (!isNullable(theDate) && !isNullable(msgSource))
-            {
-                NSString *formatedDate = [self formatDate:theDate];
-                NSString *link = getLinkWithTag(msgSource);
-                if (link)
-                    msgSource = link;
-                UILabel *infoLabel = [[[UILabel alloc] init] autorelease];
-                infoLabel.frame = CGRectMake(15, 85, 200, 40);
-                infoLabel.numberOfLines = 2;
-                infoLabel.font = [UIFont systemFontOfSize:13.];
-                infoLabel.backgroundColor = [UIColor clearColor];
-                infoLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%@\nfrom %@", @""), formatedDate, msgSource];
-                infoLabel.textColor = [UIColor grayColor];
-                [cell.contentView addSubview:infoLabel];
-            }
-            break;
         }
-        // Actions cell
-        case TVSectionGeneralActions:
+        else if (section == kActionTableSection)
         {
-            //UIImageView *celImage = [cell imageView];
-            //celImage.image = [UIImage imageNamed:@"Reply.png"];
-            textLabel.text = [content objectAtIndex:index];
-            if (index == 1)
-                textLabel.textColor = _isDirectMessage ? [UIColor grayColor] : [UIColor blackColor];
-
-            break;
-        }
-        // Delete cell
-        case TVSectionDelete:
-        {
-            textLabel.text = [content objectAtIndex:index];
-            break;
+            CGRect frame = [cell frame];
+            
+            frame.size.width -= 20;
+            _actionSegment.frame = frame;
+            [cell.contentView addSubview:_actionSegment];
         }
     }
+    
+    if (section == kMessageTableSection)
+    {
+        // Create label for date
+        NSDate *theDate = [_message objectForKey:@"created_at"];
+        NSString *msgSource = [_message objectForKey:@"source"];
+        
+        if (!isNullable(theDate) && !isNullable(msgSource))
+        {
+            NSString *formatedDate = [self formatDate:theDate];
+            NSString *link = getLinkWithTag(msgSource);
+            if (link)
+                msgSource = link;
+            
+            if (_footerView)
+            {
+                UILabel *infoLabel = (UILabel*)[_footerView viewWithTag:1];
+                infoLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%@\nfrom %@", @""), formatedDate, msgSource];
+            }
+        }
+    }
+    
     return cell;
 }
 
@@ -400,31 +392,16 @@ const int kHeadTagLocation = 4;
         _headView = nil;
         _count = [_store messageCount];
         _currentMessageIndex = (index >= _count || index < 0) ? 0 : index;
-        _sections = [[NSMutableDictionary alloc] init];
         _twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
         _defaultTintColor = [tweetNavigate.tintColor retain];
-		_imagesLinks = nil;//[[NSMutableDictionary alloc] initWithCapacity:1];
-		_connectionsDelegates = nil; //[[NSMutableArray alloc] initWithCapacity:1]; // See activeCurrentMessage for detail
+		_imagesLinks = nil;
+		_connectionsDelegates = nil;
 		_suspendedOperation =  TVNoMVOperations;
         _webView = [[UIWebView alloc] init];
         _webView.delegate = self;
         
-        NSMutableArray *sectionContent = nil;
-        
-        // Message
-        sectionContent = [NSMutableArray arrayWithObject:NSLocalizedString(@"Message", @"")];
-        [_sections setObject:sectionContent forKey:[NSNumber numberWithInt:TVSectionMessage]];
-        // Action
-        sectionContent = [NSMutableArray array];
-        [sectionContent addObject:NSLocalizedString(@"Reply", @"")];
-        [sectionContent addObject:NSLocalizedString(@"Favorite", @"")];
-        [sectionContent addObject:NSLocalizedString(@"Forward", @"")];
-        [_sections setObject:sectionContent forKey:[NSNumber numberWithInt:TVSectionGeneralActions]];
-        // Delete action
-        sectionContent = [NSMutableArray arrayWithObject:NSLocalizedString(@"Delete", @"")];
-        [_sections setObject:sectionContent forKey:[NSNumber numberWithInt:TVSectionDelete]];
-        
         [self createHeadView];
+        [self createFooterView];
         [self activeCurrentMessage];
     }
     return self;    
@@ -454,8 +431,9 @@ const int kHeadTagLocation = 4;
     [_defaultTintColor release];
     if (_headView)
         [_headView release];
+    if (_footerView)
+        [_footerView release];
     [(id)_store release];
-    [_sections release];
     [_message release];
     if (_imagesLinks)
         [_imagesLinks release];
@@ -485,6 +463,7 @@ const int kHeadTagLocation = 4;
 - (void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
+
 	if (self.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent ||
         self.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque) 
     {
@@ -508,8 +487,7 @@ const int kHeadTagLocation = 4;
 }
 
 #pragma mark Actions
-/** UISegmentControl action. Navigate for tweet messages.
- */
+// UISegmentControl action. Navigate for tweet messages.
 - (IBAction)tweetNavigate:(id)sender
 {
     int index = [sender selectedSegmentIndex];
@@ -517,13 +495,13 @@ const int kHeadTagLocation = 4;
     switch (index)
     {
         // Press up button. Move to previouse message.
-        case TVSegmentButtonUp:
+        case kPrevTwitSegmentIndex:
             if (_currentMessageIndex > 0)
                 _currentMessageIndex--;
             break;
             
         // Press down button. Move to next message.
-        case TVSegmentButtonDown:
+        case kNextTwitSegmentIndex:
             if (_currentMessageIndex < (_count - 1))
                 _currentMessageIndex++;
             break;
@@ -531,6 +509,28 @@ const int kHeadTagLocation = 4;
     [self activeCurrentMessage];
     [self updateViewTitle];
     [self updateSegmentButtonState];
+}
+
+- (IBAction)actionSegmentClick:(id)sender
+{
+    UISegmentedControl *segment = (UISegmentedControl *)sender;
+    
+    switch (segment.selectedSegmentIndex)
+    {
+        case kReplySegmentIndex:
+            [self replyTwit];
+            break;
+        case kFavoriteSegmentIndex:
+            if (!_isDirectMessage)
+                [self favoriteTwit];
+            break;
+        case kForwardSegmentIndex:
+            [self forwardTwit];
+            break;
+        case kDeleteSegmentIndex:
+            [self deleteTwit];
+            break;
+    }    
 }
 
 - (IBAction)replyTwit
@@ -730,23 +730,17 @@ const int kHeadTagLocation = 4;
 #pragma mark UITableView DataSource
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return [_sections count];
+    return kViewTableSectionCount;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSArray *content = [_sections objectForKey:[NSNumber numberWithInt:section]];
-    NSInteger rows = 0;
-    
-    if (content)
-        rows = [content count];
-    
-    return rows;
+    return kViewTableRowsAtSections;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [self createCellWithSection:indexPath.section forIndex:indexPath.row];
+    UITableViewCell *cell = [self createCellWithSection:tableView sectionIndex:indexPath.section forIndex:indexPath.row];
     
     return cell;
 }
@@ -754,52 +748,31 @@ const int kHeadTagLocation = 4;
 #pragma mark UITableView Delegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.section == TVSectionMessage)
-        return 135.;
-    return 40.;
+    return ((indexPath.section == kMessageTableSection) ? 250 : 40);
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    if (section == TVSectionMessage)
-        return 60.;
-    return 0;
+    return ((section == kMessageTableSection) ? 60 : 0);
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return ((section == kMessageTableSection) ? 40 : 0);
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    if (section == TVSectionMessage)
-        return _headView;
-    return nil;
+    return ((section == kMessageTableSection) ? _headView : nil);
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
+    return ((section == kMessageTableSection) ? _footerView : nil);
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.section == TVSectionGeneralActions)
-    {
-        switch (indexPath.row)
-        {
-            // Reply
-            case 0: 
-                [self replyTwit];
-                break;
-
-            // Favorite
-            case 1: 
-                if (!_isDirectMessage)
-                    [self favoriteTwit];
-                break;
-                
-            // Forward
-            case 2: 
-                [self forwardTwit];
-                break; 
-        }
-    }
-    else if (indexPath.section == TVSectionDelete)
-    {
-        [self deleteTwit];
-    }
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 

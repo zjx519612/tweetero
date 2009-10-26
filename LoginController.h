@@ -27,8 +27,18 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
-@interface LoginController : UIViewController <UITextFieldDelegate>
+#import "SA_OAuthTwitterController.h"
+#import "SA_OAuthTwitterEngine.h"
+
+extern const NSString *kNewAccountLoginDataKey;
+extern const NSString *kOldAccountLoginDataKey;
+extern const NSString *LoginControllerAccountDidChange;
+
+@class UserAccount;
+
+@interface LoginController : UIViewController <UITextFieldDelegate, SA_OAuthTwitterControllerDelegate>
 {
+@private
     IBOutlet id cancelButton;
     IBOutlet id loginButton;
     IBOutlet id loginField;
@@ -37,17 +47,18 @@
 	IBOutlet id iconView;
     IBOutlet id authTypeSegment;
     IBOutlet UIView *accountView;
-    IBOutlet UIView *oAuthView;
-    
-    NSString *_currentUsername;
-    NSString *_currentPassword;
+    IBOutlet UIView *oAuthView;    
+    UserAccount *_currentAccount;
 }
 
-- (id)initWithUserData:(NSString *)userName password:(NSString *)password;
+- (id)initWithUserAccount:(UserAccount*)account;
 
 - (IBAction)cancel:(id)sender;
+
 - (IBAction)login:(id)sender;
+
 - (IBAction)changeAuthTypeClick:(id)sender;
+
 - (IBAction)oAuthOKClick;
 
 @end

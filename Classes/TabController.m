@@ -77,7 +77,7 @@
     
     theController = [self createViewController: [HomeViewController class] 
                                        nibName: nil 
-                                   tabIconName: @"HomeTabIcon.tiff" 
+                                   tabIconName: @"home.tif" 
                                       tabTitle: @"Home"];
     theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
@@ -85,7 +85,7 @@
     
 	theController = [self createViewController: [RepliesListController class] 
                                        nibName: @"UserMessageList" 
-                                   tabIconName: @"Replies.tiff" 
+                                   tabIconName: @"mentions.tif" 
                                       tabTitle: @"Replies"];
     theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
@@ -93,7 +93,7 @@
     
 	theController = [self createViewController: [DirectMessagesController class] 
                                        nibName: @"UserMessageList" 
-                                   tabIconName: @"Messages.tiff" 
+                                   tabIconName: @"messages.tif" 
                                       tabTitle: @"Messages"];
     theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
@@ -101,7 +101,7 @@
     
 	theController = [self createViewController: [TweetQueueController class] 
                                        nibName: @"TweetQueue" 
-                                   tabIconName: @"Queue.tiff" 
+                                   tabIconName: @"unsent.tif" 
                                       tabTitle: [TweetQueueController queueTitle]];
     theController.tabBarItem.tag = tag++;
     [self addViewController:theController];
@@ -109,7 +109,7 @@
     
 	theController = [self createViewController: [MyTweetViewController class] 
                                        nibName: @"UserMessageList" 
-                                   tabIconName: @"mytweets.png" 
+                                   tabIconName: @"my-tweets.png" 
                                       tabTitle: @"My Tweets"];
     theController.tabBarItem.tag = tag++;
     [self addViewController:theController];

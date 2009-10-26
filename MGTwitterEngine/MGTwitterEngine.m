@@ -206,7 +206,10 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
     return [[_password retain] autorelease];
 }
 
-
++ (void)setUsername:(NSString *)newUsername password:(NSString *)newPassword
+{
+    [MGTwitterEngine setUsername:newUsername password:newPassword remember:NO];
+}
 
 + (void)setUsername:(NSString *)newUsername password:(NSString *)newPassword remember:(BOOL)storePassword
 {
