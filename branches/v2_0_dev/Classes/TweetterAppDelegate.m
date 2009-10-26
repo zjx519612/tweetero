@@ -42,6 +42,7 @@
 #import "AccountController.h"
 
 #import "ISVideoUploadEngine.h"
+#import "AccountManager.h"
 
 static int NetworkActivityIndicatorCounter = 0;
 
@@ -57,9 +58,11 @@ static int NetworkActivityIndicatorCounter = 0;
 	[[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
 	[appDefaults release];
 
-    AccountController *accountController = [[AccountController alloc] init];
+    AccountManager *accountManager = [AccountManager manager];
+    AccountController *accountController = [[AccountController alloc] initWithManager:accountManager];
     navigationController = [[NavigationRotateController alloc] initWithRootViewController:accountController];
     [accountController release];
+    
     [window addSubview:navigationController.view];
 
 	[[LocationManager locationManager] startUpdates];

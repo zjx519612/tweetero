@@ -40,6 +40,7 @@
 + (NSString *)version; // returns the version of MGTwitterEngine
 + (NSString *)username;
 + (NSString *)password;
++ (void)setUsername:(NSString *)newUsername password:(NSString *)newPassword;
 + (void)setUsername:(NSString *)newUsername password:(NSString *)newPassword remember:(BOOL)storePassword;
 + (void)forgetPassword;
 + (void)remindPassword;

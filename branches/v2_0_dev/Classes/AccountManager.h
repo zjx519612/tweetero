@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 #define kInvalidUserIndex   -1
-
+/*
 @interface AccountManager : NSObject 
 {
     NSMutableArray *_users;
@@ -31,5 +31,37 @@
 
 // Login methods
 - (void)login:(NSString *)userName;
+
+@end
+*/
+
+@class UserAccount;
+
+@interface AccountManager : NSObject
+{
+@private
+    NSMutableDictionary     *_accounts;
+    UserAccount             *_loggedUserAccount;
+}
+
+@property (nonatomic, readonly) UserAccount *loggedUserAccount;
+
++ (AccountManager*)manager;
+
+- (void)saveAccount:(UserAccount*)account;
+
+- (void)replaceAccount:(UserAccount*)oldAccount with:(UserAccount*)newAccount;
+
+- (void)removeAccount:(UserAccount*)account;
+
+- (UserAccount*)accountByUsername:(NSString*)username;
+
+- (NSArray*)allAccountUsername;
+
+- (BOOL)hasAccountWithUsername:(NSString*)username;
+
+- (void)login:(UserAccount*)account;
+
+- (void)clearLoggedObject;
 
 @end

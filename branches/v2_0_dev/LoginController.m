@@ -25,37 +25,42 @@
 // 
 
 #import "LoginController.h"
-#import "MGTwitterEngine.h"
 #import "WebViewController.h"
+#import "UserAccount.h"
+
+#include "config.h"
+
+#define AccountSegmentIndex     0
+#define OAuthSegmentIndex       1
+
+const NSString *kNewAccountLoginDataKey = @"newAccount";
+const NSString *kOldAccountLoginDataKey = @"oldAccount";
+
+const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidChange";
 
 @implementation LoginController
 
 - (id)init
 {
-    if ((self = [super initWithNibName:@"Login" bundle:nil]))
+    if (self = [super initWithNibName:@"Login" bundle:nil])
     {
-        _currentUsername = nil;
-        _currentPassword = nil;
+        _currentAccount = nil;
     }
     return self;
 }
 
-- (id)initWithUserData:(NSString *)userName password:(NSString *)password
+- (id)initWithUserAccount:(UserAccount*)account
 {
-    if ((self = [self init]))
+    if (self = [self init])
     {
-        _currentUsername = [userName retain];
-        _currentPassword = [password retain];
+        _currentAccount = [account retain];
     }
     return self;
 }
 
 - (void)dealloc
 {
-    if (_currentUsername)
-        [_currentUsername release];
-    if (_currentPassword)
-        [_currentPassword release];
+    [_currentAccount release];
     [super dealloc];
 }
 
@@ -66,23 +71,24 @@
 
 - (IBAction)login:(id)sender 
 {
-    NSString *login = [loginField text];
-	NSString *password = [passwordField text];
-	
-	[MGTwitterEngine setUsername:login password:password remember:[rememberSwitch isOn]];
+    // Create new UserAccount object and send it as parameter of notification
+    TwitterCommonUserAccount *newAccount = [[TwitterCommonUserAccount alloc] init];
+
+    newAccount.username = [loginField text];
+    newAccount.password = [passwordField text];
     
-    NSDictionary *userInfoDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                login, @"login", password, @"password",
-                                                _currentUsername, @"old_login", _currentPassword, @"old_password",
-                                                nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"AccountDataChanged" 
+    // Notification parameters
+    NSDictionary *loginData = [NSDictionary dictionaryWithObjectsAndKeys: newAccount, kNewAccountLoginDataKey, _currentAccount, kOldAccountLoginDataKey, nil];
+    [newAccount release];
+    
+    // Post LoginControllerAccountDidChange notifiaction
+    [[NSNotificationCenter defaultCenter] postNotificationName: (NSString *)LoginControllerAccountDidChange 
                                                         object: nil
-                                                      userInfo: userInfoDict];
+                                                      userInfo: loginData];
+    
+    // Pop self controller from navigation bar
     [self.navigationController popViewControllerAnimated:YES];
 }
-
-#define AccountSegmentIndex     0
-#define OAuthSegmentIndex       1
 
 - (IBAction)changeAuthTypeClick:(id)sender
 {
@@ -107,11 +113,17 @@
 
 - (IBAction)oAuthOKClick
 {
-    NSURLRequest *twitterUrlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://twitter.com"]];
+    SA_OAuthTwitterEngine *engine = [[SA_OAuthTwitterEngine alloc] initOAuthWithDelegate: self];
     
-    OAuthWebController *web = [[OAuthWebController alloc] initWithRequest:twitterUrlRequest];
-    [self.navigationController pushViewController:web animated:YES];
-    [web release];
+    engine.consumerKey = kTweeteroConsumerKey;
+    engine.consumerSecret = kTweeteroConsumerSecret;
+    
+    SA_OAuthTwitterController *oAuthController = [SA_OAuthTwitterController controllerToEnterCredentialsWithTwitterEngine:engine delegate:self];
+    
+    if (oAuthController)
+        [self.navigationController pushViewController:oAuthController animated:YES];
+    else
+		[engine sendUpdate: [NSString stringWithFormat: @"Already Updated. %@", [NSDate date]]];
 }
 
 - (void)viewDidLoad 
@@ -124,10 +136,15 @@
     self.navigationItem.leftBarButtonItem = cancelButton;
     self.navigationItem.titleView = authTypeSegment;
     
-    [loginField setText:_currentUsername];
-    [passwordField setText:_currentPassword];
-	[rememberSwitch setOn: NO];
-	
+    if (_currentAccount)
+    {
+        [loginField setText:_currentAccount.username];
+        [passwordField setText:@""];
+        [rememberSwitch setOn: NO];
+    }
+    
+    self.navigationItem.leftBarButtonItem = nil;
+    
 	UIImage *icon = [UIImage imageNamed:@"Frog.tiff"];
 	if(icon)
 		[iconView setImage:icon];
@@ -135,7 +152,6 @@
 
 #pragma mark -
 #pragma mark <UITextFieldDelegate> Methods
-
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
 	[textField resignFirstResponder];

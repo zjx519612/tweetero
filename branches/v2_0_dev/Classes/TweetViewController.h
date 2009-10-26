@@ -15,18 +15,27 @@
 #import "MGConnectionWrap.h"
 #import "UserInfoView.h"
 
-// Content table sections indexes
-typedef enum {
-    TVSectionMessage = 0,
-    TVSectionGeneralActions,
-    TVSectionDelete
-} TVSectionIndex;
+enum {
+    kMessageTableSection      = 0,
+    kActionTableSection       = 1
+};
 
-// Segment button indexes
-typedef enum {
-    TVSegmentButtonDown = 0,
-    TVSegmentButtonUp
-} TVSegmentButton;
+enum {
+    kNextTwitSegmentIndex     = 0,
+    kPrevTwitSegmentIndex     = 1
+};
+
+enum {
+    kReplySegmentIndex        = 0,
+    kFavoriteSegmentIndex     = 1,
+    kForwardSegmentIndex      = 2,
+    kDeleteSegmentIndex       = 3
+};
+
+enum {
+    kViewTableSectionCount    = 2,
+    kViewTableRowsAtSections  = 1
+};
 
 typedef enum {
 	TVNoMVOperations,
@@ -51,22 +60,24 @@ typedef enum {
                                                    UIWebViewDelegate, UserInfoViewDelegate,
                                                    MFMailComposeViewControllerDelegate>
 {
+@private
     IBOutlet UISegmentedControl         *tweetNavigate;
+    IBOutlet UISegmentedControl         *_actionSegment;
     IBOutlet UITableView                *contentTable;
 	UIActionSheet                       *_progressSheet;    
     UserInfoView                        *_headView;
+    UIView                              *_footerView;
     UIWebView                           *_webView;
     NSDictionary                        *_message;
-    NSMutableDictionary                 *_sections;
     NSMutableDictionary                 *_imagesLinks;
 	NSMutableArray                      *_connectionsDelegates;
     UIColor                             *_defaultTintColor;
-    TVMessageViewSuspendedOperations    _suspendedOperation;
-	BOOL                                _isDirectMessage;
-	int                                 _newLineCounter;
-    int                                 _count;
-    int                                 _currentMessageIndex;
-    id <TweetViewDelegate>              _store;
+    TVMessageViewSuspendedOperations     _suspendedOperation;
+	BOOL                                 _isDirectMessage;
+	int                                  _newLineCounter;
+    int                                  _count;
+    int                                  _currentMessageIndex;
+    id <TweetViewDelegate>               _store;
     MGTwitterEngine                     *_twitter;
 }
 
@@ -77,7 +88,7 @@ typedef enum {
 
 // Actions
 - (IBAction)tweetNavigate:(id)sender;
-//- (IBAction)nameSelected;
+- (IBAction)actionSegmentClick:(id)sender;
 - (IBAction)replyTwit;
 - (IBAction)favoriteTwit;
 - (IBAction)forwardTwit;

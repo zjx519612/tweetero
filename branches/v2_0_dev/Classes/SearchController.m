@@ -235,6 +235,24 @@
         ++_pageNum;
         [self updateSearch];
     }
+    else
+    {
+        //TweetViewController *view = [[TweetViewController alloc] initWithStore:self messageIndex:indexPath.row];
+        //[self.navigationController pushViewController:view animated:YES];
+        //[view release];
+    }
+}
+
+#pragma mark TweetViewDelegate
+- (int)messageCount
+{
+    return [_result count];
+}
+
+// Must return dictionary with message data
+- (NSDictionary *)messageData:(int)index
+{
+    return [_result objectAtIndex:index];
 }
 
 @end
@@ -291,6 +309,7 @@
             [label release];
         }
     }
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     return cell;
 }
 

@@ -3,51 +3,17 @@
 #import "LoginController.h"
 #import "MGTwitterEngine.h"
 #import "AccountManager.h"
+#import "UserAccount.h"
 
-@interface AccountController (Private)
-
+@interface AccountController(Private)
 - (void)saveAccountNotification:(NSNotification*)notification;
 - (void)showTabController;
-
-@end
-
-@implementation AccountController (Private)
-
-- (void)saveAccountNotification:(NSNotification*)notification
-{
-    NSLog(@"saveAccountNotification Handler\n");
-    
-    NSDictionary *userInfo = (NSDictionary *)[notification userInfo];
-    NSString *userName = [userInfo objectForKey:@"login"];
-    NSString *userPassword = [userInfo objectForKey:@"password"];
-    NSString *oldPassword = [userInfo objectForKey:@"old_password"];
-    NSString *oldUserName = [userInfo objectForKey:@"old_login"];
-    
-    NSLog(@"userName = %@, userPassword = %@, oldUserName = %@, oldUserPassword = %@\n", userName, userPassword, oldUserName, oldPassword);
-    if (userName)
-    {
-        if (oldPassword == nil && oldUserName == nil)
-            [[AccountManager manager] addUser:userName password:userPassword];
-        else
-            [[AccountManager manager] updateUser:oldUserName newUserName:userName newPassword:userPassword];
-        [_tableAccounts reloadData];
-    }
-    NSLog(@"end handler");
-}
-
-- (void)showTabController
-{
-    // Navigate tab controller
-    TabController *controller = [[TabController alloc] init];
-    [self.navigationController pushViewController:controller animated:self.canAnimate];
-    [controller release];
-}
-
 @end
 
 @implementation AccountController
 
-@synthesize canAnimate;
+@synthesize canAnimate = _canAnimate;
+@synthesize accountManager = _manager;
 
 + (void)showAccountController:(UINavigationController*)navigationController
 {
@@ -73,17 +39,31 @@
         [button release];
         
         self.navigationItem.title = NSLocalizedString(@"Accounts", @"");
-        _tableAccounts = nil;
         self.canAnimate = YES;
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveAccountNotification:) name:@"AccountDataChanged" object:nil];
+        _tableAccounts = nil;
+        _manager = nil;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveAccountNotification:) name:(NSString*)LoginControllerAccountDidChange object:nil];
     }
     return self;
 }
-        
+
+- (id)initWithManager:(AccountManager*)manager
+{
+    if (self = [self init])
+    {
+        _manager = [manager retain];
+    }
+    return self;
+}
+
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_tableAccounts release];
+    [_manager release];
+    
     [super dealloc];
 }
 
@@ -100,7 +80,7 @@
         [_tableAccounts reloadData];
 
 #ifndef LOGIN_DEBUG
-    if ([AccountManager loggedUserName])
+    if (self.accountManager.loggedUserAccount)
     {
         self.canAnimate = NO;
         [self showTabController];
@@ -109,19 +89,15 @@
 }
 
 #pragma mark Actions
-/** 
- Create LoginController and push it to navigation controller.
- */
+// Create LoginController and push it to navigation controller.
 - (IBAction)clickAdd
 {
     LoginController *controller = [[LoginController alloc] initWithNibName:@"Login" bundle:nil];
+    
     [self.navigationController pushViewController:controller animated:YES];
     [controller release];
 }
 
-/** 
- Create LoginController with selected account data and push it to nvaigation controller.
- */
 - (IBAction)clickEdit
 {
     [_tableAccounts setEditing:!_tableAccounts.editing];
@@ -132,31 +108,23 @@
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     NSIndexPath *index = [_tableAccounts indexPathForSelectedRow];
-    NSString *userName = [[AccountManager manager] userName:index.row];
+    UITableViewCell *cell = [_tableAccounts cellForRowAtIndexPath:index];
     
-    switch (buttonIndex)
+    UserAccount *account = [self.accountManager accountByUsername:cell.textLabel.text];
+    
+    if (buttonIndex == 0)
     {
-        // Delete
-        case 0:
-        {
-            [[AccountManager manager] removeUser:userName];
-            break;
-        }
-        
-        // Change
-        case 1:
-        {
-            NSString *password = [[AccountManager manager] userPassword:userName];
-            
-            LoginController *controller = [[LoginController alloc] initWithUserData:userName password:password];
-            [self.navigationController pushViewController:controller animated:YES];
-            [controller release];
-            break;
-        }   
-        // Cancel
-        case 2:
-            break;
+        // Remove selected account
+        [self.accountManager removeAccount:account];
     }
+    else if (buttonIndex == 1)
+    {
+        // Edit selected account. Navigate LoginController with account data.
+        LoginController *login = [[LoginController alloc] initWithUserAccount:account];
+        [self.navigationController pushViewController:login animated:YES];
+        [login release];
+    }
+    
     [_tableAccounts setEditing:NO];
     [_tableAccounts reloadData];
 }
@@ -169,16 +137,11 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSInteger count = [[AccountManager manager] accountCount];
-    NSLog(@"AccountController: numberOfRowsInSection = %i\n", count);
-    
-    return count;
+    return [[self.accountManager allAccountUsername] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"AccountController: cellForRowAtIndexPath\n");
-    
     static NSString *kCellIdentifier = @"AccountCell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:kCellIdentifier];
@@ -186,11 +149,8 @@
     if (cell == nil)
         cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:kCellIdentifier] autorelease];
     
-    cell.textLabel.text = [[AccountManager manager] userName:indexPath.row];
+    cell.textLabel.text = [[self.accountManager allAccountUsername] objectAtIndex:indexPath.row];
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-    
-    NSLog(@"textLabel.text = %@\n", cell.textLabel.text);
-    NSLog(@"AccountController: finish cellForRowAtIndexPath\n");
     
     return cell;
 }
@@ -200,10 +160,13 @@
 {
     if (!tableView.editing)
     {
-        NSString *userName = [[AccountManager manager] userName:indexPath.row];
+        NSIndexPath *index = [_tableAccounts indexPathForSelectedRow];
+        UITableViewCell *cell = [_tableAccounts cellForRowAtIndexPath:index];
         
+        UserAccount *account = [self.accountManager accountByUsername:cell.textLabel.text];
+
         // Login with user
-        [[AccountManager manager] login:userName];
+        [self.accountManager login:account];
         [self showTabController];
     }
     else
@@ -211,9 +174,9 @@
         // Show alert
         UIActionSheet *action = [[UIActionSheet alloc] initWithTitle: nil
                                                             delegate: self 
-                                                   cancelButtonTitle: @"Cancel" 
-                                              destructiveButtonTitle: @"Delete" 
-                                                   otherButtonTitles: @"Change", nil];
+                                                   cancelButtonTitle: NSLocalizedString(@"Cancel", @"")
+                                              destructiveButtonTitle: NSLocalizedString(@"Delete", @"")
+                                                   otherButtonTitles: NSLocalizedString(@"Change", @""), nil];
         [action showInView:self.view];
         [action release];
     }
@@ -227,6 +190,36 @@
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return (UITableViewCellEditingStyleDelete | UITableViewCellEditingStyleInsert);
+}
+
+@end
+
+@implementation AccountController(Private)
+
+- (void)saveAccountNotification:(NSNotification*)notification
+{
+    NSDictionary *loginData = (NSDictionary*)[notification userInfo];
+    
+    UserAccount *newAccount = [loginData objectForKey:kNewAccountLoginDataKey];
+    UserAccount *oldAccount = [loginData objectForKey:kOldAccountLoginDataKey];
+    
+    if (newAccount)
+    {
+        if (oldAccount)
+            [self.accountManager replaceAccount:oldAccount with:newAccount];
+        else
+            [self.accountManager saveAccount:newAccount];
+        
+        [_tableAccounts reloadData];
+    }
+}
+
+- (void)showTabController
+{
+    // Navigate tab controller
+    TabController *controller = [[TabController alloc] init];
+    [self.navigationController pushViewController:controller animated:self.canAnimate];
+    [controller release];
 }
 
 @end

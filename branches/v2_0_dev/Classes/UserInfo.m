@@ -66,6 +66,8 @@ static NSString* kActionCell = @"UserInfoActionCell";
         _userTableSection = [[NSMutableArray alloc] init];
         _userInfoView.buttons = UserInfoButtonFollow;
         
+        _userTableImages = [[NSMutableDictionary alloc] init];
+        
         if ([uname compare:[MGTwitterEngine username]] == NSOrderedSame)
             [_userInfoView hideFollowingButton:YES];
         [self initTableData];
@@ -76,6 +78,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 
 - (void)dealloc 
 {
+    [_userTableImages release];
     [_userInfoView release];
     [_userTableSection release];
     
@@ -403,6 +406,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
     UITableViewCell *cell = [self createCellForIdentifier:tableView reuseIdentifier:cellIdent];
     
     cell.textLabel.text = [[_userTableSection objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
+    cell.imageView.image = [UIImage imageNamed:[_userTableImages objectForKey:[NSNumber numberWithInt:indexPath.row]]];
     return cell;
 }
 
@@ -414,23 +418,17 @@ static NSString* kActionCell = @"UserInfoActionCell";
 #pragma mark UITableView Delegate
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.section == USDescription)
-        return infoView.frame.size.height + 1;
-    return 40;
+    return ((indexPath.section == USDescription) ? (infoView.frame.size.height + 1) : 40);
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    if (section == 0)
-        return 60;
-    return 0;
+    return ((section == 0) ? 60 : 0);
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    if (section == USDescription)
-        return _userInfoView;
-    return nil;
+    return ((section == USDescription) ? _userInfoView : nil);
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -478,7 +476,11 @@ static NSString* kActionCell = @"UserInfoActionCell";
                                                 NSLocalizedString(@"Send Public Reply", @""),
                                                 NSLocalizedString(@"Recent Tweets", @""),
                                                 NSLocalizedString(@"Followers", @""),
-                                                nil]];    
+                                                nil]];
+    
+    [_userTableImages setObject:@"followers.png" forKey:[NSNumber numberWithInt:UActionFollowersIndex]];
+    [_userTableImages setObject:@"recent-tweets.png" forKey:[NSNumber numberWithInt:UActionRecentIndex]];
+    [_userTableImages setObject:@"reply.png" forKey:[NSNumber numberWithInt:UActionReplyIndex]];
 }
 
 - (UITableViewCell*)createCellForIdentifier:(UITableView*)tableView reuseIdentifier:(NSString*)identifier

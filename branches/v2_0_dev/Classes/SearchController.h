@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "SearchProvider.h"
+#import "TweetViewController.h"
 
-@interface SearchController : UITableViewController <UISearchBarDelegate, SearchProviderDelegate>
+@interface SearchController : UITableViewController <UISearchBarDelegate, SearchProviderDelegate, TweetViewDelegate>
 {
   @private
     IBOutlet UISearchBar        *_searchBar;

@@ -53,6 +53,9 @@
 
 - (UIImage*)imageWithURL:(NSString*)url
 {
+    if (url == nil)
+        return nil;
+    
 	UIImage *image = [_cache objectForKey:url];
 	if(image) return image;
 	

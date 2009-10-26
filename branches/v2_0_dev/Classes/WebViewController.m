@@ -93,7 +93,7 @@
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-	self.navigationItem.title = NSLocalizedString(@"Failed", @"");
+	self.navigationItem.title = NSLocalizedString(@"Failed!", @"");
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView

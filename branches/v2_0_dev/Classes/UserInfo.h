@@ -60,6 +60,7 @@ enum {
     BOOL _isDirectMessage;
     UserInfoView *_userInfoView;
     NSMutableArray *_userTableSection;
+    NSMutableDictionary *_userTableImages;
 }
 - (id)initWithUserName:(NSString*)uname;
 - (IBAction)changeFollowing:(id)sender;
