@@ -93,9 +93,14 @@
 		return;
 	}
 	
-	NSString* login = [MGTwitterEngine username];
-	NSString* pass = [MGTwitterEngine password];
+	//NSString* login = [MGTwitterEngine username];
+	//NSString* pass = [MGTwitterEngine password];
 	
+	NSString* login = [[[AccountManager manager] loggedUserAccount] username];
+	NSString* pass = @"";//[MGTwitterEngine password];
+    
+    //NSLog([[[AccountManager manager] loggedUserAccount] secretData]);
+    
 	NSString *boundary = [NSString stringWithFormat:@"------%ld__%ld__%ld", random(), random(), random()];
 	
 	NSURL *url = [NSURL URLWithString:@"http://yfrog.com/api/upload"];
@@ -284,7 +289,10 @@
 - (void) connectionDidFinishLoading:(NSURLConnection *)connection
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-
+    NSString *str = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
+    NSLog(str);
+    [str release];
+    
 	NSXMLParser *parser = [[NSXMLParser alloc] initWithData:result];
 	[parser setDelegate:self];
 	[parser setShouldProcessNamespaces:NO];

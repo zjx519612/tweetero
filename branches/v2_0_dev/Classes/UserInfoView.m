@@ -60,7 +60,7 @@ const int kHeadTagLocation = 4;
         self.delegate = nil;
     }
     [detailButton release];
-    [followSegment release];
+    [followButton release];
     [super dealloc];
 }
 
@@ -75,7 +75,7 @@ const int kHeadTagLocation = 4;
         username = nil;
     }
     
-    if ((id)name != [NSNull null])
+    if (name && (id)name != [NSNull null])
         username = [[NSString alloc] initWithString:name];
     
     label.text = self.username;
@@ -109,7 +109,7 @@ const int kHeadTagLocation = 4;
         location = nil;
     }
     
-    if ((id)newLocation != [NSNull null])
+    if (newLocation && (id)newLocation != [NSNull null])
         location = [[NSString alloc] initWithString:newLocation];
     
     label.text = self.location;
@@ -138,7 +138,7 @@ const int kHeadTagLocation = 4;
 - (void)setFollow:(BOOL)isFollow
 {
     follow = isFollow;
-    [followSegment setTitle:follow ? NSLocalizedString(@"FOLLOW", @"") : NSLocalizedString(@"UNFOLLOW", @"") forSegmentAtIndex:0];
+    [followButton setTitle:follow ? NSLocalizedString(@"UNFOLLOW", @"") : NSLocalizedString(@"FOLLOW", @"") forState:UIControlStateNormal];
 }
 
 - (void)setButtons:(int)button
@@ -152,9 +152,9 @@ const int kHeadTagLocation = 4;
     
     // Following button
     if (button & UserInfoButtonFollow)
-        [self addSubview:followSegment];
+        [self addSubview:followButton];
     else
-        [followSegment removeFromSuperview];
+        [followButton removeFromSuperview];
 }
 
 #pragma mark Actions
@@ -179,12 +179,12 @@ const int kHeadTagLocation = 4;
 #pragma mark Public methods
 - (void)disableFollowingButton:(BOOL)disabled
 {
-    [followSegment setEnabled:!disabled];
+    [followButton setEnabled:!disabled];
 }
 
 - (void)hideFollowingButton:(BOOL)hide
 {
-    [followSegment setHidden:hide];
+    [followButton setHidden:hide];
 }
 
 @end
@@ -233,11 +233,17 @@ const int kHeadTagLocation = 4;
     [detailButton addTarget:self action:@selector(detailPressed) forControlEvents:UIControlEventTouchUpInside];
     
     // Following segment
-    followSegment = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:NSLocalizedString(@"FOLLOW", @""), nil]];
-    followSegment.segmentedControlStyle = UISegmentedControlStyleBar;
-    followSegment.momentary = YES;
-    followSegment.frame = CGRectMake(225, 24, 85, 30);
-    [followSegment addTarget:self action:@selector(followPressed) forControlEvents:UIControlEventTouchUpInside];
+    //followSegment = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:NSLocalizedString(@"FOLLOW", @""), nil]];
+    //followSegment.segmentedControlStyle = UISegmentedControlStyleBar;
+    //followSegment.momentary = YES;
+    //followSegment.frame = CGRectMake(215, 24, 95, 30);
+    //[followSegment addTarget:self action:@selector(followPressed) forControlEvents:UIControlEventValueChanged];
+    
+    followButton = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
+    followButton.frame = CGRectMake(205, 29, 105, 25);
+    followButton.titleLabel.font = [UIFont systemFontOfSize:12];
+    [followButton setTitle:NSLocalizedString(@"UNFOLLOW", @"") forState:UIControlStateNormal];
+    [followButton addTarget:self action:@selector(followPressed) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)updateView

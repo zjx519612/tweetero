@@ -34,6 +34,9 @@
 //#import <MediaPlayer/MediaPlayer.h>
 #import "TweetPlayer.h"
 #import "ImageViewController.h"
+#import "MGTwitterEngineFactory.h"
+#import "AccountManager.h"
+#import "Logger.h"
 
 #define SEND_SEGMENT_CNTRL_WIDTH			130
 #define FIRST_SEND_SEGMENT_WIDTH			 66
@@ -192,7 +195,13 @@
 
 - (void)initData
 {
-	_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+	//_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+    _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
+    
+    //NSLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).authorizeURL path]);
+    //NSLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).accessTokenURL path]);
+    //NSLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).requestTokenURL path]);
+    
 	inTextEditingMode = NO;
 	suspendedOperation = noTEOperations;
 	photoURLPlaceholderMask = [NSLocalizedString(@"YFrog image URL placeholder", @"") retain];
@@ -340,7 +349,7 @@
 		isImageNeedToConvert(img, &needToResize, &needToRotate);
 		if(needToResize || needToRotate)
 		{
-			self.progressSheet = ShowActionSheet(NSLocalizedString(@"Processing image...", @""), self, nil, self.tabBarController.view);
+			self.progressSheet = ShowActionSheet(NSLocalizedString(@"Processing image...", @""), self, nil, self.view);
 			self.progressSheet.tag = PROCESSING_PHOTO_SHEET_TAG;
 		}
 	}
@@ -374,7 +383,7 @@
 	isImageNeedToConvert(img, &needToResize, &needToRotate);
 	if(needToResize || needToRotate)
 	{
-		self.progressSheet = ShowActionSheet(NSLocalizedString(@"Processing image...", @""), self, nil, self.tabBarController.view);
+		self.progressSheet = ShowActionSheet(NSLocalizedString(@"Processing image...", @""), self, nil, self.view);
 		self.progressSheet.tag = PROCESSING_PHOTO_SHEET_TAG;
 	}
 }
@@ -673,7 +682,7 @@
 													otherButtonTitles:firstButton, secondButton, thirdButton, nil];
 	actionSheet.actionSheetStyle = UIActionSheetStyleAutomatic;
 	actionSheet.tag = PHOTO_Q_SHEET_TAG;
-	[actionSheet showInView:self.tabBarController.view];
+	[actionSheet showInView:self.view];
 	[actionSheet release];
 	
 }
@@ -788,17 +797,14 @@
 		suspendedOperation = send;
 		if(!connectionDelegate)
 			[self startUpload];
-		self.progressSheet = ShowActionSheet(NSLocalizedString(@"Upload Image to yFrog", @""), self, NSLocalizedString(@"Cancel", @""), self.tabBarController.view);
+		self.progressSheet = ShowActionSheet(NSLocalizedString(@"Upload Image to yFrog", @""), self, NSLocalizedString(@"Cancel", @""), self.view);
 		return;
 	}
 	
 	suspendedOperation = noTEOperations;
-	NSString* login = [MGTwitterEngine username];
-	NSString* pass = [MGTwitterEngine password];
 	
-	if(!login || !pass)
+	if(![[AccountManager manager] isValidLoggedUser])
 	{
-		//[LoginController showModal:self.navigationController];
         [AccountController showAccountController:self.navigationController];
 		return;
 	}
@@ -842,10 +848,13 @@
     NSString *conntectionID = nil;
     
 	if(_message)
-		conntectionID = [_twitter sendUpdate:body inReplyTo:[[_message objectForKey:@"id"] intValue]];
+		conntectionID = [_twitter sendUpdate:body inReplyTo:[[_message objectForKey:@"id"] stringValue]];
 	else if(_queueIndex >= 0)
-		conntectionID = [_twitter sendUpdate:body inReplyTo:_queuedReplyId];
-	else
+    {
+        NSNumber *statusID = [NSNumber numberWithInt:_queuedReplyId];
+		conntectionID = [_twitter sendUpdate:body inReplyTo:[statusID stringValue]];
+	}
+    else
 		conntectionID = [_twitter sendUpdate:body];
     return conntectionID;
 }
@@ -1135,6 +1144,8 @@
 	if(suspendedOperation == send)
 	{
 		suspendedOperation == noTEOperations;
+        NSLog(@"Test");
+        NSLog(yFrogURL);
 		if(yFrogURL)
 			[self postImageAction];
 		else

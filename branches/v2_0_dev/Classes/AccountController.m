@@ -1,13 +1,14 @@
 #import "AccountController.h"
-#import "TabController.h"
 #import "LoginController.h"
-#import "MGTwitterEngine.h"
 #import "AccountManager.h"
 #import "UserAccount.h"
+#import "MGTwitterEngineFactory.h"
+#import "TwTabController.h"
 
 @interface AccountController(Private)
 - (void)saveAccountNotification:(NSNotification*)notification;
 - (void)showTabController;
+- (void)verifySelectedAccount;
 @end
 
 @implementation AccountController
@@ -44,7 +45,10 @@
         _tableAccounts = nil;
         _manager = nil;
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(saveAccountNotification:) name:(NSString*)LoginControllerAccountDidChange object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self 
+                                                 selector:@selector(saveAccountNotification:) 
+                                                     name:(NSString*)LoginControllerAccountDidChange 
+                                                   object:nil];
     }
     return self;
 }
@@ -67,8 +71,6 @@
     [super dealloc];
 }
 
-//#define LOGIN_DEBUG 1
-
 - (void)viewDidAppear:(BOOL)animated
 {
     self.canAnimate = YES;
@@ -79,13 +81,11 @@
     if (_tableAccounts)
         [_tableAccounts reloadData];
 
-#ifndef LOGIN_DEBUG
     if (self.accountManager.loggedUserAccount)
     {
         self.canAnimate = NO;
         [self showTabController];
     }
-#endif
 }
 
 #pragma mark Actions
@@ -167,7 +167,10 @@
 
         // Login with user
         [self.accountManager login:account];
-        [self showTabController];
+        
+        [self verifySelectedAccount];
+        
+        //[self showTabController];
     }
     else
     {
@@ -217,9 +220,40 @@
 - (void)showTabController
 {
     // Navigate tab controller
-    TabController *controller = [[TabController alloc] init];
-    [self.navigationController pushViewController:controller animated:self.canAnimate];
-    [controller release];
+    TwTabController *tab = [[TwTabController alloc] init];
+    [self.navigationController pushViewController:tab animated:self.canAnimate];
+    [tab release];
+}
+
+- (void)verifySelectedAccount
+{
+    _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
+    
+    _credentialIdentifier = [_twitter checkUserCredentials];
+}
+
+#pragma mark MGTwitterEngine delegate methods
+- (void)requestSucceeded:(NSString *)connectionIdentifier
+{
+    [_twitter release];
+    if ([connectionIdentifier isEqualToString:_credentialIdentifier])
+        [self showTabController];
+    _credentialIdentifier = nil;
+}
+
+- (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Authorization_Title", @"") 
+                                                    message:NSLocalizedString(@"Authorization_Message", @"")
+                                                   delegate:nil
+                                          cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
+    [alert show];
+    [alert release];
+    
+    [_twitter release];
+    _credentialIdentifier = nil;
+    
+    [self.accountManager clearLoggedObject];
 }
 
 @end

@@ -66,15 +66,15 @@
     if (isNewAccount && isValid)
     {
         // Add and save new account
-        NSString *securityString = nil;
-        
-        if ([account authType] == TwitterCommon)
-            securityString = ((TwitterCommonUserAccount*)account).password;
-        
+        NSString *securityString = [account secretData];
+            
         NSData *secData = [securityString dataUsingEncoding:NSUTF8StringEncoding];
 
+        //NSNumber *accType = [NSNumber numberWithInt:[account authType]];
+        
         // Prepate SecItemEnty
         NSMutableDictionary *secItemEntry = [self prepareSecItemEntry:SEC_ATTR_SERVER user:account.username];
+        //[secItemEntry setObject:accType forKey:(id)kSecAttrType];
         [secItemEntry setObject:secData forKey:(id)kSecValueData];
         
         OSStatus err = SecItemAdd((CFDictionaryRef)secItemEntry, NULL);
@@ -112,10 +112,7 @@
         {
             NSLog(@"Replace security data");
             
-            NSString *secString = nil;
-            
-            if ([newAccount authType] == TwitterCommon)
-                secString = ((TwitterCommonUserAccount*)newAccount).password;
+            NSString *secString = [newAccount secretData];
             
             NSMutableDictionary *secItemEntry = [self prepareSecItemEntry:SEC_ATTR_SERVER user:oldAccount.username];
             
@@ -194,16 +191,16 @@
 {
     if (account)
     {
-        TwitterCommonUserAccount *commonAccount = (TwitterCommonUserAccount*)account;
-        
-        [MGTwitterEngine setUsername:commonAccount.username password:commonAccount.password remember:NO];
-        
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:commonAccount.username, @"login", commonAccount.password, @"password", nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"AccountChanged" 
-                                                            object: nil
-                                                          userInfo: userInfo];
-        if ([MGTwitterEngine username] != nil && [MGTwitterEngine password] != nil)
-            [self updateLoggedUserAccount:commonAccount];
+        if (account.authType == TwitterAuthCommon)
+        {
+            [MGTwitterEngine setUsername:account.username password:account.secretData remember:NO];
+            
+            NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:account.username, @"login", account.secretData, @"password", nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"AccountChanged" 
+                                                                object: nil
+                                                              userInfo: userInfo];
+        }
+        [self updateLoggedUserAccount:account];
     }
 }
 
@@ -211,6 +208,11 @@
 {
     if (_loggedUserAccount)
         [_loggedUserAccount release];
+}
+
+- (BOOL)isValidLoggedUser
+{
+    return !(self.loggedUserAccount == nil);
 }
 
 @end
@@ -229,9 +231,25 @@
 
 - (void)updateStandadUserDefaults
 {
-    NSArray *usernames = [self allAccountUsername];
+    //NSArray *usernames = [self allAccountUsername];
     
-    [[NSUserDefaults standardUserDefaults] setObject:usernames forKey:ACCOUNT_MANAGER_KEY];
+    NSMutableArray *accData = [NSMutableArray array];
+    
+    for (NSString *key in _accounts)
+    {
+        UserAccount *acc = [_accounts objectForKey:key];
+        
+        NSNumber *type = [NSNumber numberWithInt:acc.authType];
+        
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        [dict setObject:acc.username forKey:@"username"];
+        [dict setObject:type forKey:@"authtype"];
+        
+        [accData addObject:dict];
+    }
+    
+    //[[NSUserDefaults standardUserDefaults] setObject:usernames forKey:ACCOUNT_MANAGER_KEY];
+    [[NSUserDefaults standardUserDefaults] setObject:accData forKey:ACCOUNT_MANAGER_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -250,8 +268,15 @@
     NSArray *accounts = [[NSUserDefaults standardUserDefaults] arrayForKey:ACCOUNT_MANAGER_KEY];
     
     // Load all account data
-    for (NSString *username in accounts)
+    //for (NSString *username in accounts)
+    for (NSDictionary *dict in accounts)
     {
+        if (!dict)
+            continue;
+        
+        NSString *username = [dict objectForKey:@"username"];
+        NSNumber *type = [dict objectForKey:@"authtype"];
+        
         NSMutableDictionary *secItemEntry = [self prepareSecItemEntry:SEC_ATTR_SERVER user:username];
         
         [secItemEntry setObject:(id)kSecMatchLimitOne forKey:(id)kSecMatchLimit];
@@ -265,9 +290,11 @@
         {
             secData = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
             
-            TwitterCommonUserAccount *account = [[TwitterCommonUserAccount alloc] init];
+            UserAccount *account = [[UserAccount alloc] init];
             account.username = username;
-            account.password = secData;
+            account.secretData = secData;
+            if (type)
+                account.authType = [type intValue];
             
             [_accounts setObject:account forKey:account.username];
             

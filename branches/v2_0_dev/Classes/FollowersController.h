@@ -24,6 +24,7 @@
 //THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import <UIKit/UIKit.h>
+#import "TwActivityIndicator.h"
 
 @class MGTwitterEngine;
 
@@ -31,7 +32,7 @@
 {
 	MGTwitterEngine *_twitter;
 	NSArray *_users;
-	UIActivityIndicatorView *_indicator;
+    TwActivityIndicator *_activity;
 	int _indicatorCount;
 	BOOL _loading;
 }

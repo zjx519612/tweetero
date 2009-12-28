@@ -26,6 +26,7 @@
 
 #include "util.h"
 #import "MGTwitterEngine.h"
+#import "ImageLoader.h"
 
 void traceDict(NSDictionary *dict)
 {
@@ -258,6 +259,23 @@ NSArray* linksFromText(NSString *text)
     }
     
     return links;
+}
+
+NSArray* yFrogLinksArrayFromText(NSString *text)
+{
+    NSArray *links = linksFromText(text);
+    NSMutableArray *yfrogLinks = [NSMutableArray array];
+    
+    for (NSString *link in links)
+    {
+        NSString *yFrogLink = ValidateYFrogLink(link);
+        if (yFrogLink)
+        {
+            NSString *validLink = [NSString stringWithFormat:@"%@.th.jpg", yFrogLink];
+            [yfrogLinks addObject:validLink];
+        }
+    }
+    return (NSArray*)[[yfrogLinks retain] autorelease];
 }
 
 NSString* yFrogLinkFromText(NSString *text)
@@ -523,4 +541,59 @@ NSMutableURLRequest* tweeteroMutableURLRequest(NSURL* url)
 BOOL isNullable(id obj)
 {
     return (obj == nil || [NSNull null] == obj);
+}
+
+UIImage* loadAndScaleImage(NSString *url, CGSize size)
+{
+    UIImage *image = [[ImageLoader sharedLoader] imageWithURL:url];
+    
+    if (image != nil)
+    {
+        if(image.size.width > size.width || image.size.height > size.height)
+        {
+            image = imageScaledToSize(image, size.width);
+            [[ImageLoader sharedLoader] cachedImageWithUrl:image forUrl:url];
+        }
+    }
+    return image;
+}
+
+NSString* FormatNSDate(NSDate* date)
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+
+    //Set message date and time
+    NSCalendarUnit unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit;
+
+    NSDateComponents *nowComponents = [calendar components:unitFlags fromDate:[NSDate date]];
+    NSDateComponents *yesterdayComponents = [calendar components:unitFlags fromDate:[NSDate dateWithTimeIntervalSinceNow:-60*60*24]];
+    NSDateComponents *createdAtComponents = [calendar components:unitFlags fromDate:date];
+    
+    NSString *formatedDate = nil;
+    if([nowComponents year] == [createdAtComponents year] &&
+       [nowComponents month] == [createdAtComponents month] &&
+       [nowComponents day] == [createdAtComponents day])
+    {
+        [dateFormatter setDateStyle:NSDateFormatterNoStyle];
+        [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+        formatedDate = [dateFormatter stringFromDate:date];
+    }
+    else if([yesterdayComponents year] == [createdAtComponents year] &&
+			[yesterdayComponents month] == [createdAtComponents month] &&
+			[yesterdayComponents day] == [createdAtComponents day])
+    {
+        [dateFormatter setDateStyle:NSDateFormatterNoStyle];
+        [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+        formatedDate = [NSString stringWithFormat:@"Yesterday, %@", [dateFormatter stringFromDate:date]];
+    }
+    else
+    {
+        [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
+        [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+        formatedDate = [dateFormatter stringFromDate:date];
+    }
+    [calendar release];
+    [dateFormatter release];
+    return formatedDate;
 }

@@ -31,7 +31,7 @@ typedef enum {
     int                          buttons;
     id <UserInfoViewDelegate>    delegate;
     UIButton                    *detailButton;
-    UISegmentedControl          *followSegment;
+    UIButton                    *followButton;
 }
 
 @property (nonatomic, copy)     NSString                    *username;

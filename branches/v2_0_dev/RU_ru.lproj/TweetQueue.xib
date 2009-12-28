@@ -61,7 +61,7 @@
 			<object class="IBUISegmentedControl" id="544420320">
 				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">292</int>
-				<string key="NSFrameSize">{207, 30}</string>
+				<string key="NSFrameSize">{128, 30}</string>
 				<reference key="NSSuperview"/>
 				<bool key="IBUIOpaque">NO</bool>
 				<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -69,9 +69,9 @@
 				<int key="IBNumberOfSegments">3</int>
 				<object class="NSArray" key="IBSegmentTitles">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string type="base64-UTF8">0KDQtdC00LDQutGC0LjRgNC+0LLQsNGC0Yw</string>
-					<string type="base64-UTF8">0KPQtNCw0LvQuNGC0Yw</string>
-					<string type="base64-UTF8">0J7RgtC/0YDQsNCy0LjRgtGMINCy0YHQtQ</string>
+					<string/>
+					<string/>
+					<string/>
 				</object>
 				<object class="NSMutableArray" key="IBSegmentWidths">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -93,9 +93,18 @@
 				</object>
 				<object class="NSMutableArray" key="IBSegmentImages">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<object class="NSNull" id="4"/>
-					<reference ref="4"/>
-					<reference ref="4"/>
+					<object class="NSCustomResource">
+						<string key="NSClassName">NSImage</string>
+						<string key="NSResourceName">edit.tif</string>
+					</object>
+					<object class="NSCustomResource">
+						<string key="NSClassName">NSImage</string>
+						<string key="NSResourceName">delete-top.tif</string>
+					</object>
+					<object class="NSCustomResource">
+						<string key="NSClassName">NSImage</string>
+						<string key="NSResourceName">sendall.tif</string>
+					</object>
 				</object>
 				<bool key="IBMomentary">YES</bool>
 			</object>
@@ -199,7 +208,7 @@
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>TweetQueueController</string>
 					<string>UIResponder</string>
-					<string>{{0, 965}, {207, 30}}</string>
+					<string>{{0, 965}, {128, 30}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>

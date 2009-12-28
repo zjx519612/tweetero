@@ -27,36 +27,38 @@
 #import "DirectMessagesController.h"
 #import "MGTwitterEngine.h"
 #import "TweetterAppDelegate.h"
+#import "AccountManager.h"
 
 @implementation DirectMessagesController
 
-- (void)viewControllerDidActivate:(id)parent
+- (void)dealloc
 {
-    UIViewController *parentController = parent;
-    
-    parentController.navigationItem.title = NSLocalizedString(@"Direct Messages", @"");
-    
-	UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem: UIBarButtonSystemItemRefresh
-                                                                                  target: self
-                                                                                  action: @selector(reload)];
-	parentController.navigationItem.rightBarButtonItem = reloadButton;
-	[reloadButton release];
-    [self setRootNavigationController:parentController.navigationController];
+  	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [_topBarItem release];
+    [super dealloc];
 }
 
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-    /*
-	self.navigationItem.title = @"Direct Messages";
-	
-	UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-		target:self action:@selector(reload)];
-	self.navigationItem.leftBarButtonItem = reloadButton;
-	[reloadButton release];
-	*/
-	
+    
+    if (_topBarItem != nil)
+        [_topBarItem release];
+    
+    _topBarItem =[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"refresh.tif"] 
+                                                  style:UIBarButtonItemStyleBordered 
+                                                 target:self 
+                                                 action:@selector(reload)];
+    
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:@"DirectMessageSent" object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(twittsUpdatedNotificationHandler:) name:@"TwittsUpdated" object:nil];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    self.parentViewController.navigationItem.title = NSLocalizedString(@"Direct Messages", @"");    
+    self.parentViewController.navigationItem.rightBarButtonItem = _topBarItem;
 }
 
 - (void)accountChanged:(NSNotification*)notification
@@ -77,20 +79,32 @@
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count
 {
 	[super loadMessagesStaringAtPage:numPage count:count];
-	if([MGTwitterEngine password] != nil)
+
+    if ([[AccountManager manager] isValidLoggedUser])
 	{
 		[self retainActivityIndicator];
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
 		[_twitter getDirectMessagesSince:nil startingAtPage:numPage];
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
 		[_twitter getSentDirectMessagesSince:nil startingAtPage:numPage];
-		//self.rootNavigationController.navigationItem.title = [MGTwitterEngine username];
 	}
 }
 
 - (void)reload
 {
 	[self reloadAll];
+}
+
+- (void)twittsUpdatedNotificationHandler:(NSNotification*)note
+{
+    id object = [note object];
+    
+    if ([object respondsToSelector:@selector(dataSourceClass)])
+    {
+        Class ds_class = [object dataSourceClass];
+        if (ds_class == [self class])
+            [self reload];
+    }
 }
 
 @end

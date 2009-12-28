@@ -723,7 +723,6 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 			break;
         case MGTwitterSearchResults:
         {
-            char *ptr = (char *)[jsonData bytes];
  			[MGTwitterSearchYAJLParser parserWithJSON:jsonData delegate:self 
 						  connectionIdentifier:identifier requestType:requestType 
 								  responseType:responseType URL:URL deliveryOptions:_deliveryOptions];
@@ -1041,6 +1040,8 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
     }
     NSString *path = [NSString stringWithFormat:@"friendships/create/%@.%@", username, API_FORMAT];
     
+    NSLog(@"enableUpdatesFor: %@", path);
+    
     return [self _sendRequestWithMethod:HTTP_POST_METHOD path:path queryParameters:nil body:nil 
                             requestType:MGTwitterAccountRequest 
                            responseType:MGTwitterUser];
@@ -1054,6 +1055,8 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
         return nil;
     }
     NSString *path = [NSString stringWithFormat:@"friendships/destroy/%@.%@", username, API_FORMAT];
+    
+    NSLog(@"disableUpdatesFor: %@", path);
     
     return [self _sendRequestWithMethod:HTTP_POST_METHOD path:path queryParameters:nil body:nil 
                             requestType:MGTwitterAccountRequest 
@@ -1237,7 +1240,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                            responseType:MGTwitterStatuses];
 }
 
-
+/*
 - (NSString *)getFollowedTimelineFor:(NSString *)username sinceID:(int)updateID startingAtPage:(int)pageNum count:(int)count
 {
 	NSString *path = [NSString stringWithFormat:@"statuses/friends_timeline.%@", API_FORMAT];
@@ -1245,6 +1248,31 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
     if (updateID > 0) {
         [params setObject:[NSString stringWithFormat:@"%d", updateID] forKey:@"since_id"];
+    }
+    if (pageNum > 0) {
+        [params setObject:[NSString stringWithFormat:@"%d", pageNum] forKey:@"page"];
+    }
+    if (username) {
+        path = [NSString stringWithFormat:@"statuses/friends_timeline/%@.%@", username, API_FORMAT];
+    }
+	int tweetCount = DEFAULT_TWEET_COUNT;
+	if (count > 0) {
+		tweetCount = count;
+	}
+	[params setObject:[NSString stringWithFormat:@"%d", tweetCount] forKey:@"count"];
+    
+    return [self _sendRequestWithMethod:nil path:path queryParameters:params body:nil 
+                            requestType:MGTwitterStatusesRequest 
+                           responseType:MGTwitterStatuses];
+}
+*/
+- (NSString *)getFollowedTimelineFor:(NSString *)username sinceID:(NSString*)updateID startingAtPage:(int)pageNum count:(int)count
+{
+	NSString *path = [NSString stringWithFormat:@"statuses/friends_timeline.%@", API_FORMAT];
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
+    if (updateID && [updateID longLongValue] > 0) {
+        [params setObject:updateID forKey:@"since_id"];
     }
     if (pageNum > 0) {
         [params setObject:[NSString stringWithFormat:@"%d", pageNum] forKey:@"page"];
@@ -1294,7 +1322,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                            responseType:MGTwitterStatuses];
 }
 
-
+/*
 - (NSString *)getUserTimelineFor:(NSString *)username sinceID:(int)updateID startingAtPage:(int)pageNum count:(int)numUpdates
 {
 	NSString *path = [NSString stringWithFormat:@"statuses/user_timeline.%@", API_FORMAT];
@@ -1302,6 +1330,30 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
     if (updateID > 0) {
         [params setObject:[NSString stringWithFormat:@"%d", updateID] forKey:@"since_id"];
+    }
+	if (pageNum > 0) {
+        [params setObject:[NSString stringWithFormat:@"%d", pageNum] forKey:@"page"];
+    }
+    if (numUpdates > 0) {
+        [params setObject:[NSString stringWithFormat:@"%d", numUpdates] forKey:@"count"];
+    }
+    if (username) {
+        path = [NSString stringWithFormat:@"statuses/user_timeline/%@.%@", username, API_FORMAT];
+    }
+    
+    return [self _sendRequestWithMethod:nil path:path queryParameters:params body:nil 
+                            requestType:MGTwitterStatusesRequest 
+                           responseType:MGTwitterStatuses];
+}
+*/
+
+- (NSString *)getUserTimelineFor:(NSString *)username sinceID:(NSString*)updateID startingAtPage:(int)pageNum count:(int)numUpdates
+{
+	NSString *path = [NSString stringWithFormat:@"statuses/user_timeline.%@", API_FORMAT];
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
+    if (updateID && [updateID longLongValue] > 0) {
+        [params setObject:updateID forKey:@"since_id"];
     }
 	if (pageNum > 0) {
         [params setObject:[NSString stringWithFormat:@"%d", pageNum] forKey:@"page"];
@@ -1335,7 +1387,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 }
 */
 
-
+/*
 - (NSString *)getPublicTimelineSinceID:(int)updateID
 {
     NSString *path = [NSString stringWithFormat:@"statuses/public_timeline.%@", API_FORMAT];
@@ -1343,6 +1395,20 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
     if (updateID > 0) {
         [params setObject:[NSString stringWithFormat:@"%d", updateID] forKey:@"since_id"];
+    }
+    
+    return [self _sendRequestWithMethod:nil path:path queryParameters:params body:nil 
+                            requestType:MGTwitterStatusesRequest 
+                           responseType:MGTwitterStatuses];
+}
+*/
+- (NSString *)getPublicTimelineSinceID:(NSString*)updateID
+{
+    NSString *path = [NSString stringWithFormat:@"statuses/public_timeline.%@", API_FORMAT];
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
+    if (updateID && [updateID longLongValue] > 0) {
+        [params setObject:updateID forKey:@"since_id"];
     }
     
     return [self _sendRequestWithMethod:nil path:path queryParameters:params body:nil 
@@ -1379,13 +1445,13 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 }
 
 
-- (NSString *)getRepliesSinceID:(int)updateID startingAtPage:(int)pageNum count:(int)count
+- (NSString *)getRepliesSinceID:(NSString*)updateID startingAtPage:(int)pageNum count:(int)count
 {
 	NSString *path = [NSString stringWithFormat:@"statuses/replies.%@", API_FORMAT];
     
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
-    if (updateID > 0) {
-        [params setObject:[NSString stringWithFormat:@"%d", updateID] forKey:@"since_id"];
+    if (updateID && [updateID longLongValue] > 0) {
+        [params setObject:updateID forKey:@"since_id"];
     }
     if (pageNum > 0) {
         [params setObject:[NSString stringWithFormat:@"%d", pageNum] forKey:@"page"];
@@ -1421,7 +1487,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                            responseType:MGTwitterStatuses];
 }
 
-
+/*
 - (NSString *)getUpdate:(int)updateID
 {
     NSString *path = [NSString stringWithFormat:@"statuses/show/%d.%@", updateID, API_FORMAT];
@@ -1430,7 +1496,15 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                             requestType:MGTwitterStatusesRequest 
                            responseType:MGTwitterStatus];
 }
-
+*/
+- (NSString *)getUpdate:(NSString*)updateID
+{
+    NSString *path = [NSString stringWithFormat:@"statuses/show/%@.%@", updateID, API_FORMAT];
+    
+    return [self _sendRequestWithMethod:nil path:path queryParameters:nil body:nil 
+                            requestType:MGTwitterStatusesRequest 
+                           responseType:MGTwitterStatus];
+}
 
 #pragma mark Retrieving direct messages
 
@@ -1452,7 +1526,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                            responseType:MGTwitterDirectMessages];
 }
 
-
+/*
 - (NSString *)getDirectMessagesSinceID:(int)updateID startingAtPage:(int)pageNum
 {
     NSString *path = [NSString stringWithFormat:@"direct_messages.%@", API_FORMAT];
@@ -1469,7 +1543,23 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                             requestType:MGTwitterDirectMessagesRequest 
                            responseType:MGTwitterDirectMessages];
 }
-
+*/
+- (NSString *)getDirectMessagesSinceID:(NSString*)updateID startingAtPage:(int)pageNum
+{
+    NSString *path = [NSString stringWithFormat:@"direct_messages.%@", API_FORMAT];
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
+    if (updateID && [updateID longLongValue] > 0) {
+        [params setObject:updateID forKey:@"since_id"];
+    }
+    if (pageNum > 0) {
+        [params setObject:[NSString stringWithFormat:@"%d", pageNum] forKey:@"page"];
+    }
+    
+    return [self _sendRequestWithMethod:nil path:path queryParameters:params body:nil 
+                            requestType:MGTwitterDirectMessagesRequest 
+                           responseType:MGTwitterDirectMessages];
+}
 
 - (NSString *)getSentDirectMessagesSince:(NSDate *)date startingAtPage:(int)pageNum
 {
@@ -1488,7 +1578,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                            responseType:MGTwitterDirectMessages];
 }
 
-
+/*
 - (NSString *)getSentDirectMessagesSinceID:(int)updateID startingAtPage:(int)pageNum
 {
     NSString *path = [NSString stringWithFormat:@"direct_messages/sent.%@", API_FORMAT];
@@ -1505,7 +1595,24 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                             requestType:MGTwitterDirectMessagesRequest 
                            responseType:MGTwitterDirectMessages];
 }
+*/
 
+- (NSString *)getSentDirectMessagesSinceID:(NSString*)updateID startingAtPage:(int)pageNum
+{
+    NSString *path = [NSString stringWithFormat:@"direct_messages/sent.%@", API_FORMAT];
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
+    if (updateID && [updateID longLongValue] > 0) {
+        [params setObject:updateID forKey:@"since_id"];
+    }
+    if (pageNum > 0) {
+        [params setObject:[NSString stringWithFormat:@"%d", pageNum] forKey:@"page"];
+    }
+    
+    return [self _sendRequestWithMethod:nil path:path queryParameters:params body:nil 
+                            requestType:MGTwitterDirectMessagesRequest 
+                           responseType:MGTwitterDirectMessages];
+}
 
 #pragma mark Retrieving user information
 
@@ -1589,7 +1696,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 }
 
 
-- (NSString *)sendUpdate:(NSString *)status inReplyTo:(int)updateID
+- (NSString *)sendUpdate:(NSString *)status inReplyTo:(NSString*)updateID
 {
     if (!status) {
         return nil;
@@ -1604,8 +1711,8 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
     
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
     [params setObject:trimmedText forKey:@"status"];
-    if (updateID > 0) {
-        [params setObject:[NSString stringWithFormat:@"%d", updateID] forKey:@"in_reply_to_status_id"];
+    if (updateID && [updateID longLongValue] > 0) {
+        [params setObject:updateID forKey:@"in_reply_to_status_id"];
     }
     NSString *body = [self _queryStringWithBase:nil parameters:params prefixed:NO];
     
@@ -1615,7 +1722,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                            responseType:MGTwitterStatus];
 }
 
-
+/*
 - (NSString *)deleteUpdate:(int)updateID
 {
     NSString *path = [NSString stringWithFormat:@"statuses/destroy/%d.%@", updateID, API_FORMAT];
@@ -1624,11 +1731,30 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                             requestType:MGTwitterAccountRequest 
                            responseType:MGTwitterStatus];
 }
-
-
+*/
+- (NSString *)deleteUpdate:(NSString*)updateID
+{
+    NSString *path = [NSString stringWithFormat:@"statuses/destroy/%@.%@", updateID, API_FORMAT];
+    
+    return [self _sendRequestWithMethod:HTTP_POST_METHOD path:path queryParameters:nil body:nil 
+                            requestType:MGTwitterAccountRequest 
+                           responseType:MGTwitterStatus];
+}
+/*
 - (NSString *)markUpdate:(int)updateID asFavorite:(BOOL)flag
 {
     NSString *path = [NSString stringWithFormat:@"favorites/%@/%d.%@", 
+                      (flag) ? @"create" : @"destroy" ,
+                      updateID, API_FORMAT];
+    
+    return [self _sendRequestWithMethod:HTTP_POST_METHOD path:path queryParameters:nil body:nil 
+                            requestType:MGTwitterAccountRequest 
+                           responseType:MGTwitterStatus];
+}
+*/
+- (NSString *)markUpdate:(NSString*)updateID asFavorite:(BOOL)flag
+{
+    NSString *path = [NSString stringWithFormat:@"favorites/%@/%@.%@", 
                       (flag) ? @"create" : @"destroy" ,
                       updateID, API_FORMAT];
     
@@ -1665,10 +1791,20 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
                            responseType:MGTwitterDirectMessage];
 }
 
-
+/*
 - (NSString *)deleteDirectMessage:(int)updateID
 {
     NSString *path = [NSString stringWithFormat:@"direct_messages/destroy/%d.%@", updateID, API_FORMAT];
+    
+    return [self _sendRequestWithMethod:HTTP_POST_METHOD path:path queryParameters:nil body:nil 
+                            requestType:MGTwitterAccountRequest 
+                           responseType:MGTwitterDirectMessage];
+}
+*/
+
+- (NSString *)deleteDirectMessage:(NSString*)updateID
+{
+    NSString *path = [NSString stringWithFormat:@"direct_messages/destroy/%@.%@", updateID, API_FORMAT];
     
     return [self _sendRequestWithMethod:HTTP_POST_METHOD path:path queryParameters:nil body:nil 
                             requestType:MGTwitterAccountRequest 
@@ -1683,7 +1819,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 {
     return [self getSearchResultsForQuery:query sinceID:0 startingAtPage:0 count:0]; // zero means default
 }
-
+/*
 - (NSString *)getSearchResultsForQuery:(NSString *)query sinceID:(int)updateID startingAtPage:(int)pageNum count:(int)count
 {
     NSString *path = [NSString stringWithFormat:@"search.%@", API_FORMAT];
@@ -1701,7 +1837,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
     if (count > 0) {
         [params setObject:[NSString stringWithFormat:@"%d", count] forKey:@"rpp"];
     }
-	
+*/
 	/*
 	NOTE: These parameters are also available but not implemented yet:
 	
@@ -1718,7 +1854,49 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 
 			Ex: http://search.twitter.com/search.atom?geocode=40.757929%2C-73.985506%2C25km.
 	*/
+/*
+	
+    return [self _sendRequestWithMethod:nil path:path queryParameters:params body:nil 
+                            requestType:MGTwitterSearchRequest 
+                           responseType:MGTwitterSearchResults];
+}
+*/
 
+- (NSString *)getSearchResultsForQuery:(NSString *)query sinceID:(NSString*)updateID startingAtPage:(int)pageNum count:(int)count
+{
+    NSString *path = [NSString stringWithFormat:@"search.%@", API_FORMAT];
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
+	if (query) {
+		[params setObject:query forKey:@"q"];
+	}
+    if (updateID && [updateID longLongValue] > 0) {
+        [params setObject:updateID forKey:@"since_id"];
+    }
+	if (pageNum > 0) {
+        [params setObject:[NSString stringWithFormat:@"%d", pageNum] forKey:@"page"];
+    }
+    if (count > 0) {
+        [params setObject:[NSString stringWithFormat:@"%d", count] forKey:@"rpp"];
+    }
+	
+	/*
+     NOTE: These parameters are also available but not implemented yet:
+     
+     lang: restricts tweets to the given language, given by an ISO 639-1 code.
+     
+     Ex: http://search.twitter.com/search.atom?lang=en&q=devo
+     
+     geocode: returns tweets by users located within a given radius of the given latitude/longitude, where the user's
+     location is taken from their Twitter profile. The parameter value is specified by "latitide,longitude,radius",
+     where radius units must be specified as either "mi" (miles) or "km" (kilometers).
+     
+     Note that you cannot use the near operator via the API to geocode arbitrary locations; however you can use this
+     geocode parameter to search near geocodes directly.
+     
+     Ex: http://search.twitter.com/search.atom?geocode=40.757929%2C-73.985506%2C25km.
+     */
+    
 	
     return [self _sendRequestWithMethod:nil path:path queryParameters:params body:nil 
                             requestType:MGTwitterSearchRequest 

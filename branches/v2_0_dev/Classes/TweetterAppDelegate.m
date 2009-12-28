@@ -46,6 +46,10 @@
 
 static int NetworkActivityIndicatorCounter = 0;
 
+@interface TweetterAppDelegate(Private)
+- (void)registerUserDefault;
+@end
+
 @implementation TweetterAppDelegate
 
 @synthesize window;
@@ -54,12 +58,11 @@ static int NetworkActivityIndicatorCounter = 0;
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application 
 {
-	NSDictionary *appDefaults = [[NSDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]];
-	[[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
-	[appDefaults release];
+    [self registerUserDefault];
 
     AccountManager *accountManager = [AccountManager manager];
     AccountController *accountController = [[AccountController alloc] initWithManager:accountManager];
+    
     navigationController = [[NavigationRotateController alloc] initWithRootViewController:accountController];
     [accountController release];
     
@@ -68,7 +71,6 @@ static int NetworkActivityIndicatorCounter = 0;
 	[[LocationManager locationManager] startUpdates];
 	
 	[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRotate:) name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
@@ -87,7 +89,9 @@ static int NetworkActivityIndicatorCounter = 0;
         if (![navigationController.topViewController isKindOfClass:[TwitEditorController self]] && 
             ![navigationController.modalViewController isKindOfClass:[UIImagePickerController self]])
         {
-            if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
+            UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+            if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera] &&
+                UIInterfaceOrientationIsLandscape(orientation))
             {
                 TwitEditorController *editor = [[TwitEditorController alloc] initInCameraMode];
                 [navigationController pushViewController:editor animated:YES];
@@ -106,17 +110,34 @@ static int NetworkActivityIndicatorCounter = 0;
     return [(TweetterAppDelegate*)[UIApplication sharedApplication] navigationController];
 }
 
-+ (void) increaseNetworkActivityIndicator
++ (void)increaseNetworkActivityIndicator
 {
 	NetworkActivityIndicatorCounter++;
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = NetworkActivityIndicatorCounter > 0;
 }
 
-+ (void) decreaseNetworkActivityIndicator
++ (void)decreaseNetworkActivityIndicator
 {
 	NetworkActivityIndicatorCounter--;
 	[UIApplication sharedApplication].networkActivityIndicatorVisible = NetworkActivityIndicatorCounter > 0;
 }
 
++ (BOOL)isCurrentUserName:(NSString*)screenname
+{
+    UserAccount *account = [[AccountManager manager] loggedUserAccount];
+    
+    return (account) ? ([screenname isEqualToString:[account username]]) : NO;
+}
+
 @end
 
+@implementation TweetterAppDelegate(Private)
+// Register user defaults
+- (void)registerUserDefault
+{
+	NSDictionary *appDefaults = [[NSDictionary alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"]];
+	[[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
+	[appDefaults release];
+}
+
+@end

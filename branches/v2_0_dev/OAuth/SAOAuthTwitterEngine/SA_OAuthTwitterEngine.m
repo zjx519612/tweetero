@@ -98,6 +98,26 @@
 	return NO;
 }
 
+// Write by S.Shkrabak
+- (BOOL) authorizeWithAccessTokenString:(NSString*)accessTokenString
+{
+    if (![self isAuthorized])
+    {
+        if (accessTokenString.length)
+        {
+            [_accessToken release];
+            _accessToken = [[OAToken alloc] initWithHTTPResponseBody:accessTokenString];
+            [[self class] setUsername: [self extractUsernameFromHTTPBody:accessTokenString] password:nil];
+            if (!(_accessToken.key && _accessToken.secret))
+            {
+                [_accessToken release];
+                _accessToken = [[OAToken alloc] initWithKey:nil secret:nil];
+            }
+        }
+    }
+    return [self isAuthorized];
+}
+// ---
 
 //This generates a URL request that can be passed to a UIWebView. It will open a page in which the user must enter their Twitter creds to validate
 - (NSURLRequest *) authorizeURLRequest {
@@ -276,7 +296,7 @@
 	//                                                              cachePolicy:NSURLRequestReloadIgnoringCacheData 
 	//                                                          timeoutInterval:URL_REQUEST_TIMEOUT];
 	// --------------------------------------------------------------------------------
-	
+    
 	OAMutableURLRequest *theRequest = [[[OAMutableURLRequest alloc] initWithURL:finalURL
 																	   consumer:self.consumer 
 																		  token:_accessToken 
@@ -332,6 +352,7 @@
         [connection release];
     }
     
+    NSLog(@"CONNECTION_IDENTIFIER: %@, %@", [connection identifier], fullPath);
     return [connection identifier];
 }
 

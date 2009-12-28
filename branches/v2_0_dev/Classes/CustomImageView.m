@@ -108,11 +108,37 @@
     [self addSubview:_indictator];
     [_indictator startAnimating];
     
-    UIImage *theImage = [[ImageLoader sharedLoader] imageWithURL:self.imageUrl];
-    if (theImage.size.width > self.width || theImage.size.height > self.height)
-        theImage = imageScaledToSize(theImage, self.width);
-    self.image = theImage;
+    //UIImage *theImage = [[ImageLoader sharedLoader] imageWithURL:self.imageUrl];
+    //if (theImage.size.width > self.width || theImage.size.height > self.height)
+    //    theImage = imageScaledToSize(theImage, self.width);
+    //self.image = theImage;
+    //CGSize avatarViewSize = CGSizeMake(48, 48);
     
+    
+    //[self performSelectorInBackground:@selector(loadInBackground:) withObject:self];
+    
+    //self.image = loadAndScaleImage(self.imageUrl, avatarViewSize);
+    
+    //[_indictator stopAnimating];
+    //[_indictator removeFromSuperview];
+}
+
+- (void)loadInBackground:(id)object
+{
+    CGSize avatarViewSize = CGSizeMake(48, 48);
+    self.image = loadAndScaleImage(self.imageUrl, avatarViewSize);
+    [_indictator stopAnimating];
+    [_indictator removeFromSuperview];
+}
+
+- (void)start
+{
+    [self addSubview:_indictator];
+    [_indictator startAnimating];
+}
+
+- (void)stop
+{
     [_indictator stopAnimating];
     [_indictator removeFromSuperview];
 }

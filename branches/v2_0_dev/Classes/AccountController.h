@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-@class AccountManager;
+@class AccountManager, MGTwitterEngine;
 
 @interface AccountController : UIViewController <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate>
 {
@@ -8,6 +8,8 @@
     BOOL                  _canAnimate;
     IBOutlet UITableView *_tableAccounts;
     AccountManager       *_manager;
+    MGTwitterEngine      *_twitter;
+    NSString             *_credentialIdentifier;
 }
 
 @property (nonatomic) BOOL canAnimate;

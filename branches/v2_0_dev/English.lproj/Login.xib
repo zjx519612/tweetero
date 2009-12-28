@@ -8,6 +8,7 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="50"/>
 			<integer value="54"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
@@ -207,9 +208,10 @@
 						<reference key="NSSuperview" ref="603173416"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
+						<bool key="IBUIHighlighted">YES</bool>
+						<bool key="IBUISelected">YES</bool>
 						<int key="IBSegmentControlStyle">2</int>
 						<int key="IBNumberOfSegments">1</int>
-						<int key="IBSelectedSegmentIndex">0</int>
 						<object class="NSArray" key="IBSegmentTitles">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>OK</string>
@@ -276,9 +278,10 @@
 				<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
 			</object>
 			<object class="IBUISegmentedControl" id="753049035">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">292</int>
-				<string key="NSFrame">{{0, 1}, {113, 30}}</string>
+				<string key="NSFrameSize">{113, 30}</string>
+				<reference key="NSSuperview"/>
 				<bool key="IBUIOpaque">NO</bool>
 				<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
 				<int key="IBSegmentControlStyle">2</int>
@@ -286,7 +289,7 @@
 				<int key="IBSelectedSegmentIndex">0</int>
 				<object class="NSArray" key="IBSegmentTitles">
 					<bool key="EncodedWithXMLCoder">YES</bool>
-					<string>Account</string>
+					<string>Basic</string>
 					<string>OAuth</string>
 				</object>
 				<object class="NSMutableArray" key="IBSegmentWidths">
@@ -602,7 +605,7 @@
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-					<string>{{0, 962}, {113, 32}}</string>
+					<string>{{0, 962}, {113, 30}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>{{620, 523}, {320, 460}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>

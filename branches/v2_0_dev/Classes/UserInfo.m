@@ -34,6 +34,8 @@
 #import "TwitEditorController.h"
 #import "CustomImageView.h"
 #import "FollowersController.h"
+#import "MGTwitterEngineFactory.h"
+#import "AccountManager.h"
 #include "util.h"
 
 static NSString* kDescriptionCell = @"UserInfoDescriptionCell";
@@ -58,18 +60,22 @@ static NSString* kActionCell = @"UserInfoActionCell";
 	if(self)
 	{
 		_gotInfo = NO;
-		_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+        _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
 		_username = [uname copy];
         _following = NO;
         
         _userInfoView = [[UserInfoView alloc] init];
         _userTableSection = [[NSMutableArray alloc] init];
         _userInfoView.buttons = UserInfoButtonFollow;
-        
+        _userInfoView.delegate = self;
         _userTableImages = [[NSMutableDictionary alloc] init];
         
-        if ([uname compare:[MGTwitterEngine username]] == NSOrderedSame)
+        [_userInfoView disableFollowingButton:YES];
+        
+        UserAccount *account = [[AccountManager manager] loggedUserAccount];
+        if ([uname compare:[account username]] == NSOrderedSame)
             [_userInfoView hideFollowingButton:YES];
+        
         [self initTableData];
 	}
 	
@@ -106,13 +112,19 @@ static NSString* kActionCell = @"UserInfoActionCell";
 {
     [super viewDidLoad];
     
+    [_userInfoView disableFollowingButton:YES];
 	//sendDirectMessage.hidden = YES;
     _isDirectMessage = NO;
     
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
-	self.isUserReceivingUpdatesForConnectionID = [_twitter isUser:_username receivingUpdatesFor:[MGTwitterEngine username]];
+    
+    NSString *username = [[[AccountManager manager] loggedUserAccount] username];
+    
+	self.isUserReceivingUpdatesForConnectionID = [_twitter isUser:_username receivingUpdatesFor:username];
+
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
-	self.userInfoConnectionID = [_twitter getUserInformationFor:_username];
+	
+    self.userInfoConnectionID = [_twitter getUserInformationFor:_username];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -131,21 +143,26 @@ static NSString* kActionCell = @"UserInfoActionCell";
     // Release anything that's not essential, such as cached data
 }
 
-#pragma mark Actions
-- (IBAction)changeFollowing:(id)sender
+- (void)userFollowPressed
 {
-    NSString *title = _following ? @"FOLLOWING" : @"STOP FOLLOWING";
-    [followButton setTitle:NSLocalizedString(title, @"") forSegmentAtIndex:0];
+    [self follow];
 }
+
+#pragma mark Actions
 
 - (IBAction)follow
 {
     NSString *ident = nil;
+    
     if (_following)
         ident = [_twitter disableUpdatesFor:_username]; // STOP FOLLOWING
     else
         ident = [_twitter enableUpdatesFor:_username];  // FOLLOWING
+    
     [_userInfoView disableFollowingButton:YES];
+    
+    if (self.userInfoConnectionID == nil)
+        self.userInfoConnectionID = ident;
 }
 
 // Show user followers
@@ -197,6 +214,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	
+    NSLog(@"NETWORK_FAILED: %@", connectionIdentifier);
 	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Network Failure", @"")
                                                     message: [error localizedDescription]
 												   delegate: self 
@@ -208,6 +226,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 
 - (void)miscInfoReceived:(NSArray *)miscInfo forRequest:(NSString *)connectionIdentifier
 {
+    NSLog(@"MISC INFO RECEIVE");
 	if(![self.isUserReceivingUpdatesForConnectionID isEqualToString:connectionIdentifier])
 		return;
 
@@ -225,17 +244,17 @@ static NSString* kActionCell = @"UserInfoActionCell";
 
 - (void)userInfoReceived:(NSArray *)userInfo forRequest:(NSString *)connectionIdentifier;
 {
+    NSLog(@"USER INFO RECEIVE");
     if (![self.userInfoConnectionID isEqualToString:connectionIdentifier])
         return;
     
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	NSDictionary *userData = [userInfo objectAtIndex:0];
 
-	UIImage *avatar = [[ImageLoader sharedLoader] imageWithURL:[userData objectForKey:@"profile_image_url"]];
-	CGSize avatarViewSize = CGSizeMake(48, 48);
-	if(avatar.size.width > avatarViewSize.width || avatar.size.height > avatarViewSize.height)
-		avatar = imageScaledToSize(avatar, avatarViewSize.width);
+    CGSize avatarViewSize = CGSizeMake(48, 48);
     
+    UIImage *avatar = loadAndScaleImage([userData objectForKey:@"profile_image_url"], avatarViewSize);
+
     // Update UserInfo header
     _userInfoView.avatar = avatar;
     _userInfoView.screenname = [userData objectForKey:@"screen_name"];
@@ -245,8 +264,12 @@ static NSString* kActionCell = @"UserInfoActionCell";
     _following = NO;
     id following = [userData objectForKey:@"following"];
     if (!isNullable(following))
-        _following = ![following boolValue];
+        _following = [following boolValue];
+    
+    
+    NSLog(@"FOLLOWING: %i", _following);
     _userInfoView.follow = _following;
+
     [_userInfoView disableFollowingButton:NO];
     
 	// Create description html
@@ -322,27 +345,13 @@ static NSString* kActionCell = @"UserInfoActionCell";
     infoView.scalesPageToFit = NO;
     [infoView loadHTMLString:info baseURL:nil];
 
-    /*
-	if(infoEmpty)
-	{
-		//CGRect infoframe = infoView.frame, ctrlframe = controlView.frame;
-		//ctrlframe.origin = infoframe.origin;
-		//controlView.frame = ctrlframe;
-		infoView.hidden = YES;
-	}
-	else
-	{
-		[info appendString:@"</body></html>"];
-		infoView.scalesPageToFit = NO;
-		[infoView loadHTMLString:info baseURL:nil];
-	}
-	*/
-    
     // Update notify switch
 	id notifyOn = [userData objectForKey:@"notifications"];
-	if(notifyOn)
+	if(notifyOn && notifyOn != [NSNull null])
 		notifySwitch.on = [notifyOn boolValue];
 	_gotInfo = YES;
+    
+    self.userInfoConnectionID = nil;
 }
 
 #pragma mark UIAlertView Delegate
@@ -406,7 +415,8 @@ static NSString* kActionCell = @"UserInfoActionCell";
     UITableViewCell *cell = [self createCellForIdentifier:tableView reuseIdentifier:cellIdent];
     
     cell.textLabel.text = [[_userTableSection objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
-    cell.imageView.image = [UIImage imageNamed:[_userTableImages objectForKey:[NSNumber numberWithInt:indexPath.row]]];
+    if (indexPath.section == USAction)
+        cell.imageView.image = [UIImage imageNamed:[_userTableImages objectForKey:[NSNumber numberWithInt:indexPath.row]]];
     return cell;
 }
 
@@ -481,6 +491,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
     [_userTableImages setObject:@"followers.png" forKey:[NSNumber numberWithInt:UActionFollowersIndex]];
     [_userTableImages setObject:@"recent-tweets.png" forKey:[NSNumber numberWithInt:UActionRecentIndex]];
     [_userTableImages setObject:@"reply.png" forKey:[NSNumber numberWithInt:UActionReplyIndex]];
+    [_userTableImages setObject:@"directmsg.png" forKey:[NSNumber numberWithInt:UActionDirectMessageIndex]];
 }
 
 - (UITableViewCell*)createCellForIdentifier:(UITableView*)tableView reuseIdentifier:(NSString*)identifier

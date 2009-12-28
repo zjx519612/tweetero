@@ -38,4 +38,7 @@ typedef enum {
 
 - (void)update;
 
+- (void)start;
+- (void)stop;
+
 @end

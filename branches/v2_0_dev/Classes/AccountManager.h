@@ -64,4 +64,6 @@
 
 - (void)clearLoggedObject;
 
+- (BOOL)isValidLoggedUser;
+
 @end

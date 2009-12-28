@@ -94,25 +94,32 @@
 
 // Status methods - http://apiwiki.twitter.com/REST+API+Documentation#StatusMethods
 
-- (NSString *)getPublicTimelineSinceID:(int)updateID; // statuses/public_timeline
+//- (NSString *)getPublicTimelineSinceID:(int)updateID; // statuses/public_timeline
+- (NSString *)getPublicTimelineSinceID:(NSString*)updateID; // statuses/public_timeline
 
 - (NSString *)getFollowedTimelineFor:(NSString *)username since:(NSDate *)date startingAtPage:(int)pageNum; // statuses/friends_timeline
 - (NSString *)getFollowedTimelineFor:(NSString *)username since:(NSDate *)date startingAtPage:(int)pageNum count:(int)count; // statuses/friends_timeline
-- (NSString *)getFollowedTimelineFor:(NSString *)username sinceID:(int)updateID startingAtPage:(int)pageNum count:(int)count; // statuses/friends_timeline
+//- (NSString *)getFollowedTimelineFor:(NSString *)username sinceID:(int)updateID startingAtPage:(int)pageNum count:(int)count; // statuses/friends_timeline
+- (NSString *)getFollowedTimelineFor:(NSString *)username sinceID:(NSString*)updateID startingAtPage:(int)pageNum count:(int)count; // statuses/friends_timeline
 
 - (NSString *)getUserTimelineFor:(NSString *)username since:(NSDate *)date count:(int)numUpdates; // statuses/user_timeline
 - (NSString *)getUserTimelineFor:(NSString *)username since:(NSDate *)date startingAtPage:(int)pageNum count:(int)numUpdates; // statuses/user_timeline
-- (NSString *)getUserTimelineFor:(NSString *)username sinceID:(int)updateID startingAtPage:(int)pageNum count:(int)numUpdates; // statuses/user_timeline
+//- (NSString *)getUserTimelineFor:(NSString *)username sinceID:(int)updateID startingAtPage:(int)pageNum count:(int)numUpdates; // statuses/user_timeline
+- (NSString *)getUserTimelineFor:(NSString *)username sinceID:(NSString*)updateID startingAtPage:(int)pageNum count:(int)numUpdates; // statuses/user_timeline
 
-- (NSString *)getUpdate:(int)updateID; // statuses/show
+//- (NSString *)getUpdate:(int)updateID; // statuses/show
+- (NSString *)getUpdate:(NSString*)updateID; // statuses/show
 - (NSString *)sendUpdate:(NSString *)status; // statuses/update
-- (NSString *)sendUpdate:(NSString *)status inReplyTo:(int)updateID; // statuses/update
+//- (NSString *)sendUpdate:(NSString *)status inReplyTo:(int)updateID; // statuses/update
+- (NSString *)sendUpdate:(NSString *)status inReplyTo:(NSString*)updateID; // statuses/update
 
 - (NSString *)getRepliesStartingAtPage:(int)pageNum; // statuses/replies
 - (NSString *)getRepliesSince:(NSDate *)date startingAtPage:(int)pageNum count:(int)count; // statuses/replies
-- (NSString *)getRepliesSinceID:(int)updateID startingAtPage:(int)pageNum count:(int)count; // statuses/replies
+//- (NSString *)getRepliesSinceID:(int)updateID startingAtPage:(int)pageNum count:(int)count; // statuses/replies
+- (NSString *)getRepliesSinceID:(NSString*)updateID startingAtPage:(int)pageNum count:(int)count; // statuses/replies
 
-- (NSString *)deleteUpdate:(int)updateID; // statuses/destroy
+//- (NSString *)deleteUpdate:(int)updateID; // statuses/destroy
+- (NSString *)deleteUpdate:(NSString*)updateID; // statuses/destroy
 
 - (NSString *)getFeaturedUsers; // statuses/features (undocumented, returns invalid JSON data)
 
@@ -130,13 +137,16 @@
 // Direct Message methods - http://apiwiki.twitter.com/REST+API+Documentation#DirectMessageMethods
 
 - (NSString *)getDirectMessagesSince:(NSDate *)date startingAtPage:(int)pageNum; // direct_messages
-- (NSString *)getDirectMessagesSinceID:(int)updateID startingAtPage:(int)pageNum; // direct_messages
+//- (NSString *)getDirectMessagesSinceID:(int)updateID startingAtPage:(int)pageNum; // direct_messages
+- (NSString *)getDirectMessagesSinceID:(NSString*)updateID startingAtPage:(int)pageNum; // direct_messages
 
 - (NSString *)getSentDirectMessagesSince:(NSDate *)date startingAtPage:(int)pageNum; // direct_messages/sent
-- (NSString *)getSentDirectMessagesSinceID:(int)updateID startingAtPage:(int)pageNum; // direct_messages/sent
+//- (NSString *)getSentDirectMessagesSinceID:(int)updateID startingAtPage:(int)pageNum; // direct_messages/sent
+- (NSString *)getSentDirectMessagesSinceID:(NSString*)updateID startingAtPage:(int)pageNum; // direct_messages/sent
 
 - (NSString *)sendDirectMessage:(NSString *)message to:(NSString *)username; // direct_messages/new
-- (NSString *)deleteDirectMessage:(int)updateID;// direct_messages/destroy
+//- (NSString *)deleteDirectMessage:(int)updateID;// direct_messages/destroy
+- (NSString *)deleteDirectMessage:(NSString*)updateID;// direct_messages/destroy
 
 
 // Friendship methods - http://apiwiki.twitter.com/REST+API+Documentation#FriendshipMethods
@@ -170,8 +180,8 @@
 
 - (NSString *)getFavoriteUpdatesFor:(NSString *)username startingAtPage:(int)pageNum; // favorites
 
-- (NSString *)markUpdate:(int)updateID asFavorite:(BOOL)flag; // favorites/create, favorites/destroy
-
+//- (NSString *)markUpdate:(int)updateID asFavorite:(BOOL)flag; // favorites/create, favorites/destroy
+- (NSString *)markUpdate:(NSString*)updateID asFavorite:(BOOL)flag; // favorites/create, favorites/destroy
 
 // Notification methods - http://apiwiki.twitter.com/REST+API+Documentation#NotificationMethods
 
@@ -204,7 +214,8 @@
 
 // Search method - http://apiwiki.twitter.com/Search+API+Documentation#Search
 
-- (NSString *)getSearchResultsForQuery:(NSString *)query sinceID:(int)updateID startingAtPage:(int)pageNum count:(int)count; // search
+//- (NSString *)getSearchResultsForQuery:(NSString *)query sinceID:(int)updateID startingAtPage:(int)pageNum count:(int)count; // search
+- (NSString *)getSearchResultsForQuery:(NSString *)query sinceID:(NSString*)updateID startingAtPage:(int)pageNum count:(int)count; // search
 
 // Trends method - http://apiwiki.twitter.com/Search+API+Documentation#Trends
 

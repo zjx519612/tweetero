@@ -25,7 +25,18 @@
 // 
 
 #import "ImageLoader.h"
+#import "util.h"
 
+@interface InternalImageLoaderThreadData : NSObject
+{
+@public
+    id           delegate;
+    NSString    *url;
+}
+@end
+
+@implementation InternalImageLoaderThreadData
+@end
 
 @implementation ImageLoader
 
@@ -40,7 +51,6 @@
 	
 	return self;
 }
-
 
 + (ImageLoader*)sharedLoader
 {
@@ -57,7 +67,7 @@
         return nil;
     
 	UIImage *image = [_cache objectForKey:url];
-	if(image) return image;
+	if(image) return [[image retain] autorelease];
 	
 	NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:url]];
 	if(!imageData) return nil;
@@ -66,7 +76,19 @@
 	if(image)
 		[_cache setObject:image forKey:url];
 	
-	return image;
+	return [[image retain] autorelease];
+}
+
+- (void)cachedImageWithUrl:(UIImage*)image forUrl:(NSString*)url
+{
+    if (image && url)
+    {
+        UIImage *img = [_cache objectForKey:url];
+        if (img != image)
+        {
+            [_cache setObject:image forKey:url];
+        }
+    }
 }
 
 - (void)setImageWithURL:(NSString*)url toView:(UIImageView*)imageView
@@ -109,6 +131,16 @@
 	}
 	
 	[_activeDownloads removeObjectForKey:sender.origURL];
+}
+
+- (UIImage*)lookupImageWithURL:(NSString*)url
+{
+    return [_cache objectForKey:url];
+}
+
+- (BOOL)isCachedImageWithURL:(NSString*)url
+{
+    return ([self lookupImageWithURL:url] != nil);
 }
 
 @end

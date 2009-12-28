@@ -47,6 +47,8 @@
 - (BOOL) isAuthorized;
 
 
+- (BOOL) authorizeWithAccessTokenString:(NSString*)accessTokenString;
+
 
 
 

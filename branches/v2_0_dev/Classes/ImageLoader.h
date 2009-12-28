@@ -37,4 +37,8 @@
 + (ImageLoader*)sharedLoader;
 - (UIImage*)imageWithURL:(NSString*)url;
 - (void)setImageWithURL:(NSString*)url toView:(UIImageView*)imageView;
+- (void)cachedImageWithUrl:(UIImage*)image forUrl:(NSString*)url;
+- (UIImage*)lookupImageWithURL:(NSString*)url;
+- (BOOL)isCachedImageWithURL:(NSString*)url;
+
 @end

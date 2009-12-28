@@ -28,9 +28,10 @@
 
 #import "MessageListController.h"
 
-@interface DirectMessagesController : MessageListController 
-{
-	NSString *_user;
+@interface DirectMessagesController : MessageListController {
+@private
+    UIBarButtonItem *_topBarItem;
+	NSString        *_user;
 }
 
 

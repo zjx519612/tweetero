@@ -26,6 +26,9 @@
 
 #import <UIKit/UIKit.h>
 #import "AccountController.h"
+#import "AccountManager.h"
+#import "SearchProvider.h"
+#import "Logger.h"
 
 @class NavigationRotateController;
 @interface TweetterAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate> 
@@ -36,8 +39,9 @@
 }
 
 + (UINavigationController *)rootNavigationController;
-+ (void) increaseNetworkActivityIndicator;
-+ (void) decreaseNetworkActivityIndicator;
++ (void)increaseNetworkActivityIndicator;
++ (void)decreaseNetworkActivityIndicator;
++ (BOOL)isCurrentUserName:(NSString*)screenname;
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;

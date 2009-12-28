@@ -28,10 +28,10 @@
 
 #import "MessageListController.h"
 
-@interface RepliesListController : MessageListController 
-{
-	NSString *_user;
+@interface RepliesListController : MessageListController {
+@private
+    UIBarButtonItem *_topBarItem;
+	NSString        *_user;
 }
-
 
 @end

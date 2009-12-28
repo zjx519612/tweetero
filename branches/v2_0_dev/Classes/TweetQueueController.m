@@ -32,6 +32,8 @@
 #import "NewMessageController.h"
 #import "AccountController.h"
 #include "util.h"
+#import "AccountManager.h"
+#import "Logger.h"
 
 @interface TweetQueueController (Private)
 
@@ -81,45 +83,11 @@
 	}
 }
 
-- (void)viewControllerDidActivate:(id)parent
-{
-    _navigatedController = parent;
-    
-	[self.tableView reloadData];
-	[self enableModifyButtons:NO];
-    
-	queueSegmentedControl.frame = CGRectMake(0, 0, 130, 30);
-	[queueSegmentedControl setWidth:35 forSegmentAtIndex:0];
-	[queueSegmentedControl setWidth:40 forSegmentAtIndex:1];
-	queueSegmentedControl.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	queueSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
-    
-	UIBarButtonItem *segmentBarItem = [[[UIBarButtonItem alloc] initWithCustomView:queueSegmentedControl] autorelease];
-	//self.navigationItem.rightBarButtonItem = segmentBarItem;
-    _navigatedController.navigationItem.rightBarButtonItem = segmentBarItem;
-	defaultTintColor = [queueSegmentedControl.tintColor retain];	// keep track of this for later
-    
-    
-    
-	[self enableModifyButtons:NO];
-    
-	if (_navigatedController.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent || 
-        _navigatedController.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque) 
-		queueSegmentedControl.tintColor = [UIColor darkGrayColor];
-	else
-		queueSegmentedControl.tintColor = defaultTintColor;
-    
-}
-
 - (void)setQueueTitle
 {
 	NSString* title = [[self class] queueTitle];
-	//self.navigationItem.title = title;
-	//self.tabBarItem.title = title;
-    _navigatedController.navigationItem.title = title;
-    
-	//UINavigationController *more = self.tabBarController.moreNavigationController;
-	//[self reloadTablesInSubview:more.view];
+    self.parentViewController.navigationItem.title = title;
+    self.tabBarItem.title = title;
 }
 
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
@@ -288,7 +256,11 @@
 		[alert release];
 	}
 	
-	
+    
+    self.tabBarItem.title = [self getTitle];
+    //[[NSNotificationCenter defaultCenter] postNotificationName:@"UpdateChildControllers" object:nil];
+    [self setQueueTitle];
+    
 	[self release];
 }
 
@@ -296,11 +268,8 @@
 {
 	if(![[TweetQueue sharedQueue] count]) 
 		return;
-
-	NSString* login = [MGTwitterEngine username];
-	NSString* pass = [MGTwitterEngine password];
-	
-	if(!login || !pass)
+    
+	if(![[AccountManager manager] isValidLoggedUser])
 	{
         [AccountController showAccountController:_navigatedController.navigationController];
 		return;
@@ -319,18 +288,32 @@
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-
-
     
-
+	[self.tableView reloadData];
+	[self enableModifyButtons:NO];
+    
+	queueSegmentedControl.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	queueSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
+    
+	UIBarButtonItem *segmentBarItem = [[[UIBarButtonItem alloc] initWithCustomView:queueSegmentedControl] autorelease];
+    
+    self.parentViewController.navigationItem.rightBarButtonItem = segmentBarItem;
+	defaultTintColor = [queueSegmentedControl.tintColor retain];	// keep track of this for later
+    
+	[self enableModifyButtons:NO];
+    
+	if (self.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent || 
+        self.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque) 
+		queueSegmentedControl.tintColor = [UIColor darkGrayColor];
+	else
+		queueSegmentedControl.tintColor = defaultTintColor;
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
-	[self.tableView reloadData];
 	[self enableModifyButtons:NO];
-
+    
 	queueSegmentedControl.frame = CGRectMake(0, 0, 130, 30);
 	[queueSegmentedControl setWidth:35 forSegmentAtIndex:0];
 	[queueSegmentedControl setWidth:40 forSegmentAtIndex:1];
@@ -338,21 +321,23 @@
 	queueSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
     
 	UIBarButtonItem *segmentBarItem = [[[UIBarButtonItem alloc] initWithCustomView:queueSegmentedControl] autorelease];
-	//self.navigationItem.rightBarButtonItem = segmentBarItem;
-    _navigatedController.navigationItem.rightBarButtonItem = segmentBarItem;
+    self.parentViewController.navigationItem.rightBarButtonItem = segmentBarItem;
 	defaultTintColor = [queueSegmentedControl.tintColor retain];	// keep track of this for later
-    
-    
     
 	[self enableModifyButtons:NO];
     
-	if (_navigatedController.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent || 
-        _navigatedController.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque) 
+	if (self.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent || 
+        self.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque) 
 		queueSegmentedControl.tintColor = [UIColor darkGrayColor];
 	else
 		queueSegmentedControl.tintColor = defaultTintColor;
+    
+	[self.tableView reloadData];
+    //[[NSNotificationCenter defaultCenter] postNotificationName:@"UpdateChildControllers" object:nil];
+    
+    self.tabBarItem.title = [self getTitle];
+    [self setQueueTitle];
 }
-
 
 - (void)didReceiveMemoryWarning 
 {
