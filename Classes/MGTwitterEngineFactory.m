@@ -46,6 +46,9 @@
         [oaEngine setConsumerSecret:kTweeteroConsumerSecret];
         [oaEngine authorizeWithAccessTokenString:account.secretData];
         
+        NSDictionary *dict = [oaEngine authRequestFields];
+        NSLog(@"%@", dict);
+        
         engine = oaEngine;
     }
     

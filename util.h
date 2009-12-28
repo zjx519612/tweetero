@@ -59,4 +59,6 @@ BOOL isNullable(id obj);
 UIImage* loadAndScaleImage(NSString *url, CGSize size);
 NSString* FormatNSDate(NSDate* date);
 
+NSDictionary* GoogleMapsCoordsFromUrl(NSURL *url);
+
 #endif

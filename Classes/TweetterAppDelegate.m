@@ -44,6 +44,8 @@
 #import "ISVideoUploadEngine.h"
 #import "AccountManager.h"
 
+#import <MapKit/MapKit.h>
+
 static int NetworkActivityIndicatorCounter = 0;
 
 @interface TweetterAppDelegate(Private)
@@ -127,6 +129,78 @@ static int NetworkActivityIndicatorCounter = 0;
     UserAccount *account = [[AccountManager manager] loggedUserAccount];
     
     return (account) ? ([screenname isEqualToString:[account username]]) : NO;
+}
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation
+{
+	MKAnnotationView *pinView = [mapView dequeueReusableAnnotationViewWithIdentifier:@"PhotoPlacePin"];
+	if(!pinView)
+    {
+		pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"PhotoPlacePin"];
+	}
+	return pinView;
+}
+
+- (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views
+{
+	if([views count] == 0)
+		return;
+    
+	MKAnnotationView *pinView = [views objectAtIndex:0];
+	MKCoordinateRegion region;
+	MKCoordinateSpan span;
+    
+	span.latitudeDelta = 0.02;
+	span.longitudeDelta = 0.02;
+	region.span = span;
+	region.center = pinView.annotation.coordinate;
+	
+	[mapView setRegion:region animated:NO];
+}
+
+- (void)openMapWithCoords:(NSString*)latitude longtitude:(NSString*)longtitude
+{
+	Class MapViewClass = NSClassFromString(@"MKMapView");
+	
+	if(MapViewClass == nil)
+	{
+		NSString* url = [NSString stringWithFormat:@"http://maps.google.com/maps?q=image+taken+here@%@,%@", latitude, longtitude];
+        
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
+	}
+	else
+	{
+        CGRect mapViewFrame = self.window.frame;
+        
+        NSLog(@"x = %f, y = %f, w = %f, h = %f", mapViewFrame.origin.x, mapViewFrame.origin.y, mapViewFrame.size.width, mapViewFrame.size.height);
+		id mapView = [[MapViewClass alloc] initWithFrame:mapViewFrame];
+		[mapView setDelegate:self];
+        
+		UIViewController *container = [[UIViewController alloc] init];
+        container.title = @"Maps";
+		container.view = mapView;
+		
+        //container.view = [[UIView alloc] initWithFrame:mapViewFrame];
+        //UILabel *test = [[UILabel alloc] initWithFrame:CGRectMake(20, 20, 240, 40)];
+        //test.text = @"Test Message";
+        //[container.view addSubview:test];
+        
+        [mapView release];
+        
+		CLLocationCoordinate2D location;
+        
+        NSLog(@"Map: %@, %@", latitude, longtitude);
+        
+		location.latitude = [latitude doubleValue];
+		location.longitude = [longtitude doubleValue];
+        
+		MKPlacemark *place = [[MKPlacemark alloc] initWithCoordinate:location addressDictionary:[NSDictionary dictionary]];
+		[mapView addAnnotation:place];
+		
+		[self.navigationController pushViewController:container animated:NO];
+		
+		[container release];
+	}
 }
 
 @end

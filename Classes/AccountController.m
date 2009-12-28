@@ -252,8 +252,6 @@
     
     [_twitter release];
     _credentialIdentifier = nil;
-    
-    [self.accountManager clearLoggedObject];
 }
 
 @end

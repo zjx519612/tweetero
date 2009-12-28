@@ -215,6 +215,7 @@
     {
         NSDictionary *searchResult = [_result objectAtIndex:indexPath.row];
         
+        NSLog(@"SEARCH_RESULT: %@", searchResult);
         [self setCellData:cell data:searchResult];
     }
     return cell;
