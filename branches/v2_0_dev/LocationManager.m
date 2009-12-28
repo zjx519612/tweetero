@@ -143,7 +143,7 @@ static BOOL initialized = NO;
 		locationManager = [[CLLocationManager alloc] init];
 		locationManager.delegate = self;
 		locationManager.distanceFilter = 100;
-		locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
+		locationManager.desiredAccuracy = kCLLocationAccuracyBest;
 	}
 	
 	locationDefined = NO;

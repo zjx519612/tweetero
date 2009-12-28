@@ -25,13 +25,15 @@
 // 
 
 #import <UIKit/UIKit.h>
+#import <CoreLocation/CoreLocation.h>
+
 #import "AccountController.h"
 #import "AccountManager.h"
 #import "SearchProvider.h"
 #import "Logger.h"
 
 @class NavigationRotateController;
-@interface TweetterAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate> 
+@interface TweetterAppDelegate : NSObject <UIApplicationDelegate, UITabBarControllerDelegate, CLLocationManagerDelegate> 
 {
     UIWindow *window;
     UITabBarController *tabBarController;
@@ -42,6 +44,8 @@
 + (void)increaseNetworkActivityIndicator;
 + (void)decreaseNetworkActivityIndicator;
 + (BOOL)isCurrentUserName:(NSString*)screenname;
+
+- (void)openMapWithCoords:(NSString*)latitude longtitude:(NSString*)longtitude;
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;

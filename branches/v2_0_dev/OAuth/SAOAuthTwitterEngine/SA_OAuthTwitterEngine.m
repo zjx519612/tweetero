@@ -98,6 +98,55 @@
 	return NO;
 }
 
+- (NSDictionary*)authRequestFields
+{
+    NSString *urlString = [NSString stringWithFormat:@"%@://%@/%@", 
+                           (_secureConnection) ? @"https" : @"http",
+                           _APIDomain, @"statuses/user_timeline.json"];
+    NSURL *finalURL = [NSURL URLWithString:urlString];
+    if (!finalURL) {
+        return nil;
+    }
+    
+	OAMutableURLRequest *theRequest = [[[OAMutableURLRequest alloc] initWithURL:finalURL
+																	   consumer:self.consumer 
+																		  token:_accessToken 
+																		  realm: nil
+															  signatureProvider:nil] autorelease];
+    [theRequest prepare];
+    
+    NSMutableDictionary *fields = [NSMutableDictionary dictionary];
+    
+    NSString *authParam = [[theRequest allHTTPHeaderFields] objectForKey:@"Authorization"];
+    
+    if ([authParam hasPrefix:@"OAuth "])
+        authParam = [authParam substringFromIndex:5];
+    
+    NSArray *allFields = [authParam componentsSeparatedByString:@", "];
+
+    if (allFields == nil)
+        return nil;
+    
+    NSString *key, *value;
+    for (NSString *field in allFields) {
+        NSArray *keyValue = [field componentsSeparatedByString:@"="];
+        
+        key = value = nil;
+        if (keyValue && [keyValue count] == 2) {
+            key = [keyValue objectAtIndex:0];
+            value = [keyValue objectAtIndex:1];
+            
+            key = [key stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            value = [value stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\""]];
+            if (key && value) {
+                [fields setObject:value forKey:key];
+            }
+        }
+    }
+    
+    return fields;
+}
+
 // Write by S.Shkrabak
 - (BOOL) authorizeWithAccessTokenString:(NSString*)accessTokenString
 {
@@ -351,8 +400,7 @@
         [_connections setObject:connection forKey:[connection identifier]];
         [connection release];
     }
-    
-    NSLog(@"CONNECTION_IDENTIFIER: %@, %@", [connection identifier], fullPath);
+
     return [connection identifier];
 }
 

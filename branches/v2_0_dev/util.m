@@ -597,3 +597,39 @@ NSString* FormatNSDate(NSDate* date)
     [dateFormatter release];
     return formatedDate;
 }
+
+NSDictionary* GoogleMapsCoordsFromUrl(NSURL *url)
+{
+    NSMutableString *map_query = [[url query] mutableCopy];
+
+    [map_query replaceOccurrencesOfString:@"%2C" withString:@"," options:NSCaseInsensitiveSearch range:NSMakeRange(0, [map_query length])];
+
+    NSString *longtitude = nil, *latitude = nil;
+
+    NSArray *http_params = [map_query componentsSeparatedByString:@"&"];
+    for (NSString *param in http_params) {
+        if ([param hasPrefix:@"q="]) {
+            NSString *coords_param = [param substringFromIndex:2];
+            if (coords_param) {
+                NSArray *coords = [coords_param componentsSeparatedByString:@","];
+                if (coords && [coords count] == 2) {
+                    latitude = [coords objectAtIndex:0];
+                    longtitude = [coords objectAtIndex:1];
+                    break;
+                }
+            }
+        }
+    }
+    [map_query release];
+
+    NSMutableDictionary *params = nil;
+    
+    NSLog(@"%@, %@", latitude, longtitude);
+    if (longtitude && latitude) {
+        params = [NSMutableDictionary dictionary];
+        
+        [params setObject:latitude forKey:@"latitude"];
+        [params setObject:longtitude forKey:@"longtitude"];
+    }
+    return params;
+}

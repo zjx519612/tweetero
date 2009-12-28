@@ -45,7 +45,7 @@
 + (SA_OAuthTwitterEngine *) OAuthTwitterEngineWithDelegate: (NSObject *) delegate;
 - (SA_OAuthTwitterEngine *) initOAuthWithDelegate: (NSObject *) delegate;
 - (BOOL) isAuthorized;
-
+- (NSDictionary*)authRequestFields;
 
 - (BOOL) authorizeWithAccessTokenString:(NSString*)accessTokenString;
 

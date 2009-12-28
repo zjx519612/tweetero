@@ -26,6 +26,10 @@
 
 #import "WebViewController.h"
 #import "TweetterAppDelegate.h"
+#import "util.h"
+#import "AboutController.h"
+
+NSString * const WVOpenGoogleMapsNotification = @"WVOpenGoogleMapsNotification";
 
 @implementation WebViewController
 
@@ -34,6 +38,8 @@
 	self = [super initWithNibName:@"WebView" bundle:nil];
 	if(self)
 	{
+        _webView.delegate = self;
+        
 		_request = [request retain];
         _content = nil;
 		self.hidesBottomBarWhenPushed = YES;
@@ -48,18 +54,21 @@
     if (self)
     {
         _content = [[NSString alloc] initWithString:content];
+        _webView.delegate = self;
     }
     return self;
 }
 
 - (void)dealloc
 {
-	webView.delegate = nil;
-	if(webView.loading)
+    NSLog(@"DEALLOC WEB VIEW CONTROLLER");
+	_webView.delegate = nil;
+	if(_webView.loading)
 	{
-		[webView stopLoading];
+		[_webView stopLoading];
 		[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	}
+    [_webView release];
 	[_request release];
 	[super dealloc];
 }
@@ -68,10 +77,11 @@
 {
     [super viewDidLoad];
     
+    _webView.delegate = self;
     if (_request)
-        [webView loadRequest:_request];
+        [_webView loadRequest:_request];
     else if (_content)
-        [webView loadHTMLString:_content baseURL:nil];
+        [_webView loadHTMLString:_content baseURL:nil];
     
 	self.navigationItem.title = NSLocalizedString(@"Loading...", @"");
 	// important for view orientation rotation
@@ -84,6 +94,11 @@
 	[super viewWillDisappear:animated];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+}
+
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
 	// starting the load, show the activity indicator in the status bar
@@ -94,6 +109,23 @@
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	self.navigationItem.title = NSLocalizedString(@"Failed!", @"");
+    /*
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    
+    [params setObject:@"44.45" forKey:@"latitude"];
+    [params setObject:@"13.34" forKey:@"longtitude"];
+    [[NSNotificationCenter defaultCenter] postNotificationName:WVOpenGoogleMapsNotification object:nil userInfo:params];
+     */
+    
+    //NSMutableArray *arr = [[self.navigationController viewControllers] mutableCopy];
+    //[arr removeLastObject];
+    
+    /*
+    AboutController *about = [[AboutController alloc] initWithNibName:@"About" bundle:nil];
+    [self.navigationController pushViewController:about animated:YES];
+    [about release];
+     */
+    
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
@@ -104,12 +136,57 @@
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
+    NSLog(@"Load request");
 	if([[[request URL] host] isEqualToString:@"maps.google.com"])
 	{
 		BOOL success = NO;
-		success = [[UIApplication sharedApplication] openURL: [request URL]];
-		if(success)
-			return NO;
+        /*
+        NSMutableString *map_query = [[[request URL] query] mutableCopy];
+        
+        [map_query replaceOccurrencesOfString:@"%2C" withString:@"," options:NSCaseInsensitiveSearch range:NSMakeRange(0, [map_query length])];
+        
+        NSString *longtitude = nil, *latitude = nil;
+        
+        NSArray *http_params = [map_query componentsSeparatedByString:@"&"];
+        for (NSString *param in http_params) {
+            if ([param hasPrefix:@"q="]) {
+                NSString *coords_param = [param substringFromIndex:2];
+                if (coords_param) {
+                    NSArray *coords = [coords_param componentsSeparatedByString:@","];
+                    if (coords && [coords count] == 2) {
+                        latitude = [coords objectAtIndex:0];
+                        longtitude = [coords objectAtIndex:1];
+                        break;
+                    }
+                }
+            }
+        }
+        [map_query release];
+        
+        NSLog(@"%@, %@", latitude, longtitude);
+        if (longtitude && latitude) {
+            
+            NSMutableDictionary *params = [NSMutableDictionary dictionary];
+            
+            [params setObject:latitude forKey:@"latitude"];
+            [params setObject:longtitude forKey:@"longtitude"];
+
+            [[NSNotificationCenter defaultCenter] postNotificationName:WVOpenGoogleMapsNotification object:nil userInfo:params];
+            return NO;
+        } else {
+            success = [[UIApplication sharedApplication] openURL: [request URL]];
+        }
+        */
+        
+        NSDictionary *googleMapsCoords = GoogleMapsCoordsFromUrl([request URL]);
+        
+        if (googleMapsCoords) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:WVOpenGoogleMapsNotification object:nil userInfo:googleMapsCoords];
+            success = YES;
+        } else {
+            success = [[UIApplication sharedApplication] openURL: [request URL]];
+        }
+        return !success;
 	}
 
 	return YES;

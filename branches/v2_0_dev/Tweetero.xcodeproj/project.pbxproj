@@ -55,6 +55,7 @@
 		00C666AE10C021010057D8CD /* unfavorite.png in Resources */ = {isa = PBXBuildFile; fileRef = 00C666AD10C021010057D8CD /* unfavorite.png */; };
 		00C6670D10C02D000057D8CD /* statusfav.png in Resources */ = {isa = PBXBuildFile; fileRef = 00C6670C10C02D000057D8CD /* statusfav.png */; };
 		00CA903C107F896600A198AC /* MGTwitterEngine+Search.m in Sources */ = {isa = PBXBuildFile; fileRef = 00CA903B107F896600A198AC /* MGTwitterEngine+Search.m */; };
+		00DBB01D10E8C8490038044C /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00DBB01C10E8C8490038044C /* MapKit.framework */; };
 		00DDA8A8105FA927008AE91E /* AccountManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDA8A7105FA927008AE91E /* AccountManager.m */; };
 		00DDB1DF105E7B030020C9C1 /* CustomImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 00DDB1DE105E7B030020C9C1 /* CustomImageView.m */; };
 		00DDB2EC105E9D6D0020C9C1 /* AccountController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00DDB2EA105E9D6D0020C9C1 /* AccountController.xib */; };
@@ -232,6 +233,7 @@
 		00CA9038107F88D100A198AC /* MGTwitterEngineAddIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MGTwitterEngineAddIn.h; path = Classes/MGTwitterEngineAddIn.h; sourceTree = "<group>"; };
 		00CA903A107F896600A198AC /* MGTwitterEngine+Search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "MGTwitterEngine+Search.h"; path = "Classes/MGTwitterEngine+Search.h"; sourceTree = "<group>"; };
 		00CA903B107F896600A198AC /* MGTwitterEngine+Search.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "MGTwitterEngine+Search.m"; path = "Classes/MGTwitterEngine+Search.m"; sourceTree = "<group>"; };
+		00DBB01C10E8C8490038044C /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		00DDA8A6105FA927008AE91E /* AccountManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccountManager.h; sourceTree = "<group>"; };
 		00DDA8A7105FA927008AE91E /* AccountManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccountManager.m; sourceTree = "<group>"; };
 		00DDB1DD105E7B030020C9C1 /* CustomImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomImageView.h; sourceTree = "<group>"; };
@@ -415,6 +417,7 @@
 				D9F3D74D0FE87CEE0007619E /* MediaPlayer.framework in Frameworks */,
 				0088208D107251AC0055FC91 /* MessageUI.framework in Frameworks */,
 				00F2C55E10907D2500A2298C /* libOAuth.a in Frameworks */,
+				00DBB01D10E8C8490038044C /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -754,6 +757,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				00DBB01C10E8C8490038044C /* MapKit.framework */,
 				0088208C107251AC0055FC91 /* MessageUI.framework */,
 				D9F3D74C0FE87CEE0007619E /* MediaPlayer.framework */,
 				D9A1D0C90F75DE790055E311 /* Security.framework */,

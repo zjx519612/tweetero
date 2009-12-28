@@ -174,7 +174,15 @@
 
 - (UserAccount*)accountByUsername:(NSString*)username
 {
-    return [[[_accounts objectForKey:username] retain] autorelease];
+    if (_accounts == nil)
+        return nil;
+    
+    UserAccount *account = [_accounts objectForKey:username];
+    if (account == nil)
+        return nil;
+    
+    return account;
+    //return [[account retain] autorelease];
 }
 
 - (NSArray*)allAccountUsername

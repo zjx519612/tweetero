@@ -215,9 +215,11 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 {
     // Set new credentials.
     [_username release];
-    _username = [newUsername retain];
+    //_username = [newUsername retain];
+    _username = [newUsername copy];
     [_password release];
-    _password = [newPassword retain];
+    //_password = [newPassword retain];
+    _password = [newPassword copy];
 	
 	if(storePassword)
 	{
