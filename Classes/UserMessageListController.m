@@ -27,6 +27,7 @@
 #import "UserMessageListController.h"
 #import "TweetterAppDelegate.h"
 #import "MGTwitterEngine.h"
+#import "AccountManager.h"
 
 @implementation UserMessageListController
 
@@ -48,11 +49,13 @@
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count
 {
 	[super loadMessagesStaringAtPage:numPage count:count];
-	if([MGTwitterEngine password] != nil)
+	if ([[AccountManager manager] isValidLoggedUser])
 	{
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
+        
 		[_twitter getUserTimelineFor:_user since:nil startingAtPage:numPage count:count];
-		self.navigationItem.title = [MGTwitterEngine username];
+        
+		self.navigationItem.title = [[[AccountManager manager] loggedUserAccount] username];
 	}
 }
 

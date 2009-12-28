@@ -25,93 +25,116 @@
 // 
 
 #import "HomeViewController.h"
-#import "LoginController.h"
 #import "MGTwitterEngine.h"
-#import "ImageLoader.h"
-#import "MessageViewController.h"
 #import "MessageListController.h"
 #import "TwitEditorController.h"
 #import "TweetterAppDelegate.h"
-
-#define NAME_TAG 1
-#define TIME_TAG 2
-#define IMAGE_TAG 3
-#define TEXT_TAG 4
-#define ROW_HEIGHT 70
 
 @implementation HomeViewController
 
 - (void)dealloc 
 {
+    [_topBarItem release];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 
-- (void)viewControllerDidActivate:(id)parent
-{
-    UIViewController *parentController = parent;
-    
-    parentController.navigationItem.title = NSLocalizedString(@"Home",@"");
-    
-    //UISegmentedControl *userActionButton = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Refresh",@"New", nil]];
-    //userActionButton.segmentedControlStyle = UISegmentedControlStyleBar;
-    //[userActionButton setImage:[UIImage imageNamed:@"chat.png"] forSegmentAtIndex:0];
-    //userActionButton.momentary = YES;
-    
-    
-	UIBarButtonItem *newMsgButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem: UIBarButtonSystemItemCompose
-                                                                                  target: self
-                                                                                  action: @selector(newMessage)];
-	parentController.navigationItem.rightBarButtonItem = newMsgButton;
-	[newMsgButton release];
-    
-    //[userActionButton release];
-    [self setRootNavigationController:parentController.navigationController];
-}
-
-- (void)viewDidLoad 
+- (void)viewDidLoad
 {
     [super viewDidLoad];
     
-    //UIBarButtonItem *test = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:nil action:nil];
-    //[userActionButton setImage:test.image forSegmentAtIndex:0];
-    /*
-	self.navigationItem.title = @"Tweetero Home";
-	
-	UIBarButtonItem *newMsgButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose
-		target:self action:@selector(newMessage)];
-	self.parentViewController.navigationItem.rightBarButtonItem = newMsgButton;
-	[newMsgButton release];
-	
-	UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-		target:self action:@selector(reload)];
-	self.navigationItem.leftBarButtonItem = reloadButton;
-	[reloadButton release];
-     */
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:@"TwittsUpdated" object:nil];
-	if([MGTwitterEngine password] == nil)
+    if (_topBarItem != nil)
+        [_topBarItem release];
+    
+    UISegmentedControl *userActionButton = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"New", @"Refresh", nil]] autorelease];
+    
+    CGRect frame = userActionButton.frame;
+    
+    frame.size.width = 80;
+    frame.size.height = 30;
+    
+    [userActionButton setFrame:frame];
+    [userActionButton setSegmentedControlStyle:UISegmentedControlStyleBar];
+    [userActionButton setImage:[UIImage imageNamed:@"edit.tif"] forSegmentAtIndex:0];
+    [userActionButton setImage:[UIImage imageNamed:@"refresh.tif"] forSegmentAtIndex:1];
+    [userActionButton addTarget:self action:@selector(changeActionSegment:) forControlEvents:UIControlEventValueChanged];
+    [userActionButton setMomentary:YES];
+    
+    _topBarItem = [[UIBarButtonItem alloc] initWithCustomView:userActionButton];
+    
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(twittsUpdatedNotificationHandler:) name:@"TwittsUpdated" object:nil];
+    
+	if(![[AccountManager manager] isValidLoggedUser])
         [AccountController showAccountController:self.parentViewController.navigationController];
 }
 
-- (void)viewDidAppear:(BOOL)animated 
+- (void)viewWillAppear:(BOOL)animated
 {
-    [super viewDidAppear:animated];
+    [super viewWillAppear:animated];
+    
+    self.parentViewController.navigationItem.title = NSLocalizedString(@"Home",@"");
+    self.parentViewController.navigationItem.rightBarButtonItem = _topBarItem;
+}
+
+- (void)twittsUpdatedNotificationHandler:(NSNotification*)note
+{
+    id object = [note object];
+    
+    NSLog(@"UPDATE_TWITS");
+    if ([object respondsToSelector:@selector(dataSourceClass)])
+    {
+        Class ds_class = [object dataSourceClass];
+        if (ds_class == [self class])
+            [self reload];
+    }
+    else
+    {
+        [self reload];
+    }
+}
+
+- (void)newMessage
+{
+	TwitEditorController *msgView = [[TwitEditorController alloc] init];
+    [self.navigationController pushViewController:msgView animated:YES];
+	[msgView release];
+}
+
+- (void)reload
+{
+	if(![[AccountManager manager] isValidLoggedUser])
+        [AccountController showAccountController:self.navigationController];
+	else
+		[self reloadAll];
+}
+
+- (void)changeActionSegment:(id)sender
+{
+    UISegmentedControl *seg = (UISegmentedControl*)sender;
+    
+    if (seg.selectedSegmentIndex == 0)
+        [self newMessage];
+    else
+        [self reload];
 }
 
 - (void)accountChanged:(NSNotification*)notification
 {
 	[self reloadAll];
-	self.navigationItem.title = [MGTwitterEngine username];
+    
+    //UserAccount *account = [[AccountManager manager] loggedUserAccount];
+	//self.parentViewController.navigationItem.title = [account username];
 }
 
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count
 {
+    NSLog(@"LOAD HOME START WITH %d COUNT %d", numPage, count);
 	[super loadMessagesStaringAtPage:numPage count:count];
-	if([MGTwitterEngine password] != nil)
+    
+    if ([[AccountManager manager] isValidLoggedUser])
 	{
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
 		[_twitter getFollowedTimelineFor:nil since:nil startingAtPage:numPage count:count];
-		self.navigationItem.title = [MGTwitterEngine username];
 	}
 }
 
@@ -125,20 +148,4 @@
 	return NSLocalizedString(@"Loading Tweets...", @"");
 }
 
-- (void)newMessage
-{
-	TwitEditorController *msgView = [[TwitEditorController alloc] init];
-	[self.rootNavigationController pushViewController:msgView animated:YES];
-	[msgView release];
-}
-
-- (void)reload
-{
-	if([MGTwitterEngine password] == nil)
-        [AccountController showAccountController:self.parentViewController.navigationController];
-	else
-		[self reloadAll];
-}
-
 @end
-

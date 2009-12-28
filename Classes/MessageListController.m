@@ -28,46 +28,51 @@
 #import "LoginController.h"
 #import "MGTwitterEngine.h"
 #import "ImageLoader.h"
-#import "MessageViewController.h"
 #import "TweetterAppDelegate.h"
 #import "CustomImageView.h"
-#include "util.h"
-#include "TweetViewController.h"
+#import "MGTwitterEngineFactory.h"
+#import "util.h"
+#import "TweetViewController.h"
+#import "AccountManager.h"
+#import "TwitterMessageObject.h"
+#import "TwMessageCell.h"
 
 #define NAME_TAG            1
 #define TIME_TAG            2
 #define IMAGE_TAG           3
 #define TEXT_TAG            4
 #define YFROG_IMAGE_TAG     5
+#define FAVICON_TAG         6
 #define ROW_HEIGHT          70
 
-@interface MessageListController (Proivate)
+@interface MessageListController(Private)
 - (void)updateYFrogImages;
+@end
+
+@interface MessageListController(TwitterMessageObjectManagament)
+- (void)initTwitterMessageObjectCache;
+- (void)releaseTwitterMessageObjectCache;
+- (TwitterMessageObject*)mapTwitterMessageObject:(NSDictionary*)message;
+- (TwitterMessageObject*)cacheMessageObjectAsDictionary:(NSDictionary*)message;
+- (TwitterMessageObject*)cacheMessageObject:(TwitterMessageObject*)message;
+- (TwitterMessageObject*)lookupTwitterMessageObject:(NSDictionary*)message;
+- (TwitterMessageObject*)lookupTwitterMessageObjectById:(NSString*)messageId;
+- (TwitterMessageObject*)twitterMessageObjectByDictionary:(NSDictionary*)message;
+@end
+
+@interface MessageListController(ThumbnailLoader)
+- (void)loadThumbnailsForMessageObject:(TwitterMessageObject*)message;
+//- (void)loadThumbnailsThread:(TwitterMessageObject*)message;
+- (void)loadThumbnailsThread:(NSDictionary*)data;
 @end
 
 @implementation MessageListController
 
-@synthesize rootNavigationController;
-
-- (void)setRootNavigationController:(UINavigationController *)controller
-{
-    if (_rootNavigationController != controller)
-    {
-        [controller retain];
-        [_rootNavigationController autorelease];
-        _rootNavigationController = controller;
-    }
-}
-
-- (UINavigationController *)rootNavigationController
-{
-    return _rootNavigationController;
-}
-
 - (void)dealloc
 {
-    [_rootNavigationController release];
-    _rootNavigationController = nil;
+    ISLog(@"Destroy object");
+    
+    [self releaseTwitterMessageObjectCache];
 	while (_indicatorCount) 
 	{
 		[self releaseActivityIndicator];
@@ -97,20 +102,25 @@
 {
     [super viewDidLoad];
 	
+    [self initTwitterMessageObjectCache];
 	_errorDesc = nil;
 	_lastMessage = NO;
-	_loading = [MGTwitterEngine username] != nil;
+	_loading = [[AccountManager manager] isValidLoggedUser];
 	_indicatorCount = 0;
 	_indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
 	
+    _indicator.autoresizingMask = UIViewAutoresizingNone;
+    
 	CGRect frame = self.tableView.frame;
+
 	CGRect indFrame = _indicator.frame;
 	frame.origin.x += (frame.size.width - indFrame.size.width) * 0.5f;
 	frame.origin.y += (frame.size.height - indFrame.size.height) * 0.3f;
-	frame.size = indFrame.size;
+	frame.size.width = indFrame.size.width;
+    frame.size.height = indFrame.size.height;
 	_indicator.frame = frame;
 	
-	_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+    _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(accountChanged:) name:@"AccountChanged" object:nil];
 
 	[self performSelector:@selector(reloadAll) withObject:nil afterDelay:0.5f];
@@ -124,14 +134,34 @@
 		[self.tableView reloadData];
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+    if (_processIndicator)
+        [_processIndicator hide];
+    [super viewWillDisappear:animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    if (_loading && _processIndicator) {
+        [_processIndicator show];
+    }
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+}
+
 - (void)didReceiveMemoryWarning 
 {
+    ISLog(@"MEMORY WARNING");
     [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
     // Release anything that's not essential, such as cached data
 }
 
 #pragma mark Table view methods
-
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView 
 {
     return 1;
@@ -149,7 +179,7 @@
 		_lastMessage? [_messages count]: [_messages count] + 1;
 }
 
-
+/*
 #define IMAGE_SIDE              48
 #define BORDER_WIDTH            5
 
@@ -161,10 +191,13 @@
 #define LABEL_HEIGHT            20
 #define LABEL_WIDTH             130
 
-#define YFROG_IMAGE_X           TEXT_OFFSET_X + TEXT_WIDTH + BORDER_WIDTH
-#define YFROG_IMAGE_Y           TEXT_OFFSET_Y
+//#define YFROG_IMAGE_X           TEXT_OFFSET_X + TEXT_WIDTH + BORDER_WIDTH
+//#define YFROG_IMAGE_Y           TEXT_OFFSET_Y
 #define YFROG_IMAGE_WIDTH       48
 
+#define YFROG_IMAGE_X           TEXT_OFFSET_X
+#define YFROG_IMAGE_Y           TEXT_OFFSET_Y + TEXT_HEIGHT
+*/
 - (UITableViewCell *)tableviewCellWithReuseIdentifier:(NSString *)identifier 
 {
 	if([identifier isEqualToString:@"UICell"])
@@ -182,6 +215,9 @@
 		CGRect rect;
         
 		rect = CGRectMake(0.0, 0.0, 320.0, ROW_HEIGHT);
+        UITableViewCell *cell = [[[TwMessageCell alloc] initWithFrame:rect reuseIdentifier:identifier] autorelease];
+
+        /*
 		
 		UITableViewCell *cell = [[[UITableViewCell alloc] initWithFrame:rect reuseIdentifier:identifier] autorelease];
 		
@@ -235,13 +271,20 @@
 		
 		[label release];
 		
-        CustomImageView *yFrogImage = [[CustomImageView alloc] initWithFrame:CGRectMake(YFROG_IMAGE_X, YFROG_IMAGE_Y, YFROG_IMAGE_WIDTH, YFROG_IMAGE_WIDTH)];
+        rect = CGRectMake(300, TEXT_OFFSET_Y, 16, 16);
+        UIImageView *favImageView = [[UIImageView alloc] initWithFrame:rect];
+        favImageView.tag = FAVICON_TAG;
+        [cell.contentView addSubview:favImageView];
+        [favImageView release];
+        
+        //CustomImageView *yFrogImage = [[CustomImageView alloc] initWithFrame:CGRectMake(YFROG_IMAGE_X, YFROG_IMAGE_Y, YFROG_IMAGE_WIDTH, YFROG_IMAGE_WIDTH)];
+        ActiveImageView *yFrogImage = [[ActiveImageView alloc] initWithFrame:CGRectMake(YFROG_IMAGE_X, YFROG_IMAGE_Y, YFROG_IMAGE_WIDTH, YFROG_IMAGE_WIDTH)];
         yFrogImage.frameType = CIDefaultFrameType;
         yFrogImage.tag = YFROG_IMAGE_TAG;
         yFrogImage.backgroundColor = [UIColor clearColor];
         [cell.contentView addSubview:yFrogImage];
         [yFrogImage release];
-        
+        */
 		return cell;
 	}
 	
@@ -267,20 +310,83 @@
 		if(_errorDesc)
 			cellLabel.text = _errorDesc;
 		else
-            cellLabel.text = _loading? [self loadingMessagesString]: [self noMessagesString];
+            cellLabel.text = _loading ? @"" : [self noMessagesString];
 		return;
 	}
-    
+
 	if(indexPath.row < [_messages count])
 	{
-		static NSDateFormatter *dateFormatter = nil;
-		if (dateFormatter == nil) 
-			dateFormatter = [[NSDateFormatter alloc] init];
+        NSDictionary *messageData = [_messages objectAtIndex:indexPath.row];
 
-		static NSCalendar *calendar;
-		if(calendar == nil)
-			calendar= [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-		
+        TwitterMessageObject *object = [self twitterMessageObjectByDictionary:messageData];
+        [((TwMessageCell*)cell) setTwitterMessageObject:object];
+        
+        /*
+        if (object)
+        {
+            CGRect cellFrame = [cell frame];
+            
+            //Set message text
+            UILabel *label;
+            
+            label = (UILabel *)[cell viewWithTag:TEXT_TAG];
+            label.text = object.message;
+            [label setFrame:CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH + YFROG_IMAGE_WIDTH, TEXT_HEIGHT)];
+            [label sizeToFit];
+            
+            // Load yFrog thumbnail
+            //CustomImageView *yFrogImage = (CustomImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
+            ActiveImageView *yFrogImage = (ActiveImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
+            
+            float row_max_y = 0;
+            
+            id image = (_yFrogImages) ? [_yFrogImages objectForKey:object.messageId] : nil;
+            if (image && (image != [NSNull null]))
+            {
+                CGRect image_frame = yFrogImage.frame;
+                
+                image_frame.origin.y = label.frame.origin.y + label.frame.size.height + BORDER_WIDTH;
+                yFrogImage.frame = image_frame;
+                yFrogImage.image = (UIImage*)image;
+                
+                row_max_y = image_frame.origin.y + image_frame.size.height + BORDER_WIDTH;
+            }
+            else
+            {
+                row_max_y = label.frame.origin.y + label.frame.size.height + BORDER_WIDTH;
+                yFrogImage.image = nil;
+            }
+            
+            cellFrame.size.height = max(row_max_y, ROW_HEIGHT);
+            [cell setFrame:cellFrame];
+            
+            label = (UILabel *)[cell viewWithTag:TIME_TAG];
+            label.text = object.creationFormattedDate;
+            
+            //Set userpic
+            CustomImageView *imageView = (CustomImageView *)[cell viewWithTag:IMAGE_TAG];
+            imageView.image = object.avatar;
+            
+            //Set user name
+            label = (UILabel *)[cell viewWithTag:NAME_TAG];
+            label.text = object.screenname;
+            
+            UIImageView *favView = (UIImageView*)[cell viewWithTag:FAVICON_TAG];
+            if (object.isFavorite)
+                favView.image = [UIImage imageNamed:@"statusfav.png"];
+            else
+                favView.image = nil;            
+        }
+         */
+    }
+	else
+	{
+        cellLabel.text = NSLocalizedString(@"Load More...", @"");
+	}
+    
+    /*
+	if(indexPath.row < [_messages count])
+	{
 		NSDictionary *messageData = [_messages objectAtIndex:indexPath.row];
 		NSDictionary *userData = [messageData objectForKey:@"user"];
 		if(!userData)
@@ -288,83 +394,66 @@
 		
 		CGRect cellFrame = [cell frame];
 		
-        // Load yFrog thumbnail
-        CustomImageView *yFrogImage = (CustomImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
-        
-        int yFrogImageHeight = 0;
-        id image = (_yFrogImages) ? [_yFrogImages objectForKey:[messageData objectForKey:@"id"]] : nil;
-        if (image && (image != [NSNull null]))
-        {
-            yFrogImage.image = (UIImage*)image;
-            yFrogImageHeight = YFROG_IMAGE_WIDTH;
-        }
-        else
-        {
-            yFrogImage.image = nil;
-        }
-        
         //Set message text
 		UILabel *label;
 		label = (UILabel *)[cell viewWithTag:TEXT_TAG];
 		label.text = DecodeEntities([messageData objectForKey:@"text"]);
-		[label setFrame:CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH + (YFROG_IMAGE_WIDTH - yFrogImageHeight), TEXT_HEIGHT)];
+        [label setFrame:CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH + YFROG_IMAGE_WIDTH, TEXT_HEIGHT)];
 		[label sizeToFit];
         
-        int max_h = max(label.frame.size.height, yFrogImageHeight);
-		if(max_h > TEXT_HEIGHT)
-		{
-            int cell_h = ROW_HEIGHT + max_h - TEXT_HEIGHT;
-			cellFrame.size.height = cell_h;
-		}
-		else
-		{
-			cellFrame.size.height = ROW_HEIGHT;
-		}
+        // Load yFrog thumbnail
+        //CustomImageView *yFrogImage = (CustomImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
+        ActiveImageView *yFrogImage = (ActiveImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
+        
+        float row_max_y = 0;
+        
+        id image = (_yFrogImages) ? [_yFrogImages objectForKey:[messageData objectForKey:@"id"]] : nil;
+        if (image && (image != [NSNull null]))
+        {
+            CGRect image_frame = yFrogImage.frame;
+            
+            image_frame.origin.y = label.frame.origin.y + label.frame.size.height + BORDER_WIDTH;
+            yFrogImage.frame = image_frame;
+            yFrogImage.image = (UIImage*)image;
+            
+            row_max_y = image_frame.origin.y + image_frame.size.height + BORDER_WIDTH;
+        }
+        else
+        {
+            row_max_y = label.frame.origin.y + label.frame.size.height + BORDER_WIDTH;
+            yFrogImage.image = nil;
+        }
+        
+        cellFrame.size.height = max(row_max_y, ROW_HEIGHT);
 		[cell setFrame:cellFrame];
         
-		//Set message date and time
-		NSCalendarUnit unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit;
-		label = (UILabel *)[cell viewWithTag:TIME_TAG];
 		NSDate *createdAt = [messageData objectForKey:@"created_at"];
-		NSDateComponents *nowComponents = [calendar components:unitFlags fromDate:[NSDate date]];
-		NSDateComponents *yesterdayComponents = [calendar components:unitFlags fromDate:[NSDate dateWithTimeIntervalSinceNow:-60*60*24]];
-		NSDateComponents *createdAtComponents = [calendar components:unitFlags fromDate:createdAt];
-		
-		if([nowComponents year] == [createdAtComponents year] &&
-			[nowComponents month] == [createdAtComponents month] &&
-			[nowComponents day] == [createdAtComponents day])
-		{
-			[dateFormatter setDateStyle:NSDateFormatterNoStyle];
-			[dateFormatter setTimeStyle:NSDateFormatterShortStyle];
-			label.text = [dateFormatter stringFromDate:createdAt];
-		}
-		else if([yesterdayComponents year] == [createdAtComponents year] &&
-			[yesterdayComponents month] == [createdAtComponents month] &&
-			[yesterdayComponents day] == [createdAtComponents day])
-		{
-			[dateFormatter setDateStyle:NSDateFormatterNoStyle];
-			[dateFormatter setTimeStyle:NSDateFormatterShortStyle];
-			label.text = [NSString stringWithFormat:@"Yesterday, %@", [dateFormatter stringFromDate:createdAt]];
-		}
-		else
-		{
-			[dateFormatter setDateStyle:NSDateFormatterMediumStyle];
-			[dateFormatter setTimeStyle:NSDateFormatterShortStyle];
-			label.text = [dateFormatter stringFromDate:createdAt];
-		}
-		
+		label = (UILabel *)[cell viewWithTag:TIME_TAG];
+        label.text = FormatNSDate(createdAt);
+        
 		//Set userpic
 		CustomImageView *imageView = (CustomImageView *)[cell viewWithTag:IMAGE_TAG];
-        imageView.image = [[ImageLoader sharedLoader] imageWithURL:[userData objectForKey:@"profile_image_url"]];
+        CGSize avatarViewSize = CGSizeMake(48, 48);
+        
+        imageView.image = loadAndScaleImage([userData objectForKey:@"profile_image_url"], avatarViewSize);
         
 		//Set user name
 		label = (UILabel *)[cell viewWithTag:NAME_TAG];
 		label.text = [userData objectForKey:@"screen_name"];
+        
+        UIImageView *favView = (UIImageView*)[cell viewWithTag:FAVICON_TAG];
+        
+        id fav = [messageData objectForKey:@"favorited"];
+        if (fav && [fav boolValue])
+            favView.image = [UIImage imageNamed:@"statusfav.png"];
+        else
+            favView.image = nil;
 	} 
 	else
 	{
         cellLabel.text = NSLocalizedString(@"Load More...", @"");
 	}
+    */
 }
 
 // Customize the appearance of table view cells.
@@ -380,7 +469,7 @@
     
     [self configureCell:cell forIndexPath:indexPath];
 	
-	cell.contentView.backgroundColor = indexPath.row % 2? [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1]: [UIColor whiteColor];
+	cell.contentView.backgroundColor = indexPath.row % 2 ? [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1]: [UIColor whiteColor];
     
     return cell;
 }
@@ -390,6 +479,7 @@
 	if(indexPath.row >= [_messages count]) return 50;
 	
 	UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
+    NSLog(@"cell height = %f", cell.frame.size.height);
 	return cell.frame.size.height;
 }
 
@@ -407,23 +497,19 @@
 			[messageData setObject:userInfo forKey:@"user"];
 			[messageData setObject:[NSNumber numberWithBool:YES] forKey:@"DirectMessage"];
 		}
-#if 0
-		MessageViewController *msgView = [[MessageViewController alloc] initWithMessage:messageData];
-		[self.rootNavigationController pushViewController:msgView animated:YES];
-		[msgView release];
-#else
+        
         TweetViewController *tweetView = [[TweetViewController alloc] initWithStore:self messageIndex:indexPath.row];
-        [self.rootNavigationController pushViewController:tweetView animated:YES];
+        [tweetView setDataSourceClass:[self class]];
+        [self.navigationController pushViewController:tweetView animated:YES];
         [tweetView release];
-#endif
 	}
 	else
 	{
 		[self loadMessagesStaringAtPage:++_pagenum count:MESSAGES_PER_PAGE];
 	}
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-// DEBUG Methods -------------------------------------------------------------------------------------------------------------------
 #pragma mark TweetViewDelegate
 - (int)messageCount
 {
@@ -433,6 +519,7 @@
 - (NSDictionary *)messageData:(int)index
 {
     NSMutableDictionary *messageData = [NSMutableDictionary dictionaryWithDictionary:[_messages objectAtIndex:index]];
+    
     id userInfo = [messageData objectForKey:@"sender"];
     if(userInfo && [messageData objectForKey:@"user"] == nil)
     {
@@ -440,11 +527,8 @@
         [messageData setObject:[NSNumber numberWithBool:YES] forKey:@"DirectMessage"];
     }
     
-    //[self traceDict:messageData];
     return messageData;
 }
-
-// DEBUG Methods -------------------------------------------------------------------------------------------------------------------
 
 - (void)accountChanged:(NSNotification*)notification
 {
@@ -453,21 +537,20 @@
 
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-
 }
 
 #pragma mark MGTwitterEngineDelegate methods
-
-
 - (void)requestSucceeded:(NSString *)connectionIdentifier
 {
+    ISLog(@"Success");
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	_loading = NO;
 }
 
-
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
+    ISLog(@"Failed");
+    
 	if(self.navigationItem.leftBarButtonItem)
 			self.navigationItem.leftBarButtonItem.enabled = YES;
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
@@ -476,24 +559,23 @@
 	
 	[self releaseActivityIndicator];
 	
-	//if(self.tabBarController.selectedViewController == self.navigationController && [error code] == 401)
     if ([error code] == 401)
-        [AccountController showAccountController:self.rootNavigationController];
-		//[LoginController showModal:self.navigationController];
+        [AccountController showAccountController:self.navigationController];
 		
 	if(_messages)
 	{
 		[_messages release];
 		_messages = nil;
-        [self updateYFrogImages];
 	}
 	
 	[self.tableView reloadData];
 }
 
-
 - (void)statusesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier
 {
+    ISLog(@"Receive status");
+    
+    /*
 	if([statuses count] < MESSAGES_PER_PAGE)
 	{
 		_lastMessage = YES;
@@ -502,18 +584,21 @@
 					[NSArray arrayWithObject: [NSIndexPath indexPathForRow:[_messages count] inSection:0]]
 				withRowAnimation:UITableViewRowAnimationTop];
 	}
-	
+	*/
+    
 	if(!_messages)
 	{
 		if([statuses count] > 0)
-			_messages = [statuses retain];
-        [self updateYFrogImages];
+            _messages = [statuses retain];
+        
 		[self.tableView reloadData];
 	}
 	else
 	{
 		NSArray *messages = _messages;
+        
 		_messages = [[messages arrayByAddingObjectsFromArray:statuses] retain];
+        
 		NSMutableArray *indices = [NSMutableArray arrayWithCapacity:[statuses count]];
 		for(int i = [messages count]; i < [_messages count]; ++i)
 			[indices addObject:[NSIndexPath indexPathForRow:i inSection:0]];
@@ -530,15 +615,14 @@
 		}
 		
 		[messages release];
-        [self updateYFrogImages];
 	}
     
+    [self updateYFrogImages];
 	[self releaseActivityIndicator];
 	
 	if(self.navigationItem.leftBarButtonItem)
 		self.navigationItem.leftBarButtonItem.enabled = YES;
 }
-
 
 NSInteger dateReverseSort(id num1, id num2, void *context)
 {
@@ -549,6 +633,8 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 
 - (void)directMessagesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier;
 {
+    ISLog(@"Receive Direct message");
+    /*
 	if([statuses count] < MESSAGES_PER_PAGE)
 	{
 		_lastMessage = YES;
@@ -557,7 +643,7 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 					[NSArray arrayWithObject: [NSIndexPath indexPathForRow:[_messages count] inSection:0]]
 				withRowAnimation:UITableViewRowAnimationTop];
 	}
-	
+	*/
 	if(!_messages)
 	{
 		if([statuses count] > 0)
@@ -596,7 +682,7 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 		
 		[messages release];
 	}
-	
+    
 	[self updateYFrogImages];
 	[self releaseActivityIndicator];
 	
@@ -605,12 +691,11 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 }
 
 #pragma mark ===
-
-
-
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count
 {
-	if([MGTwitterEngine password] != nil)
+    ISLog(@"Start load message");
+
+    if ([[AccountManager manager] isValidLoggedUser])
 	{
 		if(_errorDesc)
 		{
@@ -628,12 +713,10 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 
 - (void)reloadAll
 {
+    ISLog(@"Reload data");
+    
 	_lastMessage = NO;
 	_pagenum = 1;
-	
-    //if (_yFrogImages)
-    //    [_yFrogImages release];
-    //_yFrogImages = nil;
     
 	if(_messages)
 	{
@@ -646,11 +729,23 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 
 - (void)retainActivityIndicator
 {
-	if(++_indicatorCount == 1)
-	{
-		[self.tableView.superview addSubview:_indicator];
-		[_indicator startAnimating];
-	}
+    _indicatorCount++;
+    
+    if (_processIndicator == nil)
+        _processIndicator = [[TwActivityIndicator alloc] init];
+    
+    [_processIndicator.messageLabel setText:[self loadingMessagesString]];
+    if (self.navigationController.topViewController == self.parentViewController)
+    {
+        if (_indicatorCount == 1)
+        {
+            [_processIndicator show];
+        }
+    }
+    else
+    {
+        [_processIndicator hide];
+    }
 }
 
 - (void)releaseActivityIndicator
@@ -659,27 +754,26 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 	{
 		if(--_indicatorCount == 0)
 		{
-			[_indicator stopAnimating];
-			[_indicator removeFromSuperview];
+            if (_processIndicator)
+                [_processIndicator hide];
 		}
 	}
 }
 
 @end
 
-@implementation MessageListController (Private)
+@implementation MessageListController(Private)
 
-- (void)updateYFrogImages
-{
-    NSLog(NSStringFromSelector(_cmd));
-    
+- (void)loadThumbnailsFromYFrog {
     if (_messages)
     {
+        NSDictionary *copyOfMessage = [_messages copy];
+        
         if (!_yFrogImages)
             _yFrogImages = [[NSMutableDictionary alloc] init];
-
+        
         NSDictionary *message;
-        NSEnumerator *en = [_messages objectEnumerator];
+        NSEnumerator *en = [copyOfMessage objectEnumerator];
         while ((message = (NSDictionary *)[en nextObject]))
         {
             id key = [message objectForKey:@"id"];
@@ -688,25 +782,222 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
                 NSString *yFrogLink = yFrogLinkFromText([message objectForKey:@"text"]);
                 if (yFrogLink)
                 {
-                    UIImage *image = [[ImageLoader sharedLoader] imageWithURL:yFrogLink];
-                    if (image)
-                    {
-                        if (image.size.width > YFROG_IMAGE_WIDTH || image.size.height > YFROG_IMAGE_WIDTH)
-                            image = imageScaledToSize(image, YFROG_IMAGE_WIDTH);
-                        [_yFrogImages setObject:image forKey:key];
-                    }
-                    else
-                    {
-                        [_yFrogImages setObject:[NSNull null] forKey:key];
-                    }
+                    //CGSize size = CGSizeMake(YFROG_IMAGE_WIDTH, YFROG_IMAGE_WIDTH);
+                    CGSize size = CGSizeMake(48, 48);
+                    
+                    id image = loadAndScaleImage(yFrogLink, size);
+                    if (!image)
+                        image = [NSNull null];
+                    
+                    [_yFrogImages setObject:image forKey:key];
                 }
             }
         }
+        
+        [copyOfMessage release];
     }
     else if (_yFrogImages)
     {
         [_yFrogImages release];
         _yFrogImages = nil;
+    }
+    [self.tableView reloadData];
+}
+
+- (void)updateYFrogImages
+{
+    ISLog(@"Update Images");
+    
+    //[self performSelectorInBackground:@selector(loadThumbnailsFromYFrog) withObject:nil];
+    //[self loadThumbnailsFromYFrog];
+}
+
+@end
+
+@implementation MessageListController(TwitterMessageObjectManagament)
+
+- (void)initTwitterMessageObjectCache
+{
+    if (_messageObjects == nil)
+        _messageObjects = [[NSMutableDictionary alloc] init];
+}
+
+- (void)releaseTwitterMessageObjectCache
+{
+    [_messageObjects release];
+}
+
+- (TwitterMessageObject*)mapTwitterMessageObject:(NSDictionary*)message
+{
+    NSDictionary *userData = [message objectForKey:@"user"];
+    if (!userData)
+        userData = [message objectForKey:@"sender"];
+
+    CGSize avatarViewSize = CGSizeMake(48, 48);
+    TwitterMessageObject *messageObject = [[TwitterMessageObject alloc] init];
+    
+    NSString *text = [message objectForKey:@"text"];
+    
+    messageObject.messageId             = [message objectForKey:@"id"];
+    messageObject.screenname            = [userData objectForKey:@"screen_name"];
+    messageObject.message               = DecodeEntities(text);
+    messageObject.creationDate          = [message objectForKey:@"created_at"];
+    messageObject.creationFormattedDate = FormatNSDate(messageObject.creationDate);
+    messageObject.avatarUrl             = [userData objectForKey:@"profile_image_url"];
+    messageObject.avatar                = loadAndScaleImage(messageObject.avatarUrl, avatarViewSize);
+    messageObject.yfrogLinks            = yFrogLinksArrayFromText(text);
+    
+    BOOL isFavorite = NO;
+    
+    id fav = [message objectForKey:@"favorited"];
+    if (fav && fav != (id)[NSNull null])
+        isFavorite = [fav boolValue];
+    
+    messageObject.isFavorite = isFavorite;
+    
+    [self loadThumbnailsForMessageObject:messageObject];
+    
+    return [messageObject autorelease];
+}
+
+- (TwitterMessageObject*)cacheMessageObjectAsDictionary:(NSDictionary*)message
+{
+    if (_messageObjects == nil)
+        return nil;
+    
+    TwitterMessageObject *object = [self lookupTwitterMessageObject:message];
+    if (object == nil)
+    {
+        object = [self mapTwitterMessageObject:message];
+        if (object)
+            [_messageObjects setObject:object forKey:object.messageId];
+    }
+    return object;
+}
+
+- (TwitterMessageObject*)cacheMessageObject:(TwitterMessageObject*)message
+{
+    if (_messageObjects == nil)
+        return nil;
+    if ([self lookupTwitterMessageObjectById:message.messageId] == nil)
+    {
+        [_messageObjects setObject:message forKey:message.messageId];
+    }
+    return message;
+}
+
+- (TwitterMessageObject*)lookupTwitterMessageObject:(NSDictionary*)message
+{
+    if (message == nil)
+        return nil;
+    return [self lookupTwitterMessageObjectById:[message objectForKey:@"id"]];
+}
+
+- (TwitterMessageObject*)lookupTwitterMessageObjectById:(NSString*)messageId
+{
+    if (_messageObjects == nil || messageId == nil)
+        return nil;
+    return [_messageObjects objectForKey:messageId];
+}
+
+- (TwitterMessageObject*)twitterMessageObjectByDictionary:(NSDictionary*)message
+{
+    TwitterMessageObject *object = [self lookupTwitterMessageObject:message];
+    if (object == nil)
+        object = [self cacheMessageObjectAsDictionary:message];
+    
+    BOOL isFavorite = NO;
+    
+    id fav = [message objectForKey:@"favorited"];
+    if (fav && fav != (id)[NSNull null])
+        isFavorite = [fav boolValue];
+    
+    object.isFavorite = isFavorite;
+    
+    return object;
+}
+
+@end
+
+@implementation MessageListController(ThumbnailLoader)
+- (void)loadThumbnailsForMessageObject:(TwitterMessageObject*)message
+{
+    if (message.yfrogLinks)
+    {
+        NSMutableDictionary *data = [NSMutableDictionary dictionary];
+        
+        [data setObject:message.messageId forKey:@"id"];
+        [data setObject:message.yfrogLinks forKey:@"links"];
+        
+         [self performSelectorInBackground:@selector(loadThumbnailsThread:) withObject:data];
+    }
+}
+
+- (void)loadThumbnailsThread:(NSDictionary*)data
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
+    NSString *messageId = [data objectForKey:@"id"];
+    NSArray *links = [data objectForKey:@"links"];
+    
+    CGSize thumbSize = CGSizeMake(48., 48.);
+    
+    NSMutableArray *images = [[NSMutableArray alloc] init];
+
+    for (NSString *link in links)
+    {
+        if (link)
+        {
+            @try 
+            {
+                //UIImage *image = loadAndScaleImage(link, thumbSize);
+                
+                //TEST
+                
+                NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:link]];
+                if (!imageData)
+                    continue;
+                
+                UIImage *image = [UIImage imageWithData:imageData];
+                //END_TEST
+                
+                
+                if (image)
+                    [images addObject:image];
+            }
+            @catch (...) {
+            }
+        }
+    }
+    
+    NSMutableDictionary *resultData = [[NSMutableDictionary alloc] initWithCapacity:2];
+    
+    [resultData setObject:messageId forKey:@"id"];
+    [resultData setObject:images forKey:@"images"];
+    
+    [self performSelectorOnMainThread:@selector(thumbnailWasLoaded:) withObject:resultData waitUntilDone:NO];
+    
+    [pool release];
+}
+
+- (void)thumbnailWasLoaded:(NSDictionary*)result
+{
+    if (result)
+    {
+        NSArray *images = [result objectForKey:@"images"];
+        NSString *messageId = [result objectForKey:@"id"];
+        
+        if (messageId && images)
+        {
+            TwitterMessageObject *object = [self lookupTwitterMessageObjectById:messageId];
+            if (object)
+                object.yfrogThumbnails = images;
+            
+            [images release];
+        }
+        [result release];
+        
+        [self.tableView reloadData];
     }
 }
 

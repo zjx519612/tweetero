@@ -11,21 +11,26 @@
 @class OAToken;
 
 typedef enum {
-    TwitterCommon,
-    TwitterOAuth
+    TwitterAuthCommon,
+    TwitterAuthOAuth
 } TwitterAuthType;
 
 // Base account class
 @interface UserAccount : NSObject
 {
-    NSString    *_username;
+    NSString        *_username;
+    NSString        *_secretData;
+    TwitterAuthType  _authType;
 }
-@property (nonatomic, copy) NSString *username;
 
-- (TwitterAuthType)authType;
+@property (nonatomic, copy) NSString *username;
+@property (nonatomic, copy) NSString *secretData;
+@property (nonatomic) TwitterAuthType authType;
+
+//- (TwitterAuthType)authType;
 
 @end
-
+/*
 // TwitterCommonUserAccount
 @interface TwitterCommonUserAccount : UserAccount
 {
@@ -41,3 +46,4 @@ typedef enum {
 }
 @property (nonatomic, retain) OAToken *accessToken;
 @end
+*/

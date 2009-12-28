@@ -21,7 +21,25 @@
 #import "MGTwitterEngine.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import "TweetPlayer.h"
+#import "MGTwitterEngineFactory.h"
 
+/*
+    - forward for all
+ 
+    Direct Messages
+        for All:
+        - delete
+        - reply
+ 
+    Home & Mentions
+        for owner:
+        - delete
+        - favorite
+        
+        for guests
+        - reply
+        - favorite
+ */
 @interface TweetViewController (Private)
 - (void)createHeadView;
 - (void)createFooterView;
@@ -33,6 +51,9 @@
 - (void)implementOperationIfPossible;
 - (void)copyImagesToYFrog;
 - (NSString*)makeHTMLMessage;
+- (void)updateFavoriteIcon;
+- (void)enableFavoriteButton:(BOOL)enable;
+- (void)updateActionState;
 @end
 
 @implementation TweetViewController (Private)
@@ -74,6 +95,9 @@
         
         _message = [[_store messageData:_currentMessageIndex] retain];
         
+        NSLog(@"CURRENT INDEX: %i", _currentMessageIndex);
+        NSLog(@"%@", _message);
+        
         if (_imagesLinks)
             [_imagesLinks release];
         if (_connectionsDelegates)
@@ -89,11 +113,18 @@
         
         // Update user data
         NSDictionary *userData = [_message objectForKey:@"user"];
-        UIImage *avatarImage = [[ImageLoader sharedLoader] imageWithURL:[userData objectForKey:@"profile_image_url"]];
-
+        
+        CGSize avatarViewSize = CGSizeMake(48, 48);
+        
+        UIImage *avatarImage = loadAndScaleImage([userData objectForKey:@"profile_image_url"], avatarViewSize);
+        
+        NSString *screenname = [userData objectForKey:@"screen_name"];
+        
+        _isCurrentUserMessage = [TweetterAppDelegate isCurrentUserName:screenname];
+        
         _headView.avatar = avatarImage;
         _headView.username = [userData objectForKey:@"name"];
-        _headView.screenname = [NSString stringWithFormat:@"@%@", [[userData objectForKey:@"screen_name"] lowercaseString]];
+        _headView.screenname = [NSString stringWithFormat:@"@%@", [screenname lowercaseString]];
         _headView.location = [userData objectForKey:@"location"];
         
         if (_footerView)
@@ -101,6 +132,14 @@
         
         // Reload content table
         [contentTable reloadData];
+        
+        isFavorited = NO;
+        id favObj = [_message objectForKey:@"favorited"];
+        if (favObj)
+            isFavorited = [favObj boolValue];
+        
+        [self updateFavoriteIcon];
+        [self updateActionState];
     }
 }
 
@@ -378,11 +417,42 @@
 	return html;
 }
 
+- (void)updateFavoriteIcon
+{
+    UIImage *icon = (isFavorited ? [UIImage imageNamed:@"unfavorite.png"] : [UIImage imageNamed:@"favorite.png"]);
+    [_actionSegment setImage:icon forSegmentAtIndex:1];
+}
+
+- (void)enableFavoriteButton:(BOOL)enable
+{
+    [_actionSegment setEnabled:enable forSegmentAtIndex:1];
+}
+
+- (void)updateActionState
+{
+    if (_isDirectMessage)
+    {
+        [_actionSegment setEnabled:YES forSegmentAtIndex:0]; // Reply
+        [_actionSegment setEnabled:NO forSegmentAtIndex:1];  // Favorite
+        [_actionSegment setEnabled:YES forSegmentAtIndex:2]; // Forward (send via email)
+        [_actionSegment setEnabled:YES forSegmentAtIndex:3]; // Delete
+    }
+    else
+    {
+        [_actionSegment setEnabled:!_isCurrentUserMessage forSegmentAtIndex:0]; // Reply
+        [_actionSegment setEnabled:YES forSegmentAtIndex:1];  // Favorite
+        [_actionSegment setEnabled:YES forSegmentAtIndex:2]; // Forward (send via email)
+        [_actionSegment setEnabled:_isCurrentUserMessage forSegmentAtIndex:3]; // Delete
+    }
+}
+
 @end
 
 @implementation TweetViewController
 
 @synthesize _progressSheet;
+@synthesize connectionIdentifier = _connectionIdentifier;
+@synthesize dataSourceClass = _dataSourceClass;
 
 - (id)initWithStore:(id <TweetViewDelegate>)store messageIndex:(int)index
 {
@@ -392,7 +462,8 @@
         _headView = nil;
         _count = [_store messageCount];
         _currentMessageIndex = (index >= _count || index < 0) ? 0 : index;
-        _twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+        //_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+        _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
         _defaultTintColor = [tweetNavigate.tintColor retain];
 		_imagesLinks = nil;
 		_connectionsDelegates = nil;
@@ -400,6 +471,7 @@
         _webView = [[UIWebView alloc] init];
         _webView.delegate = self;
         
+        [_twitter setUsesSecureConnection:NO];
         [self createHeadView];
         [self createFooterView];
         [self activeCurrentMessage];
@@ -414,6 +486,7 @@
 
 - (void)dealloc
 {
+    self.connectionIdentifier = nil;
     _webView.delegate = nil;
     if (_webView.loading)
     {
@@ -473,6 +546,9 @@
     {
 		tweetNavigate.tintColor = _defaultTintColor;
     }
+    
+    [self updateFavoriteIcon];
+    [self updateActionState];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -553,9 +629,11 @@
 
 - (IBAction)favoriteTwit
 {
-    NSString *updateId = [_message objectForKey:@"id"];
-	[TweetterAppDelegate increaseNetworkActivityIndicator];
-    [_twitter markUpdate:[updateId intValue] asFavorite:YES];
+    NSNumber *num = [_message objectForKey:@"id"];
+    
+    [TweetterAppDelegate increaseNetworkActivityIndicator];
+    self.connectionIdentifier = [_twitter markUpdate:[num stringValue] asFavorite:!isFavorited];
+    [self enableFavoriteButton:NO];
 }
 
 - (IBAction)forwardTwit
@@ -723,7 +801,16 @@
 	if(buttonIndex > 0)
 	{
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
-		[_twitter deleteUpdate:[[_message objectForKey:@"id"] intValue]];
+        
+        NSString *messageId = [[_message objectForKey:@"id"] stringValue];
+        
+        NSLog(@"Delete twit: Message ID = %@", messageId);
+        if (_isDirectMessage)
+            [_twitter deleteDirectMessage:messageId];
+        else
+            [_twitter deleteUpdate:messageId];
+
+        _suspendedOperation = TVDelete;
 	}
 }
 
@@ -779,16 +866,51 @@
 #pragma mark MGTweeterEngine Delegate
 - (void)requestSucceeded:(NSString *)connectionIdentifier
 {
-	[[NSNotificationCenter defaultCenter] postNotificationName: @"TwittsUpdated" object: nil];
+    NSLog(@"MGTwitterEngine Request SUCCEEDED");
+    
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"TwittsUpdated" object:self];
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-	[self.navigationController popViewControllerAnimated:YES];
+    
+    if (_suspendedOperation == TVDelete)
+    {
+        [self.navigationController popViewControllerAnimated:YES];
+        _suspendedOperation = TVNoMVOperations;
+    }
 }
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
+    NSLog(@"MGTwitterEngine Request FAILED");
+    NSLog(@"%@", error);
+
+    [self enableFavoriteButton:YES];//DEBUG
+    
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
     if ([error code] == 401)
         [AccountController showAccountController:self.navigationController];
+}
+
+- (void)statusesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier
+{
+    NSLog(@"STATUS RECEIVED");
+    isFavorited = !isFavorited;
+    [self updateFavoriteIcon];
+    [self enableFavoriteButton:YES];
+}
+
+- (void)directMessagesReceived:(NSArray *)messages forRequest:(NSString *)connectionIdentifier
+{
+    NSLog(@"DIRECT MESSAGES RECEIVED");
+}
+
+- (void)userInfoReceived:(NSArray *)userInfo forRequest:(NSString *)connectionIdentifier
+{
+    NSLog(@"USER INFO RECEIVED");
+}
+
+- (void)miscInfoReceived:(NSArray *)miscInfo forRequest:(NSString *)connectionIdentifier
+{
+    NSLog(@"MISC INFO RECEIVED");
 }
 
 @end

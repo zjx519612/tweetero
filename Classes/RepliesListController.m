@@ -34,35 +34,42 @@
 {
 	self = [super initWithNibName:@"UserMessageList" bundle:nil];
 	if(self)
+    {
 		_user = [user retain];
-		
+        _topBarItem = nil;
+	}	
 	return self;
 }
 
-- (void)viewControllerDidActivate:(id)parent
+- (void)dealloc
 {
-    UIViewController *parentController = parent;
-    
-    parentController.navigationItem.title = NSLocalizedString(@"Replies", @"");
-    
-	UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-                                                                                  target:self action:@selector(reload)];
-	parentController.navigationItem.rightBarButtonItem = reloadButton;
-	[reloadButton release];
-    [self setRootNavigationController:parentController.navigationController];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [_topBarItem release];
+	[_user release];
+	[super dealloc];
 }
 
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-	/*
-    self.navigationItem.title = NSLocalizedString(@"Replies", @"");
-	
-	UIBarButtonItem *reloadButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-		target:self action:@selector(reload)];
-	self.navigationItem.leftBarButtonItem = reloadButton;
-	[reloadButton release];
-     */
+    
+    if (_topBarItem != nil)
+        [_topBarItem release];
+    
+	_topBarItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"refresh.tif"] 
+                                                   style:UIBarButtonItemStyleBordered
+                                                  target:self 
+                                                  action:@selector(reload)];
+    
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(twittsUpdatedNotificationHandler:) name:@"TwittsUpdated" object:nil];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    self.parentViewController.navigationItem.title = NSLocalizedString(@"Replies", @"");
+    self.parentViewController.navigationItem.rightBarButtonItem = _topBarItem;
 }
 
 - (void)accountChanged:(NSNotification*)notification
@@ -83,10 +90,13 @@
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count
 {
 	[super loadMessagesStaringAtPage:numPage count:count];
-	if([MGTwitterEngine password] != nil)
+
+    if ([[AccountManager manager] isValidLoggedUser])
 	{
 		[_twitter getRepliesSince:nil startingAtPage:numPage count:count];
-		self.navigationItem.title = [MGTwitterEngine username];
+        
+        //UserAccount *account = [[AccountManager manager] loggedUserAccount];
+		//self.parentViewController.navigationItem.title = [account username];
 	}
 }
 
@@ -95,10 +105,16 @@
 	[self reloadAll];
 }
 
-- (void)dealloc
+- (void)twittsUpdatedNotificationHandler:(NSNotification*)note
 {
-	[_user release];
-	[super dealloc];
+    id object = [note object];
+    
+    if ([object respondsToSelector:@selector(dataSourceClass)])
+    {
+        Class ds_class = [object dataSourceClass];
+        if (ds_class == [self class])
+            [self reload];
+    }
 }
 
 @end

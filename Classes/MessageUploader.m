@@ -27,7 +27,7 @@
 #import "MessageUploader.h"
 #import "MGTwitterEngine.h"
 #import "TweetterAppDelegate.h"
-
+#import "MGTwitterEngineFactory.h"
 
 @implementation MessageUploader
 
@@ -50,7 +50,8 @@
 	self = [super init];
 	if(self)
 	{
-		_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+		//_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+        _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
 		self._body = text;
 		self._imageData = JPEGData;	
 		_replyTo = replayTo;
@@ -112,7 +113,10 @@
     if (self._isDirectMessage)
         mgTwitterConnectionID = [_twitter sendDirectMessage:self._body to:self._username];
     else
-        mgTwitterConnectionID = [_twitter sendUpdate:self._body inReplyTo:_replyTo];
+    {
+        NSNumber *statusID = [NSNumber numberWithInt:_replyTo];
+        mgTwitterConnectionID = [_twitter sendUpdate:self._body inReplyTo:[statusID stringValue]];
+    }
 	MGConnectionWrap * mgConnectionWrap = [[MGConnectionWrap alloc] initWithTwitter:_twitter connection:mgTwitterConnectionID delegate:self];
 	self._connection = mgConnectionWrap;
 	[mgConnectionWrap release];

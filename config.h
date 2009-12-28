@@ -10,7 +10,7 @@
 #ifndef __Config_h__
 #define __Config_h__
 
-#define kTweeteroConsumerKey            @""
-#define kTweeteroConsumerSecret         @""
+#define kTweeteroConsumerKey            @"DCFacUSPSTRqzUyQ3Ml4A"
+#define kTweeteroConsumerSecret         @"c4LNsix4lCcptZKo9hoObXJ2xOWl2WuUiJMNWs7iYI"
 
 #endif //__Config_h__

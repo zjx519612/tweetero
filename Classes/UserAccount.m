@@ -12,27 +12,35 @@
 @implementation UserAccount
 
 @synthesize username = _username;
+@synthesize secretData = _secretData;
+@synthesize authType = _authType;
 
 - (id)init
 {
-    NSAssert(NO, @"Object could not created");
-    return nil;
+    //NSAssert(NO, @"Object could not created");
+    if (self = [super init])
+    {
+        self.authType = TwitterAuthCommon;
+    }
+    return self;
 }
 
 - (void)dealloc
 {
     self.username = nil;
+    self.secretData = nil;
     [super dealloc];
 }
-
+/*
 - (TwitterAuthType)authType
 {
     return 0;
 }
-
+*/
 @end
 
 // TwitterCommonUserAccount
+/*
 @implementation TwitterCommonUserAccount
 
 @synthesize password = _password;
@@ -46,6 +54,11 @@
 {
     self.password = nil;
     [super dealloc];
+}
+
+- (NSString*)secretData
+{
+    return self.password;
 }
 
 - (TwitterAuthType)authType
@@ -76,3 +89,4 @@
 }
 
 @end
+*/

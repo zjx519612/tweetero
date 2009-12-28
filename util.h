@@ -44,6 +44,7 @@ UIImage* imageScaledToSize(UIImage* image, int maxDimension);
 int isImageNeedToConvert(UIImage* testImage, BOOL *needToResize, BOOL *needToRotate);
 
 NSArray* linksFromText(NSString *text);
+NSArray* yFrogLinksArrayFromText(NSString *text);
 NSString* yFrogLinkFromText(NSString *text);
 NSString* ValidateYFrogLink(NSString *url);
 BOOL isVideoLink(NSString *yfrogUrl);
@@ -54,5 +55,8 @@ NSString *DecodeEntities(NSString *str);
 NSURLRequest* tweeteroURLRequest(NSURL* url);
 NSMutableURLRequest* tweeteroMutableURLRequest(NSURL* url);
 BOOL isNullable(id obj);
+
+UIImage* loadAndScaleImage(NSString *url, CGSize size);
+NSString* FormatNSDate(NSDate* date);
 
 #endif

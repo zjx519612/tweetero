@@ -45,6 +45,7 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
     if (self = [super initWithNibName:@"Login" bundle:nil])
     {
         _currentAccount = nil;
+        oAuthAuthorization = NO;
     }
     return self;
 }
@@ -72,10 +73,12 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
 - (IBAction)login:(id)sender 
 {
     // Create new UserAccount object and send it as parameter of notification
-    TwitterCommonUserAccount *newAccount = [[TwitterCommonUserAccount alloc] init];
+    //TwitterCommonUserAccount *newAccount = [[TwitterCommonUserAccount alloc] init];
+    UserAccount *newAccount = [[UserAccount alloc] init];
 
     newAccount.username = [loginField text];
-    newAccount.password = [passwordField text];
+    newAccount.secretData = [passwordField text];
+    //newAccount.password = [passwordField text];
     
     // Notification parameters
     NSDictionary *loginData = [NSDictionary dictionaryWithObjectsAndKeys: newAccount, kNewAccountLoginDataKey, _currentAccount, kOldAccountLoginDataKey, nil];
@@ -118,6 +121,8 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
     engine.consumerKey = kTweeteroConsumerKey;
     engine.consumerSecret = kTweeteroConsumerSecret;
     
+    [engine requestRequestToken];
+    
     SA_OAuthTwitterController *oAuthController = [SA_OAuthTwitterController controllerToEnterCredentialsWithTwitterEngine:engine delegate:self];
     
     if (oAuthController)
@@ -150,6 +155,26 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
 		[iconView setImage:icon];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    if (_currentAccount)
+    {
+        UISegmentedControl *seg = authTypeSegment;
+        
+        [seg setSelectedSegmentIndex:_currentAccount.authType];
+        [self changeAuthTypeClick:seg];
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    if (oAuthAuthorization)
+        [self.navigationController popToRootViewControllerAnimated:YES];
+}
 #pragma mark -
 #pragma mark <UITextFieldDelegate> Methods
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
@@ -157,5 +182,34 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
 	[textField resignFirstResponder];
     return YES;
 }
+
+#pragma mark OAuth delegate
+- (void) storeCachedTwitterOAuthData: (NSString *) data forUsername: (NSString *) username 
+{
+    UserAccount *newAccount = [[UserAccount alloc] init];
+    
+    newAccount.username = username;
+    newAccount.secretData = data;
+    newAccount.authType = TwitterAuthOAuth;
+    
+    // Notification parameters
+    NSDictionary *loginData = [NSDictionary dictionaryWithObjectsAndKeys: newAccount, kNewAccountLoginDataKey, _currentAccount, kOldAccountLoginDataKey, nil];
+    [newAccount release];
+    
+    // Post LoginControllerAccountDidChange notifiaction
+    [[NSNotificationCenter defaultCenter] postNotificationName: (NSString *)LoginControllerAccountDidChange 
+                                                        object: nil
+                                                      userInfo: loginData];
+    [self.navigationController popViewControllerAnimated:YES];
+    oAuthAuthorization = YES;
+}
+
+- (NSString *) cachedTwitterOAuthDataForUsername: (NSString *) username 
+{
+    if (_currentAccount)
+        return [_currentAccount secretData];
+    return nil;
+}
+
 
 @end

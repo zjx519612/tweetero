@@ -49,6 +49,7 @@ extern const NSString *LoginControllerAccountDidChange;
     IBOutlet UIView *accountView;
     IBOutlet UIView *oAuthView;    
     UserAccount *_currentAccount;
+    BOOL oAuthAuthorization;
 }
 
 - (id)initWithUserAccount:(UserAccount*)account;

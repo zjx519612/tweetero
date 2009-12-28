@@ -9,6 +9,7 @@
 #import "SearchProvider.h"
 #import "MGTwitterEngine.h"
 #import "MGTwitterEngine+Search.h"
+#import "MGTwitterEngineFactory.h"
 
 @interface SearchProvider(Private)
 
@@ -53,6 +54,7 @@ static SearchProvider *sharedProvider = nil;
         [sharedProvider release];
         sharedProvider = nil;
     }
+    return nil;
 }
 
 - (id)init
@@ -67,7 +69,8 @@ static SearchProvider *sharedProvider = nil;
     {
         _queries = [[NSMutableDictionary alloc] init];
         _twitterConnection = [[NSMutableDictionary alloc] init];
-        _twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+        //_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+        _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
         self.delegate = delegate;
     }
     return self;

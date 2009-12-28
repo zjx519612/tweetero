@@ -28,6 +28,7 @@
 #import "LocationManager.h"
 #import "MGTwitterEngine.h"
 #import "LoginController.h"
+#import "AccountManager.h"
 
 @implementation SettingsController
 
@@ -141,9 +142,11 @@
 
 - (void)accountChanged:(NSNotification*)notification
 {
-	if([MGTwitterEngine username] && [MGTwitterEngine password])
+	//if([MGTwitterEngine username] && [MGTwitterEngine password])
+    if ([[AccountManager manager] isValidLoggedUser])
 	{
-		loginInfo.text = [NSString stringWithFormat:NSLocalizedString(@"You are logged in to Twitter as %@", @""), [MGTwitterEngine username]];
+        UserAccount *account = [[AccountManager manager] loggedUserAccount];
+		loginInfo.text = [NSString stringWithFormat:NSLocalizedString(@"You are logged in to Twitter as %@", @""), [account username]];
 		[loginButton setTitle:NSLocalizedString(@"Change Account", @"") forState:0];
 	}
 	else

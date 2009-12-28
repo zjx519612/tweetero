@@ -26,12 +26,13 @@
 
 #import <UIKit/UIKit.h>
 
-@class MGTwitterEngine;
-
 #import "MessageListController.h"
 
-@interface HomeViewController : MessageListController 
-{
+@interface HomeViewController : MessageListController {
+@private
+    UIBarButtonItem *_topBarItem;
 }
+
+- (void)reload;
 
 @end

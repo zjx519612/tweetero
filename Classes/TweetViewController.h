@@ -40,7 +40,9 @@ enum {
 typedef enum {
 	TVNoMVOperations,
 	TVRetwit,
-	TVForward
+	TVForward,
+    TVFavorite,
+    TVDelete
 } TVMessageViewSuspendedOperations;
 
 
@@ -79,9 +81,14 @@ typedef enum {
     int                                  _currentMessageIndex;
     id <TweetViewDelegate>               _store;
     MGTwitterEngine                     *_twitter;
+    NSString                            *_connectionIdentifier;
+    BOOL                                 isFavorited, _isCurrentUserMessage;
+    Class                                _dataSourceClass;
 }
 
 @property (nonatomic, retain) UIActionSheet *_progressSheet;
+@property (nonatomic, retain) NSString *connectionIdentifier;
+@property (nonatomic, assign) Class dataSourceClass;
 
 - (id)initWithStore:(id <TweetViewDelegate>)store messageIndex:(int)index;
 - (id)initWithStore:(id <TweetViewDelegate>)store;

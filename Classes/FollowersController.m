@@ -26,6 +26,7 @@
 #import "FollowersController.h"
 #import "LoginController.h"
 #import "MGTwitterEngine.h"
+#import "MGTwitterEngineFactory.h"
 #import "MGTwitterEngine+UserFollowers.h"
 #import "ImageLoader.h"
 #import "UserInfo.h"
@@ -53,7 +54,8 @@
 		[self releaseActivityIndicator];
 	}
 	
-	[_indicator release];
+    [_activity release];
+    
 	int connectionsCount = [_twitter numberOfConnections];
 	[_twitter closeAllConnections];
 	[_twitter removeDelegate];
@@ -69,18 +71,13 @@
 {
     [super viewDidLoad];
 	
-	_loading = [MGTwitterEngine username] != nil;
+    if (_activity == nil)
+        _activity = [[TwActivityIndicator alloc] init];
+    
+	_loading = [[AccountManager manager] isValidLoggedUser];
 	_indicatorCount = 0;
-	_indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
 	
-	CGRect frame = self.tableView.frame;
-	CGRect indFrame = _indicator.frame;
-	frame.origin.x += (frame.size.width - indFrame.size.width) * 0.5f;
-	frame.origin.y += (frame.size.height - indFrame.size.height) * 0.3f;
-	frame.size = indFrame.size;
-	_indicator.frame = frame;
-	
-	_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+    _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(accountChanged:) name:@"AccountChanged" object:nil];
 	
 	[self performSelector:@selector(reloadAll) withObject:nil afterDelay:0.5f];
@@ -186,7 +183,8 @@
 {
 	if([self noUsers])
 	{
-		cell.textLabel.text = _loading? [self loadingMessagesString]: [self noUsersString];
+		//cell.textLabel.text = _loading? [self loadingMessagesString]: [self noUsersString];
+        cell.textLabel.text = _loading ? @"" : [self noUsersString];
 		return;
 	}
     
@@ -198,8 +196,15 @@
 		UIImageView *imageView = (UIImageView *)[cell viewWithTag:IMAGE_TAG];
 		//imageView.image = nil;
 		//[[ImageLoader sharedLoader] setImageWithURL:[userData objectForKey:@"profile_image_url"] toView:imageView];
-        UIImage *avatar = [[ImageLoader sharedLoader] imageWithURL:[userData objectForKey:@"profile_image_url"]];
-		imageView.image = avatar;
+        
+        //UIImage *avatar = [[ImageLoader sharedLoader] imageWithURL:[userData objectForKey:@"profile_image_url"]];
+        //CGSize avatarViewSize = CGSizeMake(48, 48);
+        //if(avatar.size.width > avatarViewSize.width || avatar.size.height > avatarViewSize.height)
+        //    avatar = imageScaledToSize(avatar, avatarViewSize.width);
+
+        CGSize avatarViewSize = CGSizeMake(48, 48);
+        
+        imageView.image = loadAndScaleImage([userData objectForKey:@"profile_image_url"], avatarViewSize);
         
 		UILabel *label;
 		//Set user name
@@ -336,7 +341,7 @@
 #pragma mark ===
 - (void)loadFollowers
 {
-	if([MGTwitterEngine password] != nil)
+    if ([[AccountManager manager] isValidLoggedUser])
 	{
 		_loading = YES;
 		[self retainActivityIndicator];
@@ -358,9 +363,12 @@
 {
 	if(++_indicatorCount == 1)
 	{
-		[self.tableView.superview addSubview:_indicator];
-		[_indicator startAnimating];
+        [_activity.messageLabel setText:[self loadingMessagesString]];
+        [_activity show];
 	}
+    
+    if (_activity)
+        [_activity.messageLabel setText:[self loadingMessagesString]];
 }
 
 - (void)releaseActivityIndicator
@@ -369,8 +377,7 @@
 	{
 		if(--_indicatorCount == 0)
 		{
-			[_indicator stopAnimating];
-			[_indicator removeFromSuperview];
+            [_activity hide];
 		}
 	}
 }
@@ -409,7 +416,7 @@
 {
 	[super loadFollowers];
 	
-	if([MGTwitterEngine password] != nil)
+    if ([[AccountManager manager] isValidLoggedUser])
 	{
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
 		if (_username)
@@ -453,7 +460,7 @@
 {
 	[super loadFollowers];
 	
-	if([MGTwitterEngine password] != nil)
+    if ([[AccountManager manager] isValidLoggedUser])
 	{
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
 		[_twitter getRecentlyUpdatedFriendsFor:_username startingAtPage:0];

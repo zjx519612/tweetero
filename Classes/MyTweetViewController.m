@@ -17,16 +17,22 @@
     [super viewDidLoad];
     
 	self.navigationItem.title = @"MyTweets";
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(twittsUpdatedNotificationHandler:) name:@"TwittsUpdated" object:nil];
+}
+
+- (void)dealloc 
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [super dealloc];
 }
 
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count
 {
 	[super loadMessagesStaringAtPage:numPage count:count];
-	if ([MGTwitterEngine password] != nil)
+    if ([[AccountManager manager] isValidLoggedUser])
 	{
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
 		[_twitter getUserTimelineFor:nil since:nil startingAtPage:numPage count:count];
-		self.navigationItem.title = [MGTwitterEngine username];
 	}
 }
 
@@ -38,6 +44,23 @@
 - (NSString*)loadingMessagesString
 {
 	return NSLocalizedString(@"Loading Tweets...", @"");
+}
+
+- (void)reload
+{
+    [self reloadAll];
+}
+
+- (void)twittsUpdatedNotificationHandler:(NSNotification*)note
+{
+    id object = [note object];
+    
+    if ([object respondsToSelector:@selector(dataSourceClass)])
+    {
+        Class ds_class = [object dataSourceClass];
+        if (ds_class == [self class])
+            [self reload];
+    }
 }
 
 @end

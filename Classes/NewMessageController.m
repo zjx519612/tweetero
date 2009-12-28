@@ -28,6 +28,7 @@
 #import "MGTwitterEngine.h"
 #import "TweetterAppDelegate.h"
 #import "TweetQueue.h"
+#import "MGTwitterEngineFactory.h"
 
 @implementation NewMessageController
 
@@ -108,7 +109,8 @@
 	_textModified = NO;
 	self.navigationItem.rightBarButtonItem = sendButton;
 	self.navigationItem.leftBarButtonItem = cancelButton;
-	_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+	//_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+    _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
 	_message = nil;
 	_user = nil;
 	textEdit.text = @"";

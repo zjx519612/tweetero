@@ -26,25 +26,29 @@
 
 #import <UIKit/UIKit.h>
 #import "TweetViewController.h"
-@class MGTwitterEngine;
+#import "TwActivityIndicator.h"
 
 #define MESSAGES_PER_PAGE 20
 
 @interface MessageListController : UITableViewController <TweetViewDelegate>
 {
 	MGTwitterEngine *_twitter;
-	NSArray *_messages;
+	
+    NSArray *_messages;
+    NSMutableDictionary *_messageObjects;
+    
 	int _pagenum;
 	BOOL _lastMessage;
 	UIActivityIndicatorView *_indicator;
+    
+    
+    TwActivityIndicator *_processIndicator;
+    
 	int _indicatorCount;
 	BOOL _loading;
 	NSString *_errorDesc;
-    UINavigationController *_rootNavigationController;
     NSMutableDictionary *_yFrogImages;
 }
-
-@property (nonatomic, retain) UINavigationController *rootNavigationController;
 
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count;
 - (void)reloadAll;
