@@ -196,9 +196,8 @@ UIImage* imageScaledToSize(UIImage* image, int maxDimension)
     }  
 	
     UIGraphicsBeginImageContext(bounds.size);
-	
     CGContextRef context = UIGraphicsGetCurrentContext();  
-	
+    
     if (orient == UIImageOrientationRight || orient == UIImageOrientationLeft)
 	{
         CGContextScaleCTM(context, -scaleRatio, scaleRatio);
@@ -209,13 +208,61 @@ UIImage* imageScaledToSize(UIImage* image, int maxDimension)
         CGContextScaleCTM(context, scaleRatio, -scaleRatio);
         CGContextTranslateCTM(context, 0, -height);  
     }  
-	
-    CGContextConcatCTM(context, transform);  
-	
+    
+    CGContextConcatCTM(context, transform);
     CGContextDrawImage(UIGraphicsGetCurrentContext(), CGRectMake(0, 0, width, height), imgRef);  
-    UIImage *imageCopy = UIGraphicsGetImageFromCurrentImageContext();  
-    UIGraphicsEndImageContext();  
+    UIImage *imageCopy = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return imageCopy;
 	
+}
+
+UIImage* imageScaledToSizeThreadSafe(UIImage* image, int maxDimension)
+{
+	CGImageRef imgRef = image.CGImage;  
+	
+	CGFloat width = CGImageGetWidth(imgRef);
+	CGFloat height = CGImageGetHeight(imgRef);
+	
+	CGRect bounds = CGRectMake(0, 0, width, height);  
+	
+	if(maxDimension > 0) //need scale
+	{
+        if (width > maxDimension || height > maxDimension) 
+        {  
+            CGFloat ratio = width / height;  
+            if (ratio > 1)
+            {  
+                bounds.size.width = maxDimension;  
+                bounds.size.height = bounds.size.width / ratio;  
+            }  
+            else
+            {  
+                bounds.size.height = maxDimension;  
+                bounds.size.width = bounds.size.height * ratio;  
+            }  
+        }
+	}
+
+    unsigned int bytes_per_row = CGImageGetBytesPerRow(imgRef);
+    unsigned int image_height = bounds.size.height;
+    unsigned int image_width = bounds.size.width;
+    size_t bits_per_component = CGImageGetBitsPerComponent(imgRef);
+    
+    CGContextRef context;
+    
+    context = CGBitmapContextCreate(NULL, image_width, image_height, bits_per_component, bytes_per_row, CGImageGetColorSpace(imgRef), CGImageGetBitmapInfo(imgRef));
+	
+    CGContextDrawImage(context, CGRectMake(0, 0, image_width, image_height), imgRef);
+    
+    CGImageRef scaledImageRef = CGBitmapContextCreateImage(context);
+    
+    UIImage *imageCopy = [UIImage imageWithCGImage:scaledImageRef];
+    
+    CFRelease(scaledImageRef);
+    CGContextRelease(context);
+    
     return imageCopy;
 	
 }

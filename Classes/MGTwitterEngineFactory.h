@@ -12,8 +12,12 @@
 @interface MGTwitterEngineFactory : NSObject {
 }
 
++ (MGTwitterEngineFactory*)factory;
+
 + (MGTwitterEngine*)createTwitterEngineForCurrentUser:(id)del;
 
 - (MGTwitterEngine*)createTwitterEngineForUserAccount:(UserAccount*)account delegate:(id)del;
+
+- (NSDictionary*)createTwitterAuthorizationFields:(UserAccount*)account;
 
 @end

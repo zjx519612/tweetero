@@ -215,6 +215,8 @@ static NSString* kActionCell = @"UserInfoActionCell";
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	
     NSLog(@"NETWORK_FAILED: %@", connectionIdentifier);
+    NSLog(@"%@", error);
+    
 	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Network Failure", @"")
                                                     message: [error localizedDescription]
 												   delegate: self 

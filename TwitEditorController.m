@@ -1075,7 +1075,7 @@
         {
             imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
             if([imgPicker respondsToSelector:@selector(setMediaTypes:)])
-                [imgPicker performSelector:@selector(setMediaTypes:) withObject:[NSArray arrayWithObject:K_UI_TYPE_MOVIE]];
+                [imgPicker performSelector:@selector(setMediaTypes:) withObject:[NSArray arrayWithObjects:K_UI_TYPE_MOVIE, K_UI_TYPE_IMAGE, nil]];
             [self presentModalViewController:imgPicker animated:YES];
         }
     }

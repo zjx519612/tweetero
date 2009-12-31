@@ -100,9 +100,8 @@
 
 - (NSDictionary*)authRequestFields
 {
-    NSString *urlString = [NSString stringWithFormat:@"%@://%@/%@", 
-                           (_secureConnection) ? @"https" : @"http",
-                           _APIDomain, @"statuses/user_timeline.json"];
+    NSString *urlString = @"https://twitter.com/account/verify_credentials.xml";
+    
     NSURL *finalURL = [NSURL URLWithString:urlString];
     if (!finalURL) {
         return nil;
@@ -111,10 +110,11 @@
 	OAMutableURLRequest *theRequest = [[[OAMutableURLRequest alloc] initWithURL:finalURL
 																	   consumer:self.consumer 
 																		  token:_accessToken 
-																		  realm: nil
+																		  realm:nil
 															  signatureProvider:nil] autorelease];
     [theRequest prepare];
     
+    NSLog(@"SIGNATURE %@", [theRequest signature]);
     NSMutableDictionary *fields = [NSMutableDictionary dictionary];
     
     NSString *authParam = [[theRequest allHTTPHeaderFields] objectForKey:@"Authorization"];
@@ -136,9 +136,12 @@
             key = [keyValue objectAtIndex:0];
             value = [keyValue objectAtIndex:1];
             
-            key = [key stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            value = [value stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\""]];
             if (key && value) {
+                key = [key stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+                value = [value stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\""]];
+                value = [value stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+                
                 [fields setObject:value forKey:key];
             }
         }

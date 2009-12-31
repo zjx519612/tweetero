@@ -74,6 +74,8 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     self.canAnimate = YES;
+    self.navigationItem.rightBarButtonItem.enabled = YES;
+    self.navigationItem.leftBarButtonItem.enabled = YES;
 }
 
 - (void)viewDidLoad
@@ -165,6 +167,9 @@
         
         UserAccount *account = [self.accountManager accountByUsername:cell.textLabel.text];
 
+        self.navigationItem.rightBarButtonItem.enabled = NO;
+        self.navigationItem.leftBarButtonItem.enabled = NO;
+        
         // Login with user
         [self.accountManager login:account];
         
@@ -239,6 +244,8 @@
     if ([connectionIdentifier isEqualToString:_credentialIdentifier])
         [self showTabController];
     _credentialIdentifier = nil;
+    self.navigationItem.rightBarButtonItem.enabled = YES;
+    self.navigationItem.leftBarButtonItem.enabled = YES;
 }
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
@@ -252,6 +259,9 @@
     
     [_twitter release];
     _credentialIdentifier = nil;
+    
+    self.navigationItem.rightBarButtonItem.enabled = YES;
+    self.navigationItem.leftBarButtonItem.enabled = YES;
 }
 
 @end

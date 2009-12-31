@@ -40,7 +40,7 @@
 #import "FollowersController.h"
 #import "MyTweetViewController.h"
 #import "AccountController.h"
-
+#import "TwTabController.h"
 #import "ISVideoUploadEngine.h"
 #import "AccountManager.h"
 
@@ -88,10 +88,11 @@ static int NetworkActivityIndicatorCounter = 0;
 {
     @try
     {
-        if (![navigationController.topViewController isKindOfClass:[TwitEditorController self]] && 
+        if ([navigationController.topViewController isKindOfClass:[TwTabController self]] &&
             ![navigationController.modalViewController isKindOfClass:[UIImagePickerController self]])
         {
             UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+            
             if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera] &&
                 UIInterfaceOrientationIsLandscape(orientation))
             {
@@ -172,7 +173,6 @@ static int NetworkActivityIndicatorCounter = 0;
 	{
         CGRect mapViewFrame = self.window.frame;
         
-        NSLog(@"x = %f, y = %f, w = %f, h = %f", mapViewFrame.origin.x, mapViewFrame.origin.y, mapViewFrame.size.width, mapViewFrame.size.height);
 		id mapView = [[MapViewClass alloc] initWithFrame:mapViewFrame];
 		[mapView setDelegate:self];
         
@@ -180,11 +180,6 @@ static int NetworkActivityIndicatorCounter = 0;
         container.title = @"Maps";
 		container.view = mapView;
 		
-        //container.view = [[UIView alloc] initWithFrame:mapViewFrame];
-        //UILabel *test = [[UILabel alloc] initWithFrame:CGRectMake(20, 20, 240, 40)];
-        //test.text = @"Test Message";
-        //[container.view addSubview:test];
-        
         [mapView release];
         
 		CLLocationCoordinate2D location;
