@@ -263,7 +263,11 @@
         if (!isNullable(protectedValue))
             isProtected = [protectedValue boolValue];
         
-        if (!isProtected)
+        NSString *userScreenname = [userInfo objectForKey:@"screen_name"];
+        
+        NSString *currentUserScreenname = [MGTwitterEngine username];
+        
+        if (!isProtected || [userScreenname isEqualToString:currentUserScreenname])
         {
             UserInfo *infoView = [[UserInfo alloc] initWithUserName:[userInfo objectForKey:@"screen_name"]];
             [self.navigationController pushViewController:infoView animated:YES];

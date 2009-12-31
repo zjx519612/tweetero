@@ -15,6 +15,11 @@
 
 @implementation MGTwitterEngineFactory
 
++ (MGTwitterEngineFactory*)factory
+{
+    return [[[MGTwitterEngineFactory alloc] init] autorelease];
+}
+
 + (MGTwitterEngine*)createTwitterEngineForCurrentUser:(id)del
 {
     MGTwitterEngineFactory *factory = [[[MGTwitterEngineFactory alloc] init] autorelease];
@@ -46,13 +51,62 @@
         [oaEngine setConsumerSecret:kTweeteroConsumerSecret];
         [oaEngine authorizeWithAccessTokenString:account.secretData];
         
-        NSDictionary *dict = [oaEngine authRequestFields];
-        NSLog(@"%@", dict);
-        
         engine = oaEngine;
     }
     
     return [engine autorelease];
+}
+
+- (NSDictionary*)createTwitterAuthorizationFields:(UserAccount*)account
+{
+    if (account == nil)
+        return nil;
+    
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    
+    if (account.authType == TwitterAuthCommon)
+    {
+        [params setObject:[account username] forKey:@"username"];
+        [params setObject:[account secretData] forKey:@"password"];
+    }
+    else if (account.authType == TwitterAuthOAuth)
+    {
+        SA_OAuthTwitterEngine *oaEngine = [[SA_OAuthTwitterEngine alloc] initOAuthWithDelegate:self];
+        
+        [oaEngine setConsumerKey:kTweeteroConsumerKey];
+        [oaEngine setConsumerSecret:kTweeteroConsumerSecret];
+        [oaEngine authorizeWithAccessTokenString:account.secretData];
+        
+        [params setObject:@"oauth" forKey:@"auth"];
+        [params setObject:[account username] forKey:@"username"];
+        
+        NSDictionary *oauthFields = [oaEngine authRequestFields];
+        
+        //https://twitter.com/account/verify_credentials.xml?
+        //      oauth_version=%@&
+        //      oauth_nonce=%@&
+        //      oauth_timestamp=%@&
+        //      oauth_consumer_key=%@&
+        //      oauth_token=%@&
+        //      oauth_signature_method=%@&
+        //      oauth_signature=%@
+        
+        NSString *credential = [NSString stringWithFormat:kYFrogVerifyCredentialUrlMask,
+                                    [oauthFields objectForKey:@"oauth_version"],
+                                    [oauthFields objectForKey:@"oauth_nonce"],
+                                    [oauthFields objectForKey:@"oauth_timestamp"],
+                                    [oauthFields objectForKey:@"oauth_consumer_key"],
+                                    [oauthFields objectForKey:@"oauth_token"],
+                                    [oauthFields objectForKey:@"oauth_signature_method"],
+                                    [oauthFields objectForKey:@"oauth_signature"]
+                                ];
+        
+        [params setObject:credential forKey:@"verify_url"];
+        
+        [oaEngine release];
+    }
+    
+    return params;
 }
 
 @end

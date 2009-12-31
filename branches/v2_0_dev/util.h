@@ -41,6 +41,7 @@ UIActionSheet * ShowActionSheet(NSString* title, id <UIActionSheetDelegate> dele
 	
 // may cause a crash in non main thead
 UIImage* imageScaledToSize(UIImage* image, int maxDimension);
+UIImage* imageScaledToSizeThreadSafe(UIImage* image, int maxDimension);
 int isImageNeedToConvert(UIImage* testImage, BOOL *needToResize, BOOL *needToRotate);
 
 NSArray* linksFromText(NSString *text);

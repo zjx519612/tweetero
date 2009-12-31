@@ -154,7 +154,7 @@
         msgView = [[NewMessageController alloc] init];
     else
         msgView = [[TwitEditorController alloc] init];
-    [_navigatedController.navigationController pushViewController:msgView animated:YES];
+    [self.navigationController pushViewController:msgView animated:YES];
 	[msgView editUnsentMessage:index.row];
 	[msgView release];
 }
@@ -271,7 +271,7 @@
     
 	if(![[AccountManager manager] isValidLoggedUser])
 	{
-        [AccountController showAccountController:_navigatedController.navigationController];
+        [AccountController showAccountController:self.navigationController];
 		return;
 	}
 
@@ -314,9 +314,13 @@
 	[super viewWillAppear:animated];
 	[self enableModifyButtons:NO];
     
-	queueSegmentedControl.frame = CGRectMake(0, 0, 130, 30);
-	[queueSegmentedControl setWidth:35 forSegmentAtIndex:0];
-	[queueSegmentedControl setWidth:40 forSegmentAtIndex:1];
+	queueSegmentedControl.frame = CGRectMake(0, 0, 129, 30);
+	//[queueSegmentedControl setWidth:35 forSegmentAtIndex:0];
+	//[queueSegmentedControl setWidth:40 forSegmentAtIndex:1];
+	[queueSegmentedControl setWidth:43 forSegmentAtIndex:0];
+	[queueSegmentedControl setWidth:43 forSegmentAtIndex:1];
+    [queueSegmentedControl setWidth:43 forSegmentAtIndex:2];
+    
 	queueSegmentedControl.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 	queueSegmentedControl.segmentedControlStyle = UISegmentedControlStyleBar;
     

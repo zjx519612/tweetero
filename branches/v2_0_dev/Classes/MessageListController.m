@@ -37,17 +37,7 @@
 #import "TwitterMessageObject.h"
 #import "TwMessageCell.h"
 
-#define NAME_TAG            1
-#define TIME_TAG            2
-#define IMAGE_TAG           3
-#define TEXT_TAG            4
-#define YFROG_IMAGE_TAG     5
-#define FAVICON_TAG         6
 #define ROW_HEIGHT          70
-
-@interface MessageListController(Private)
-- (void)updateYFrogImages;
-@end
 
 @interface MessageListController(TwitterMessageObjectManagament)
 - (void)initTwitterMessageObjectCache;
@@ -62,7 +52,6 @@
 
 @interface MessageListController(ThumbnailLoader)
 - (void)loadThumbnailsForMessageObject:(TwitterMessageObject*)message;
-//- (void)loadThumbnailsThread:(TwitterMessageObject*)message;
 - (void)loadThumbnailsThread:(NSDictionary*)data;
 @end
 
@@ -70,15 +59,13 @@
 
 - (void)dealloc
 {
-    ISLog(@"Destroy object");
+    ISLog(@"DEALLOC MESSAGE_LIST_CONTROLLER");
     
     [self releaseTwitterMessageObjectCache];
 	while (_indicatorCount) 
 	{
 		[self releaseActivityIndicator];
 	}
-	
-	[_indicator release];
 	
 	int connectionsCount = [_twitter numberOfConnections];
 	[_twitter closeAllConnections];
@@ -107,18 +94,6 @@
 	_lastMessage = NO;
 	_loading = [[AccountManager manager] isValidLoggedUser];
 	_indicatorCount = 0;
-	_indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-	
-    _indicator.autoresizingMask = UIViewAutoresizingNone;
-    
-	CGRect frame = self.tableView.frame;
-
-	CGRect indFrame = _indicator.frame;
-	frame.origin.x += (frame.size.width - indFrame.size.width) * 0.5f;
-	frame.origin.y += (frame.size.height - indFrame.size.height) * 0.3f;
-	frame.size.width = indFrame.size.width;
-    frame.size.height = indFrame.size.height;
-	_indicator.frame = frame;
 	
     _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(accountChanged:) name:@"AccountChanged" object:nil];
@@ -179,25 +154,6 @@
 		_lastMessage? [_messages count]: [_messages count] + 1;
 }
 
-/*
-#define IMAGE_SIDE              48
-#define BORDER_WIDTH            5
-
-#define TEXT_OFFSET_X           (BORDER_WIDTH * 2 + IMAGE_SIDE)
-#define TEXT_OFFSET_Y           (BORDER_WIDTH * 2 + LABEL_HEIGHT)
-#define TEXT_WIDTH              (320 - TEXT_OFFSET_X - BORDER_WIDTH) - YFROG_IMAGE_WIDTH - BORDER_WIDTH
-#define TEXT_HEIGHT             (ROW_HEIGHT - TEXT_OFFSET_Y - BORDER_WIDTH)
-
-#define LABEL_HEIGHT            20
-#define LABEL_WIDTH             130
-
-//#define YFROG_IMAGE_X           TEXT_OFFSET_X + TEXT_WIDTH + BORDER_WIDTH
-//#define YFROG_IMAGE_Y           TEXT_OFFSET_Y
-#define YFROG_IMAGE_WIDTH       48
-
-#define YFROG_IMAGE_X           TEXT_OFFSET_X
-#define YFROG_IMAGE_Y           TEXT_OFFSET_Y + TEXT_HEIGHT
-*/
 - (UITableViewCell *)tableviewCellWithReuseIdentifier:(NSString *)identifier 
 {
 	if([identifier isEqualToString:@"UICell"])
@@ -212,79 +168,7 @@
     
 	if([identifier isEqualToString:@"TwittListCell"])
 	{
-		CGRect rect;
-        
-		rect = CGRectMake(0.0, 0.0, 320.0, ROW_HEIGHT);
-        UITableViewCell *cell = [[[TwMessageCell alloc] initWithFrame:rect reuseIdentifier:identifier] autorelease];
-
-        /*
-		
-		UITableViewCell *cell = [[[UITableViewCell alloc] initWithFrame:rect reuseIdentifier:identifier] autorelease];
-		
-		//Userpic view
-		rect = CGRectMake(BORDER_WIDTH, (ROW_HEIGHT - IMAGE_SIDE) / 2.0, IMAGE_SIDE, IMAGE_SIDE);
-        CustomImageView *imageView = [[CustomImageView alloc] initWithFrame:rect];
-		imageView.tag = IMAGE_TAG;
-		[cell.contentView addSubview:imageView];
-		[imageView release];
-		
-		
-		UILabel *label;
-		
-		//Username
-		rect = CGRectMake(TEXT_OFFSET_X, BORDER_WIDTH, LABEL_WIDTH, LABEL_HEIGHT);
-		label = [[UILabel alloc] initWithFrame:rect];
-		label.tag = NAME_TAG;
-		label.font = [UIFont boldSystemFontOfSize:[UIFont labelFontSize]];
-		label.highlightedTextColor = [UIColor whiteColor];
-		[cell.contentView addSubview:label];
-		label.opaque = NO;
-		label.backgroundColor = [UIColor clearColor];
-		
-		[label release];
-		
-		//Message creation time
-		rect = CGRectMake(TEXT_OFFSET_X + LABEL_WIDTH, BORDER_WIDTH, LABEL_WIDTH, LABEL_HEIGHT);
-		label = [[UILabel alloc] initWithFrame:rect];
-		label.tag = TIME_TAG;
-		label.font = [UIFont systemFontOfSize:[UIFont smallSystemFontSize]];
-		label.textAlignment = UITextAlignmentRight;
-		label.highlightedTextColor = [UIColor whiteColor];
-		label.textColor = [UIColor lightGrayColor];
-		[cell.contentView addSubview:label];
-		label.opaque = NO;
-		label.backgroundColor = [UIColor clearColor];
-		
-		[label release];
-
-		//Message body
-		rect = CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH, TEXT_HEIGHT);
-		label = [[UILabel alloc] initWithFrame:rect];
-		label.tag = TEXT_TAG;
-		label.lineBreakMode = UILineBreakModeWordWrap;
-		label.font = [UIFont systemFontOfSize:[UIFont systemFontSize]];
-		label.highlightedTextColor = [UIColor whiteColor];
-		label.numberOfLines = 0;
-		[cell.contentView addSubview:label];
-		label.opaque = NO;
-		label.backgroundColor = [UIColor clearColor];
-		
-		[label release];
-		
-        rect = CGRectMake(300, TEXT_OFFSET_Y, 16, 16);
-        UIImageView *favImageView = [[UIImageView alloc] initWithFrame:rect];
-        favImageView.tag = FAVICON_TAG;
-        [cell.contentView addSubview:favImageView];
-        [favImageView release];
-        
-        //CustomImageView *yFrogImage = [[CustomImageView alloc] initWithFrame:CGRectMake(YFROG_IMAGE_X, YFROG_IMAGE_Y, YFROG_IMAGE_WIDTH, YFROG_IMAGE_WIDTH)];
-        ActiveImageView *yFrogImage = [[ActiveImageView alloc] initWithFrame:CGRectMake(YFROG_IMAGE_X, YFROG_IMAGE_Y, YFROG_IMAGE_WIDTH, YFROG_IMAGE_WIDTH)];
-        yFrogImage.frameType = CIDefaultFrameType;
-        yFrogImage.tag = YFROG_IMAGE_TAG;
-        yFrogImage.backgroundColor = [UIColor clearColor];
-        [cell.contentView addSubview:yFrogImage];
-        [yFrogImage release];
-        */
+        UITableViewCell *cell = [[[TwMessageCell alloc] initWithFrame:CGRectMake(0.0, 0.0, 320.0, ROW_HEIGHT) reuseIdentifier:identifier] autorelease];
 		return cell;
 	}
 	
@@ -320,140 +204,11 @@
 
         TwitterMessageObject *object = [self twitterMessageObjectByDictionary:messageData];
         [((TwMessageCell*)cell) setTwitterMessageObject:object];
-        
-        /*
-        if (object)
-        {
-            CGRect cellFrame = [cell frame];
-            
-            //Set message text
-            UILabel *label;
-            
-            label = (UILabel *)[cell viewWithTag:TEXT_TAG];
-            label.text = object.message;
-            [label setFrame:CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH + YFROG_IMAGE_WIDTH, TEXT_HEIGHT)];
-            [label sizeToFit];
-            
-            // Load yFrog thumbnail
-            //CustomImageView *yFrogImage = (CustomImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
-            ActiveImageView *yFrogImage = (ActiveImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
-            
-            float row_max_y = 0;
-            
-            id image = (_yFrogImages) ? [_yFrogImages objectForKey:object.messageId] : nil;
-            if (image && (image != [NSNull null]))
-            {
-                CGRect image_frame = yFrogImage.frame;
-                
-                image_frame.origin.y = label.frame.origin.y + label.frame.size.height + BORDER_WIDTH;
-                yFrogImage.frame = image_frame;
-                yFrogImage.image = (UIImage*)image;
-                
-                row_max_y = image_frame.origin.y + image_frame.size.height + BORDER_WIDTH;
-            }
-            else
-            {
-                row_max_y = label.frame.origin.y + label.frame.size.height + BORDER_WIDTH;
-                yFrogImage.image = nil;
-            }
-            
-            cellFrame.size.height = max(row_max_y, ROW_HEIGHT);
-            [cell setFrame:cellFrame];
-            
-            label = (UILabel *)[cell viewWithTag:TIME_TAG];
-            label.text = object.creationFormattedDate;
-            
-            //Set userpic
-            CustomImageView *imageView = (CustomImageView *)[cell viewWithTag:IMAGE_TAG];
-            imageView.image = object.avatar;
-            
-            //Set user name
-            label = (UILabel *)[cell viewWithTag:NAME_TAG];
-            label.text = object.screenname;
-            
-            UIImageView *favView = (UIImageView*)[cell viewWithTag:FAVICON_TAG];
-            if (object.isFavorite)
-                favView.image = [UIImage imageNamed:@"statusfav.png"];
-            else
-                favView.image = nil;            
-        }
-         */
     }
 	else
 	{
         cellLabel.text = NSLocalizedString(@"Load More...", @"");
 	}
-    
-    /*
-	if(indexPath.row < [_messages count])
-	{
-		NSDictionary *messageData = [_messages objectAtIndex:indexPath.row];
-		NSDictionary *userData = [messageData objectForKey:@"user"];
-		if(!userData)
-			userData = [messageData objectForKey:@"sender"];
-		
-		CGRect cellFrame = [cell frame];
-		
-        //Set message text
-		UILabel *label;
-		label = (UILabel *)[cell viewWithTag:TEXT_TAG];
-		label.text = DecodeEntities([messageData objectForKey:@"text"]);
-        [label setFrame:CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH + YFROG_IMAGE_WIDTH, TEXT_HEIGHT)];
-		[label sizeToFit];
-        
-        // Load yFrog thumbnail
-        //CustomImageView *yFrogImage = (CustomImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
-        ActiveImageView *yFrogImage = (ActiveImageView*)[cell viewWithTag:YFROG_IMAGE_TAG];
-        
-        float row_max_y = 0;
-        
-        id image = (_yFrogImages) ? [_yFrogImages objectForKey:[messageData objectForKey:@"id"]] : nil;
-        if (image && (image != [NSNull null]))
-        {
-            CGRect image_frame = yFrogImage.frame;
-            
-            image_frame.origin.y = label.frame.origin.y + label.frame.size.height + BORDER_WIDTH;
-            yFrogImage.frame = image_frame;
-            yFrogImage.image = (UIImage*)image;
-            
-            row_max_y = image_frame.origin.y + image_frame.size.height + BORDER_WIDTH;
-        }
-        else
-        {
-            row_max_y = label.frame.origin.y + label.frame.size.height + BORDER_WIDTH;
-            yFrogImage.image = nil;
-        }
-        
-        cellFrame.size.height = max(row_max_y, ROW_HEIGHT);
-		[cell setFrame:cellFrame];
-        
-		NSDate *createdAt = [messageData objectForKey:@"created_at"];
-		label = (UILabel *)[cell viewWithTag:TIME_TAG];
-        label.text = FormatNSDate(createdAt);
-        
-		//Set userpic
-		CustomImageView *imageView = (CustomImageView *)[cell viewWithTag:IMAGE_TAG];
-        CGSize avatarViewSize = CGSizeMake(48, 48);
-        
-        imageView.image = loadAndScaleImage([userData objectForKey:@"profile_image_url"], avatarViewSize);
-        
-		//Set user name
-		label = (UILabel *)[cell viewWithTag:NAME_TAG];
-		label.text = [userData objectForKey:@"screen_name"];
-        
-        UIImageView *favView = (UIImageView*)[cell viewWithTag:FAVICON_TAG];
-        
-        id fav = [messageData objectForKey:@"favorited"];
-        if (fav && [fav boolValue])
-            favView.image = [UIImage imageNamed:@"statusfav.png"];
-        else
-            favView.image = nil;
-	} 
-	else
-	{
-        cellLabel.text = NSLocalizedString(@"Load More...", @"");
-	}
-    */
 }
 
 // Customize the appearance of table view cells.
@@ -479,7 +234,7 @@
 	if(indexPath.row >= [_messages count]) return 50;
 	
 	UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
-    NSLog(@"cell height = %f", cell.frame.size.height);
+    
 	return cell.frame.size.height;
 }
 
@@ -617,7 +372,6 @@
 		[messages release];
 	}
     
-    [self updateYFrogImages];
 	[self releaseActivityIndicator];
 	
 	if(self.navigationItem.leftBarButtonItem)
@@ -683,7 +437,6 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 		[messages release];
 	}
     
-	[self updateYFrogImages];
 	[self releaseActivityIndicator];
 	
 	if(self.navigationItem.leftBarButtonItem)
@@ -735,7 +488,9 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
         _processIndicator = [[TwActivityIndicator alloc] init];
     
     [_processIndicator.messageLabel setText:[self loadingMessagesString]];
-    if (self.navigationController.topViewController == self.parentViewController)
+    
+    if ([self.navigationController.topViewController class] == NSClassFromString(@"TwTabController") ||
+        [self.navigationController.topViewController class] == [self class])
     {
         if (_indicatorCount == 1)
         {
@@ -758,58 +513,6 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
                 [_processIndicator hide];
 		}
 	}
-}
-
-@end
-
-@implementation MessageListController(Private)
-
-- (void)loadThumbnailsFromYFrog {
-    if (_messages)
-    {
-        NSDictionary *copyOfMessage = [_messages copy];
-        
-        if (!_yFrogImages)
-            _yFrogImages = [[NSMutableDictionary alloc] init];
-        
-        NSDictionary *message;
-        NSEnumerator *en = [copyOfMessage objectEnumerator];
-        while ((message = (NSDictionary *)[en nextObject]))
-        {
-            id key = [message objectForKey:@"id"];
-            if ([_yFrogImages objectForKey:key] == nil)
-            {
-                NSString *yFrogLink = yFrogLinkFromText([message objectForKey:@"text"]);
-                if (yFrogLink)
-                {
-                    //CGSize size = CGSizeMake(YFROG_IMAGE_WIDTH, YFROG_IMAGE_WIDTH);
-                    CGSize size = CGSizeMake(48, 48);
-                    
-                    id image = loadAndScaleImage(yFrogLink, size);
-                    if (!image)
-                        image = [NSNull null];
-                    
-                    [_yFrogImages setObject:image forKey:key];
-                }
-            }
-        }
-        
-        [copyOfMessage release];
-    }
-    else if (_yFrogImages)
-    {
-        [_yFrogImages release];
-        _yFrogImages = nil;
-    }
-    [self.tableView reloadData];
-}
-
-- (void)updateYFrogImages
-{
-    ISLog(@"Update Images");
-    
-    //[self performSelectorInBackground:@selector(loadThumbnailsFromYFrog) withObject:nil];
-    //[self loadThumbnailsFromYFrog];
 }
 
 @end
@@ -838,7 +541,7 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
     
     NSString *text = [message objectForKey:@"text"];
     
-    messageObject.messageId             = [message objectForKey:@"id"];
+    messageObject.messageId             = [[message objectForKey:@"id"] stringValue];
     messageObject.screenname            = [userData objectForKey:@"screen_name"];
     messageObject.message               = DecodeEntities(text);
     messageObject.creationDate          = [message objectForKey:@"created_at"];
@@ -890,13 +593,15 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 {
     if (message == nil)
         return nil;
-    return [self lookupTwitterMessageObjectById:[message objectForKey:@"id"]];
+    
+    return [self lookupTwitterMessageObjectById:[[message objectForKey:@"id"] stringValue]];
 }
 
 - (TwitterMessageObject*)lookupTwitterMessageObjectById:(NSString*)messageId
 {
     if (_messageObjects == nil || messageId == nil)
         return nil;
+    
     return [_messageObjects objectForKey:messageId];
 }
 
@@ -926,10 +631,12 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
     {
         NSMutableDictionary *data = [NSMutableDictionary dictionary];
         
-        [data setObject:message.messageId forKey:@"id"];
+        NSString *copyId = [message.messageId copy];
+        [data setObject:copyId forKey:@"id"];
         [data setObject:message.yfrogLinks forKey:@"links"];
         
-         [self performSelectorInBackground:@selector(loadThumbnailsThread:) withObject:data];
+        [self performSelectorInBackground:@selector(loadThumbnailsThread:) withObject:data];
+        [copyId release];
     }
 }
 
@@ -942,7 +649,7 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
     
     CGSize thumbSize = CGSizeMake(48., 48.);
     
-    NSMutableArray *images = [[NSMutableArray alloc] init];
+    NSMutableArray *images = [NSMutableArray array]; //[[NSMutableArray alloc] init];
 
     for (NSString *link in links)
     {
@@ -950,20 +657,19 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
         {
             @try 
             {
-                //UIImage *image = loadAndScaleImage(link, thumbSize);
-                
-                //TEST
-                
                 NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:link]];
                 if (!imageData)
                     continue;
                 
                 UIImage *image = [UIImage imageWithData:imageData];
-                //END_TEST
-                
                 
                 if (image)
+                {
+                    if(image.size.width > thumbSize.width || image.size.height > thumbSize.height)
+                        image = imageScaledToSizeThreadSafe(image, thumbSize.width);
+                    
                     [images addObject:image];
+                }
             }
             @catch (...) {
             }
@@ -990,10 +696,10 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
         if (messageId && images)
         {
             TwitterMessageObject *object = [self lookupTwitterMessageObjectById:messageId];
+
             if (object)
                 object.yfrogThumbnails = images;
-            
-            [images release];
+            //[images release];
         }
         [result release];
         

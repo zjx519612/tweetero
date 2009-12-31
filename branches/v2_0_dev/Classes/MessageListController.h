@@ -32,21 +32,18 @@
 
 @interface MessageListController : UITableViewController <TweetViewDelegate>
 {
-	MGTwitterEngine *_twitter;
-	
-    NSArray *_messages;
+@protected
+	MGTwitterEngine     *_twitter;
+    
+@private
+    NSArray             *_messages;
     NSMutableDictionary *_messageObjects;
-    
-	int _pagenum;
-	BOOL _lastMessage;
-	UIActivityIndicatorView *_indicator;
-    
-    
+	int                  _pagenum;
+	BOOL                 _lastMessage;
     TwActivityIndicator *_processIndicator;
-    
-	int _indicatorCount;
-	BOOL _loading;
-	NSString *_errorDesc;
+	int                  _indicatorCount;
+	BOOL                 _loading;
+	NSString            *_errorDesc;
     NSMutableDictionary *_yFrogImages;
 }
 
@@ -54,4 +51,5 @@
 - (void)reloadAll;
 - (void)retainActivityIndicator;
 - (void)releaseActivityIndicator;
+
 @end

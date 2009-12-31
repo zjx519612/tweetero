@@ -26,7 +26,6 @@
 
 #import "HomeViewController.h"
 #import "MGTwitterEngine.h"
-#import "MessageListController.h"
 #import "TwitEditorController.h"
 #import "TweetterAppDelegate.h"
 
@@ -48,10 +47,7 @@
     
     UISegmentedControl *userActionButton = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"New", @"Refresh", nil]] autorelease];
     
-    CGRect frame = userActionButton.frame;
-    
-    frame.size.width = 80;
-    frame.size.height = 30;
+    CGRect frame = CGRectMake(235, 7, 80, 30);
     
     [userActionButton setFrame:frame];
     [userActionButton setSegmentedControlStyle:UISegmentedControlStyleBar];
@@ -134,6 +130,7 @@
     if ([[AccountManager manager] isValidLoggedUser])
 	{
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
+        
 		[_twitter getFollowedTimelineFor:nil since:nil startingAtPage:numPage count:count];
 	}
 }

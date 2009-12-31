@@ -113,7 +113,7 @@
         UIImage *favoriteImage = nil;
         if (object.isFavorite)
         {
-            NSLog(@"FAVORITE_IMAGE");
+            //NSLog(@"FAVORITE_IMAGE");
             favoriteImage = [UIImage imageNamed:@"statusfav.png"];
         }
         [_favoriteImage setImage:favoriteImage];

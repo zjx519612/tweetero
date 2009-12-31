@@ -26,7 +26,7 @@
 
 #import "yFrogImageUploader.h"
 #import "TweetterAppDelegate.h"
-#import "MGTwitterEngine.h"
+#import "MGTwitterEngineFactory.h"
 #import "LocationManager.h"
 #include "util.h"
 
@@ -96,14 +96,28 @@
 	//NSString* login = [MGTwitterEngine username];
 	//NSString* pass = [MGTwitterEngine password];
 	
-	NSString* login = [[[AccountManager manager] loggedUserAccount] username];
-	NSString* pass = @"";//[MGTwitterEngine password];
+    UserAccount *account = [[AccountManager manager] loggedUserAccount];
+    
+    MGTwitterEngineFactory *factory = [MGTwitterEngineFactory factory];
+    
+    NSDictionary *authFields = [factory createTwitterAuthorizationFields:account];
+    
+    if (authFields == nil) {
+		[delegate uploadedImage:nil sender:self];
+        return;
+    }
+    
+	//NSString* login = [account username];
+	//NSString* pass = @"";//[MGTwitterEngine password];
     
     //NSLog([[[AccountManager manager] loggedUserAccount] secretData]);
     
 	NSString *boundary = [NSString stringWithFormat:@"------%ld__%ld__%ld", random(), random(), random()];
 	
 	NSURL *url = [NSURL URLWithString:@"http://yfrog.com/api/upload"];
+    
+    //NSURL *url = [NSURL URLWithString:@"http://img643.yfrog.com/yfrog/api_impl.php?action=upload"];
+    
 	NSMutableURLRequest *req = tweeteroMutableURLRequest(url);
 	[req setHTTPMethod:@"POST"];
 
@@ -121,23 +135,33 @@
 	[postBody appendData:data];
 	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 	
-	[postBody appendData:[@"Content-Disposition: form-data; name=\"username\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-	[postBody appendData:[login dataUsingEncoding:NSUTF8StringEncoding]];
-	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+	//[postBody appendData:[@"Content-Disposition: form-data; name=\"username\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+	//[postBody appendData:[login dataUsingEncoding:NSUTF8StringEncoding]];
+	//[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 	
-	[postBody appendData:[@"Content-Disposition: form-data; name=\"password\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-	[postBody appendData:[pass dataUsingEncoding:NSUTF8StringEncoding]];
+	//[postBody appendData:[@"Content-Disposition: form-data; name=\"password\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+	//[postBody appendData:[pass dataUsingEncoding:NSUTF8StringEncoding]];
 	
+    for (NSString *key in [authFields allKeys]) {
+        NSString *value = [authFields objectForKey:key];
+        
+        //NSLog(@"Key: %@, Value: %@", key, value);
+        [postBody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
+        [postBody appendData:[value dataUsingEncoding:NSUTF8StringEncoding]];
+        [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+
+    //return;    //DEBUG
 	if([[LocationManager locationManager] locationDefined])
 	{
-		[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+		//[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 		
 		[postBody appendData:[@"Content-Disposition: form-data; name=\"tags\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
 		[postBody appendData:[[NSString stringWithFormat:@"geotagged, geo:lat=%+.6f, geo:lon=%+.6f", [[LocationManager locationManager] latitude], [[LocationManager locationManager] longitude]] dataUsingEncoding:NSUTF8StringEncoding]];
+        [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 	}
 
-	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-	
+	//[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 	[req setHTTPBody:postBody];
 
     [delegate uploadedDataSize:[postBody length]];
