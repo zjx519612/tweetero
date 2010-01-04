@@ -99,16 +99,32 @@ static SearchProvider *sharedProvider = nil;
 }
 
 // Return YES if query with query id present in dictionary
+/*
 - (BOOL)hasQueryById:(int)queryId
 {
     NSNumber *value = [NSNumber numberWithInt:queryId];
     return ([[_queries allValues] indexOfObjectIdenticalTo:value] != NSNotFound);
 }
+*/
+- (BOOL)hasQueryById:(NSString*)queryId
+{
+    return ([[_queries allValues] indexOfObjectIdenticalTo:queryId] != NSNotFound);
+}
 
 // Save query string in tweeter
+/*
 - (void)saveQuery:(NSString *)query forId:(int)queryId
 {
    if (![self hasQuery:query])
+    {
+        NSString *identifier = [_twitter searchSaveQuery:query];
+        [self setNotificationValue:SPSearchDidSaved forIdentifier:identifier];
+    }
+}
+*/
+- (void)saveQuery:(NSString *)query forId:(NSString*)queryId
+{
+    if (![self hasQuery:query])
     {
         NSString *identifier = [_twitter searchSaveQuery:query];
         [self setNotificationValue:SPSearchDidSaved forIdentifier:identifier];
@@ -118,9 +134,10 @@ static SearchProvider *sharedProvider = nil;
 // Remove saved search query
 - (void)removeQuery:(NSString *)query
 {
-    int queryId = [self queryId:query];
+    //int queryId = [self queryId:query];
+    NSString *queryId = [self queryId:query];
     
-    if (queryId > 0)
+    if (queryId != nil && [queryId intValue] > 0)
     {
         [_twitter searchDestroyQuery:queryId];
         [_queries removeObjectForKey:query];
@@ -129,6 +146,7 @@ static SearchProvider *sharedProvider = nil;
 }
 
 // Remove saved search query with query id
+/*
 - (void)removeQueryById:(int)queryId
 {
     if (queryId > 0)
@@ -143,8 +161,24 @@ static SearchProvider *sharedProvider = nil;
         }
     }
 }
+*/
+- (void)removeQueryById:(NSString*)queryId
+{
+    if (queryId > 0)
+    {
+        NSString *query = [self queryById:queryId];
+        
+        if (query)
+        {
+            [_twitter searchDestroyQuery:queryId];
+            [_queries removeObjectForKey:query];
+            [self updateQueries:nil];
+        }
+    }
+}
 
 // Return query string by id
+/*
 - (NSString *)queryById:(int)queryId
 {
     NSString *query = nil;
@@ -158,8 +192,24 @@ static SearchProvider *sharedProvider = nil;
     }
     return query;
 }
+*/
+- (NSString *)queryById:(NSString*)queryId
+{
+    NSString *query = nil;
+    for (NSString *key in [_queries allKeys])
+    {
+        NSString *value = [_queries objectForKey:key];
+        if (value && [value isEqualToString:queryId])
+        {
+            query = key;
+            break;
+        }
+    }
+    return query;
+}
 
 // Return id for query string
+/*
 - (int)queryId:(NSString *)query
 {
     NSNumber *value = [_queries objectForKey:query];
@@ -167,6 +217,12 @@ static SearchProvider *sharedProvider = nil;
         return 0;
     return [value unsignedLongValue];
 }
+ */
+- (NSString*)queryId:(NSString *)query
+{
+    return [_queries objectForKey:query];
+}
+
 
 // Return queries array
 - (NSArray *)allQueries
@@ -179,6 +235,7 @@ static SearchProvider *sharedProvider = nil;
 {
     SPNotificationValue notification = [self notificationForIdentifier:connectionIdentifier];
     
+    NSLog(@"%@", searchResults);
     if (notification == SPInvalidValue)
         return;
     
@@ -248,7 +305,7 @@ static SearchProvider *sharedProvider = nil;
         [self setNotificationValue:SPSearchData forIdentifier:identifier forQuery:query];
     }
 }
-
+/*
 - (void)searchForQueryId:(int)queryId
 {
     NSString *query = [self queryById:queryId];
@@ -259,8 +316,24 @@ static SearchProvider *sharedProvider = nil;
         [self setNotificationValue:SPSearchData forIdentifier:identifier forQuery:query];
     }
 }
-
+*/
+- (void)searchForQueryId:(NSString*)queryId
+{
+    NSString *query = [self queryById:queryId];
+    
+    if ([self validateQuery:query] == YES)
+    {
+        NSString *identifier = [_twitter getSearchSavedResultById:queryId];
+        [self setNotificationValue:SPSearchData forIdentifier:identifier forQuery:query];
+    }
+}
+/*
 - (void)searchForQueryId:(int)queryId fromPage:(int)page count:(int)count
+{
+    [self searchForQueryId:queryId];
+}
+*/
+- (void)searchForQueryId:(NSString*)queryId fromPage:(int)page count:(int)count
 {
     [self searchForQueryId:queryId];
 }
@@ -323,9 +396,11 @@ static SearchProvider *sharedProvider = nil;
             for (NSDictionary *search in data)
             {
                 NSString *query = [NSString stringWithString:[search objectForKey:@"query"]];
-                int queryId = [[search objectForKey:@"id"] intValue];
+                //int queryId = [[search objectForKey:@"id"] intValue];
+                NSString *queryId = [[search objectForKey:@"id"] stringValue];
                 
-                [_queries setObject:[NSNumber numberWithInt:queryId] forKey:query];
+                //[_queries setObject:[NSNumber numberWithInt:queryId] forKey:query];
+                [_queries setObject:queryId forKey:query];
             }
         }
         // Notificate delegate object about changing

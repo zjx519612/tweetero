@@ -314,6 +314,13 @@
     return cell;
 }
 
+- (NSString*)prepareCellText:(NSString*)text
+{
+    //NSString *new_text = [NSString stringWithFormat:@"<h1 style=\"font-family:Verdna;font-size:10px;\"><b>%@</b></h1>", text];
+    NSString *new_text = [NSString stringWithFormat:@"<b>%@</b>", text];
+    return new_text;
+}
+
 - (void)setCellData:(UITableViewCell *)cell data:(NSDictionary *)result
 {
     CustomImageView *avatar = (CustomImageView*)[cell viewWithTag:TAG_IMAGE];
@@ -335,6 +342,7 @@
     label.text = DecodeEntities([result objectForKey:@"text"]);
     label.frame = CGRectMake(BORDER_WIDTH * 2 + IMAGE_SIDE, fromHeight + BORDER_WIDTH, LABLE_WIDTH, LABLE_HEIGHT);
     [label sizeToFit];
+    
     height += label.frame.size.height;
     height += BORDER_WIDTH;
     

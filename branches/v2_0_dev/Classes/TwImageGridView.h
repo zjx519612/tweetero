@@ -32,6 +32,4 @@
 
 - (CGSize)calculateSize:(float)maxWidth;
 
-- (void)startLoad;
-
 @end
