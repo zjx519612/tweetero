@@ -18,10 +18,12 @@ enum {
 
 - (NSString *)getSearchSavedResult:(int)pageNum count:(int)count;
 
-- (NSString *)getSearchSavedResultById:(int)queryID;
+//- (NSString *)getSearchSavedResultById:(int)queryID;
+- (NSString *)getSearchSavedResultById:(NSString*)queryID;
 
 - (NSString *)searchSaveQuery:(NSString *)query;
 
-- (NSString *)searchDestroyQuery:(int)queryID;
+//- (NSString *)searchDestroyQuery:(int)queryID;
+- (NSString *)searchDestroyQuery:(NSString*)queryID;
 
 @end

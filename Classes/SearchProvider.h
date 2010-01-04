@@ -46,22 +46,27 @@ typedef enum {
 - (BOOL)hasQuery:(NSString *)query;
 
 // Return YES if query with query id present in dictionary
-- (BOOL)hasQueryById:(int)queryId;
+//- (BOOL)hasQueryById:(int)queryId;
+- (BOOL)hasQueryById:(NSString*)queryId;
 
 // Save query string in tweeter
-- (void)saveQuery:(NSString *)query forId:(int)queryId;
+//- (void)saveQuery:(NSString *)query forId:(int)queryId;
+- (void)saveQuery:(NSString *)query forId:(NSString*)queryId;
 
 // Remove saved search query
 - (void)removeQuery:(NSString *)query;
 
 // Remove saved search query with query id
-- (void)removeQueryById:(int)queryId;
+//- (void)removeQueryById:(int)queryId;
+- (void)removeQueryById:(NSString*)queryId;
 
 // Return query string by id
-- (NSString *)queryById:(int)queryId;
+//- (NSString *)queryById:(int)queryId;
+- (NSString *)queryById:(NSString*)queryId;
 
 // Return id for query string
-- (int)queryId:(NSString *)query;
+//- (int)queryId:(NSString *)query;
+- (NSString*)queryId:(NSString *)query;
 
 // Return queries array
 - (NSArray *)allQueries;
@@ -77,10 +82,12 @@ typedef enum {
 - (void)search:(NSString *)query fromPage:(int)page count:(int)count;
 
 // Search query in twitter with query id
-- (void)searchForQueryId:(int)queryId;
+//- (void)searchForQueryId:(int)queryId;
+- (void)searchForQueryId:(NSString*)queryId;
 
 // Search query in twitter with query id
-- (void)searchForQueryId:(int)queryId fromPage:(int)page count:(int)count;
+//- (void)searchForQueryId:(int)queryId fromPage:(int)page count:(int)count;
+- (void)searchForQueryId:(NSString*)queryId fromPage:(int)page count:(int)count;
 
 // Request twitter saved search
 - (void)savedSearch;

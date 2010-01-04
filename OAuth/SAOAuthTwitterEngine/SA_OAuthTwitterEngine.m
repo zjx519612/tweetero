@@ -326,9 +326,9 @@
 	// modificaiton from the base clase
 	// the base class appends parameters here
 	// --------------------------------------------------------------------------------
-	//    if (params) {
-	//        fullPath = [self _queryStringWithBase:fullPath parameters:params prefixed:YES];
-	//    }
+	if (params) {
+        fullPath = [self _queryStringWithBase:fullPath parameters:params prefixed:YES];
+	}
 	// --------------------------------------------------------------------------------
 
     NSString *urlString = [NSString stringWithFormat:@"%@://%@/%@", 
@@ -388,7 +388,7 @@
 	// our version "prepares" the oauth url request
 	// --------------------------------------------------------------------------------
 	[theRequest prepare];
-    
+
     // Create a connection using this request, with the default timeout and caching policy, 
     // and appropriate Twitter request and response types for parsing and error reporting.
     MGTwitterHTTPURLConnection *connection;
