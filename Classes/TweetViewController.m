@@ -488,6 +488,7 @@
 
 - (void)dealloc
 {
+    NSLog(@"DEALLOC TweetViewController");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     self.connectionIdentifier = nil;

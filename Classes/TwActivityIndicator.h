@@ -20,6 +20,8 @@
 
 - (void)showInView:(UIView*)view;
 
+- (void)showInRect:(CGRect)rect;
+
 - (void)hide;
 
 @end

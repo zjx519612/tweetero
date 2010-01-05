@@ -48,6 +48,7 @@
 		0073C083106A498A006A0D62 /* MGTwitterYAJLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C07D106A498A006A0D62 /* MGTwitterYAJLParser.m */; };
 		0073C0B8106A54D7006A0D62 /* searchutil.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C0B7106A54D7006A0D62 /* searchutil.m */; };
 		0075C6BD107610FB003A655F /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0075C6BC107610FB003A655F /* defaults.plist */; };
+		00851F8510F3578A00F178F7 /* TwLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 00851F8410F3578A00F178F7 /* TwLabel.m */; };
 		0088208D107251AC0055FC91 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0088208C107251AC0055FC91 /* MessageUI.framework */; };
 		00999DC910567D1D003906C7 /* TweetViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00999DC810567D1D003906C7 /* TweetViewController.m */; };
 		009CB0E7107396DA00E48555 /* ISVideoUploadEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 009CB0E6107396DA00E48555 /* ISVideoUploadEngine.m */; };
@@ -221,6 +222,8 @@
 		0073C07D106A498A006A0D62 /* MGTwitterYAJLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGTwitterYAJLParser.m; sourceTree = "<group>"; };
 		0073C0B6106A54D7006A0D62 /* searchutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = searchutil.h; sourceTree = "<group>"; };
 		0073C0B7106A54D7006A0D62 /* searchutil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = searchutil.m; sourceTree = "<group>"; };
+		00851F8310F3578A00F178F7 /* TwLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwLabel.h; sourceTree = "<group>"; };
+		00851F8410F3578A00F178F7 /* TwLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwLabel.m; sourceTree = "<group>"; };
 		0088208C107251AC0055FC91 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		00999DC710567D1D003906C7 /* TweetViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetViewController.h; sourceTree = "<group>"; };
 		00999DC810567D1D003906C7 /* TweetViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweetViewController.m; sourceTree = "<group>"; };
@@ -443,6 +446,8 @@
 				006B67A210E12B600043B992 /* TwMessageCell.m */,
 				006B67BF10E131740043B992 /* TwImageGridView.h */,
 				006B67C010E131740043B992 /* TwImageGridView.m */,
+				00851F8310F3578A00F178F7 /* TwLabel.h */,
+				00851F8410F3578A00F178F7 /* TwLabel.m */,
 			);
 			name = UIControls;
 			sourceTree = "<group>";
@@ -1034,6 +1039,7 @@
 				006B676C10E1197A0043B992 /* TwitterMessageObject.m in Sources */,
 				006B67A310E12B600043B992 /* TwMessageCell.m in Sources */,
 				006B67C110E131740043B992 /* TwImageGridView.m in Sources */,
+				00851F8510F3578A00F178F7 /* TwLabel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

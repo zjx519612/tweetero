@@ -40,7 +40,7 @@ typedef enum {
 @property (nonatomic, retain)   UIImage                     *avatar;
 @property (nonatomic)           BOOL                         follow;
 @property (nonatomic)           int                          buttons;
-@property (nonatomic, retain)   id <UserInfoViewDelegate>    delegate;
+@property (nonatomic, assign)   id <UserInfoViewDelegate>    delegate;
 
 - (void)disableFollowingButton:(BOOL)disabled;
 - (void)hideFollowingButton:(BOOL)hide;

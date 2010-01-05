@@ -50,15 +50,11 @@ const int kHeadTagLocation = 4;
 
 - (void)dealloc 
 {
+    self.delegate = nil;
     [username release];
     [screenname release];
     [location release];
     [avatar release];
-    if (self.delegate)
-    {
-        //[(id)self.delegate release];
-        self.delegate = nil;
-    }
     [detailButton release];
     [followButton release];
     [super dealloc];
