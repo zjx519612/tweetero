@@ -112,6 +112,18 @@
     [self setNeedsDisplay];
 }
 
+- (void)showInRect:(CGRect)rect
+{
+    [self.messageLabel sizeToFit];
+    CGRect labelFrame = [self.messageLabel frame];
+    self.frame = CGRectMake(0, 0, (int)labelFrame.size.width + 50, 80);
+    [self resize:rect];
+    [_indicator startAnimating];
+    UIWindow *wnd = [[[UIApplication sharedApplication] windows] objectAtIndex:0];
+    [wnd addSubview:self];
+    [self setNeedsDisplay];    
+}
+
 - (void)hide
 {
     [_indicator stopAnimating];

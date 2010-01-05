@@ -25,6 +25,8 @@ typedef enum {
     NSMutableDictionary     *_twitterConnection;
     MGTwitterEngine         *_twitter;
     id                       _delegate;
+    NSMutableDictionary     *_connections;
+    NSMutableArray          *_searchResult;
 }
 
 @property (nonatomic, readonly) MGTwitterEngine *twitter;
@@ -70,6 +72,10 @@ typedef enum {
 
 // Return queries array
 - (NSArray *)allQueries;
+
+- (BOOL)isEndOfSearch;
+
+- (void)closeSearch;
 
 @end
 

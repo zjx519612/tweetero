@@ -9,17 +9,22 @@
 #import <Foundation/Foundation.h>
 #import "SearchProvider.h"
 #import "TweetViewController.h"
+#import "TwActivityIndicator.h"
 
 @interface SearchController : UITableViewController <UISearchBarDelegate, SearchProviderDelegate, TweetViewDelegate>
 {
   @private
     IBOutlet UISearchBar        *_searchBar;
-    UIActivityIndicatorView     *_indicator;
+    TwActivityIndicator         *_indicator;
     UISearchDisplayController   *_searchController;
     SearchProvider              *_searchProvider;
-    NSArray                     *_result;
+    //NSArray                     *_result;
+    NSMutableArray              *_result;
     int                          _pageNum;
     NSString                    *_query;
+    BOOL                         _showSearchResult;
+    BOOL                         _hasConnectionError;
+    NSString                    *_emptyString;
 }
 
 @property (nonatomic, retain) SearchProvider *searchProvider;

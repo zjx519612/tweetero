@@ -1,4 +1,6 @@
 ﻿/* Russian File */
+"Search_NotFound"                               = "Не найдено ни одного сообщения...";
+"Search_IndicatorText"                          = "Поиск...";
 "Authorization_Message"                         = "Некорректное имя пользователя или пароль!";
 "Authorization_Title"                           = "Ошибка авторизации!";
 

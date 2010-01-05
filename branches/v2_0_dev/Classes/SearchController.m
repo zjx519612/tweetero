@@ -10,6 +10,7 @@
 #import "SearchController.h"
 #import "CustomImageView.h"
 #import "ImageLoader.h"
+#import "TwLabel.h"
 #include "util.h"
 
 // Tag identifire
@@ -30,6 +31,7 @@
 
 - (UITableViewCell *)createSearchResultCell:(UITableView*)tableView more:(BOOL)isMore;
 - (void)setCellData:(UITableViewCell *)cell data:(NSDictionary *)result;
+- (void)clearCell:(UITableViewCell *)cell;
 - (void)updateActionButton;
 - (void)reloadData;
 - (void)updateSearch;
@@ -48,11 +50,12 @@
     if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]))
     {
         _searchController = [[UISearchDisplayController alloc] initWithSearchBar:_searchBar contentsController:self];
-        _indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+        _indicator = [[TwActivityIndicator alloc] init];
         _result = nil;
         _pageNum = START_AT_PAGE;
-        
-        self.query = nil;
+        _showSearchResult = NO;
+        _emptyString = @"";
+        self.query = @"";
     }
     return self;
 }
@@ -69,10 +72,14 @@
 
 - (void)dealloc
 {
+    NSLog(@"DEALLOC SEARCH CONTROLLER");
     self.query = nil;
-    if (self.searchProvider)
+    if (self.searchProvider) {
+        [self.searchProvider closeSearch];
+        self.searchProvider.delegate = nil;
         self.searchProvider = nil;
-    
+    }
+    [TweetterAppDelegate decreaseNetworkActivityIndicator];
     [_result release];
     [_searchBar release];
     [_indicator release];
@@ -89,24 +96,28 @@
     _pageNum = START_AT_PAGE;
     _searchBar.text = self.query;
     self.navigationItem.titleView = _searchBar;
-    if (self.query != nil)
+    //if (self.query != nil)
+    if (_showSearchResult == NO)
         [_searchBar becomeFirstResponder];
-        
+    
+    if ([self.searchProvider isEndOfSearch] == NO)
+        [self activateIndicator:YES];
     [self updateActionButton];
     [self reloadData];
 }
 
 - (void)viewDidDisappear:(BOOL)animated 
 {
-    [self clear];
-    [self reloadData];
+    //[self clear];
+    //[self reloadData];
     
+    [self activateIndicator:NO];
     // Reset delegate in searchProvider object
-    if (self.searchProvider) 
-    {
-        self.searchProvider.delegate = nil;
-        self.searchProvider = nil;
-    }
+    //if (self.searchProvider) 
+    //{
+        //self.searchProvider.delegate = nil;
+        //self.searchProvider = nil;
+    //}
     [super viewDidDisappear:animated];
 }
 
@@ -130,10 +141,15 @@
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
     [TweetterAppDelegate increaseNetworkActivityIndicator];
-    
     [self clear];
+    _emptyString = @"";
+    [self.tableView reloadData];
     [self activateIndicator:YES];
+    
+    _result = [NSMutableArray new];
+    
     [self updateSearch];
+    [_searchBar resignFirstResponder];
 }
 
 - (BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar
@@ -150,33 +166,27 @@
 #pragma mark SearchProvider Delegate
 - (void)searchDidEnd:(NSArray *)recievedData forQuery:(NSString *)query
 {
-    if ([recievedData count] == 0)
-        return;
-    
-    NSArray *tempArray;
-    NSRange range;
-    
-    range.length = [recievedData count] - 1;
-    range.location = 0;
-    tempArray = [recievedData subarrayWithRange:range];
-
-    NSArray *newResult = _result;
-    if (newResult)
-    {
-        _result = [[newResult arrayByAddingObjectsFromArray:tempArray] retain];
-        [newResult release];
+    _emptyString = @"";
+    if (recievedData && [recievedData count] > 0) {
+        if (!_result)
+            _result = [NSMutableArray new];
+        [_result addObjectsFromArray:recievedData];
     }
-    else
-        _result = [tempArray retain];
-    
     [self reloadData];
-    [TweetterAppDelegate decreaseNetworkActivityIndicator];
-    [self activateIndicator:NO];
-    [_searchBar resignFirstResponder];
+    if ([self.searchProvider isEndOfSearch]) {
+        [TweetterAppDelegate decreaseNetworkActivityIndicator];
+        [self activateIndicator:NO];
+    }
 }
 
 - (void)searchDidEndWithError:(NSString *)query
 {
+    if ([self.searchProvider isEndOfSearch]) {
+        [TweetterAppDelegate decreaseNetworkActivityIndicator];
+        [self activateIndicator:NO];
+    }
+    _emptyString = NSLocalizedString(@"Search_NotFound", @"");
+    _hasConnectionError = YES;
 }
 
 - (void)searchProviderDidUpdated
@@ -193,12 +203,16 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    int count = 0;
+    int count = 1;
     
     if (_result)
+    {
         count = [_result count];
-    if (count == MAX_SEARCH_COUNT * _pageNum)
-        count++;
+        if (count == 0)
+            count = 1;
+        else if (count == MAX_SEARCH_COUNT * _pageNum)
+            count++;
+    }
     return count;
 }
 
@@ -207,16 +221,27 @@
     UITableViewCell *cell = nil;
     BOOL isMoreCell = YES;
     
-    if (indexPath.row < [_result count])
-        isMoreCell = NO;
-
-    cell = [self createSearchResultCell:tableView more:isMoreCell];
-    if (!isMoreCell)
+    if (_result && [_result count] > 0) 
     {
-        NSDictionary *searchResult = [_result objectAtIndex:indexPath.row];
-        
-        NSLog(@"SEARCH_RESULT: %@", searchResult);
-        [self setCellData:cell data:searchResult];
+        if (indexPath.row < [_result count])
+            isMoreCell = NO;
+        cell = [self createSearchResultCell:tableView more:isMoreCell];
+        if (!isMoreCell) 
+        {
+            NSDictionary *searchResult = [_result objectAtIndex:indexPath.row];
+            [self setCellData:cell data:searchResult];
+        }
+    }
+    else
+    {
+        cell = [self createSearchResultCell:tableView more:NO];
+        [self clearCell:cell];
+        cell.textLabel.textAlignment = UITextAlignmentCenter;
+        if (!_result)    
+            cell.textLabel.text = _hasConnectionError ? NSLocalizedString(@"Failed to create connection.", @"") : @"";
+        else
+            cell.textLabel.text = _emptyString;
+            
     }
     return cell;
 }
@@ -234,14 +259,17 @@
 	if(indexPath.row == [_result count])
     {
         ++_pageNum;
+        [self activateIndicator:YES];
         [self updateSearch];
     }
     else
     {
-        //TweetViewController *view = [[TweetViewController alloc] initWithStore:self messageIndex:indexPath.row];
-        //[self.navigationController pushViewController:view animated:YES];
-        //[view release];
+        _showSearchResult = YES;
+        TweetViewController *view = [[TweetViewController alloc] initWithStore:self messageIndex:indexPath.row];
+        [self.navigationController pushViewController:view animated:YES];
+        [view release];
     }
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 #pragma mark TweetViewDelegate
@@ -299,7 +327,7 @@
             [label release];
             
             // Create "Text" label
-            label = [[UILabel alloc] initWithFrame:CGRectMake(BORDER_WIDTH * 2 + IMAGE_SIDE, BORDER_WIDTH, LABLE_WIDTH, LABLE_HEIGHT)];
+            label = [[TwLabel alloc] initWithFrame:CGRectMake(BORDER_WIDTH * 2 + IMAGE_SIDE, BORDER_WIDTH, LABLE_WIDTH, LABLE_HEIGHT)];
             label.font = [UIFont systemFontOfSize:13];
             label.lineBreakMode = UILineBreakModeWordWrap;
             label.numberOfLines = 0;
@@ -310,37 +338,38 @@
             [label release];
         }
     }
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    cell.accessoryType = UITableViewCellAccessoryNone;
     return cell;
-}
-
-- (NSString*)prepareCellText:(NSString*)text
-{
-    //NSString *new_text = [NSString stringWithFormat:@"<h1 style=\"font-family:Verdna;font-size:10px;\"><b>%@</b></h1>", text];
-    NSString *new_text = [NSString stringWithFormat:@"<b>%@</b>", text];
-    return new_text;
 }
 
 - (void)setCellData:(UITableViewCell *)cell data:(NSDictionary *)result
 {
-    CustomImageView *avatar = (CustomImageView*)[cell viewWithTag:TAG_IMAGE];
-    id profileImageUrl = [result objectForKey:@"profile_image_url"];
-    if (!isNullable(profileImageUrl))
-        avatar.image = [[ImageLoader sharedLoader] imageWithURL:profileImageUrl];
-
     int doubleBorder = BORDER_WIDTH << 1;
     int height = 0;
-    UILabel *label = nil;
+
+    CustomImageView *avatar = (CustomImageView*)[cell viewWithTag:TAG_IMAGE];
+
+    UILabel *label = (UILabel*)[cell viewWithTag:TAG_FROM];
     
-    label = (UILabel*)[cell viewWithTag:TAG_FROM];
-    label.text = [result objectForKey:@"from_user"];
+    NSDictionary *user_info = [result objectForKey:@"user"];
+    if (user_info) {
+        id profileImageUrl = [user_info objectForKey:@"profile_image_url"];
+        if (!isNullable(profileImageUrl))
+            avatar.image = [[ImageLoader sharedLoader] imageWithURL:profileImageUrl];
+        label.text = [user_info objectForKey:@"screen_name"];
+    } else {
+        label.text = @"Unknown";
+        avatar.image = nil;
+    }
     height = label.frame.size.height;
     
     int fromHeight = label.frame.size.height;
     
-    label = (UILabel*)[cell viewWithTag:TAG_TEXT];
+    label = (TwLabel*)[cell viewWithTag:TAG_TEXT];
     label.text = DecodeEntities([result objectForKey:@"text"]);
     label.frame = CGRectMake(BORDER_WIDTH * 2 + IMAGE_SIDE, fromHeight + BORDER_WIDTH, LABLE_WIDTH, LABLE_HEIGHT);
+    
+    ((TwLabel*)label).mask = self.query;
     [label sizeToFit];
     
     height += label.frame.size.height;
@@ -354,6 +383,16 @@
     CGRect rc = cell.frame;
     rc.size.height = height;
     [cell setFrame:rc];
+}
+
+- (void)clearCell:(UITableViewCell *)cell
+{
+    CustomImageView *avatar = (CustomImageView*)[cell viewWithTag:TAG_IMAGE];
+    avatar.image = nil;
+    UILabel *label = (UILabel*)[cell viewWithTag:TAG_FROM];
+    label.text = @"";
+    label = (UILabel*)[cell viewWithTag:TAG_TEXT];
+    label.text = @"";
 }
 
 // Update action button
@@ -387,7 +426,7 @@
 // Update search
 - (void)updateSearch
 {
-    //[self clearAvatars];
+    _hasConnectionError = NO;
     [self.searchProvider search:self.query fromPage:_pageNum count:MAX_SEARCH_COUNT];
 }
 
@@ -396,20 +435,12 @@
 {
     if (activate)
     {
-        CGRect frame = self.view.frame;
-        CGRect indFrame = _indicator.frame;
-        frame.origin.x += (frame.size.width - indFrame.size.width) * 0.5f;
-        frame.origin.y += (frame.size.height - indFrame.size.height) * 0.25f;
-        frame.size = indFrame.size;
-        _indicator.frame = frame;
-        
-        [self.view addSubview:_indicator];
-        [_indicator startAnimating];
+        [_indicator.messageLabel setText:NSLocalizedString(@"Search_IndicatorText", @"")];
+        [_indicator show];
     }
     else
     {
-        [_indicator stopAnimating];
-        [_indicator removeFromSuperview];
+        [_indicator hide];
     }
 }
 

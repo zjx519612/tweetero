@@ -13,6 +13,7 @@
 
 @interface SearchProvider(Private)
 
+- (void)notifyAboutEndOfSearch:(NSArray*)result forQuery:(NSString*)query;
 - (void)setNotificationValue:(SPNotificationValue)value forIdentifier:(NSString *)identifier;
 - (void)setNotificationValue:(SPNotificationValue)value forIdentifier:(NSString *)identifier forQuery:(NSString *)query;
 - (void)removeNotification:(NSString *)identifier;
@@ -78,6 +79,7 @@ static SearchProvider *sharedProvider = nil;
 
 - (void)dealloc
 {
+    [self closeSearch];
     self.delegate = nil;
     [_twitter release];
     [_twitterConnection release];
@@ -230,6 +232,24 @@ static SearchProvider *sharedProvider = nil;
     return [_queries allKeys];
 }
 
+- (BOOL)isEndOfSearch
+{
+    if (_connections == nil || [_connections count] == 0)
+        return YES;
+    return NO;
+}
+
+- (void)closeSearch
+{
+    if ([self isEndOfSearch] == NO) {
+        [_connections release];
+        [_searchResult release];
+        _connections = nil;
+        _searchResult = nil;
+    }
+    [_twitter closeAllConnections];
+}
+
 #pragma mark MGTwitterEngineDelegate
 - (void)searchResultsReceived:(NSArray *)searchResults forRequest:(NSString *)connectionIdentifier
 {
@@ -245,10 +265,17 @@ static SearchProvider *sharedProvider = nil;
             [self updateQueries:searchResults];
             break;
         case SPSearchData:
-            if (self.delegate && [self.delegate respondsToSelector:@selector(searchDidEnd:forQuery:)])
-            {
-                NSString *query = [self queryForIdentifier:connectionIdentifier];
-                [self.delegate performSelector:@selector(searchDidEnd:forQuery:) withObject:searchResults withObject:query];
+            if (_connections) [_connections release];
+            if (_searchResult) [_searchResult release];
+            
+            _connections = [NSMutableDictionary new];
+            _searchResult = [NSMutableArray new];
+            
+            for (NSDictionary *item in searchResults) {
+                id itemId = [item objectForKey:@"id"];
+                if (itemId) {
+                    [_connections setObject:connectionIdentifier forKey:[_twitter getUpdate:[itemId stringValue]]];
+                }
             }
             break;
         case SPSavedSearch:
@@ -267,8 +294,18 @@ static SearchProvider *sharedProvider = nil;
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error 
 {
-    NSString *query = [self queryForIdentifier:connectionIdentifier];
-    if (self.delegate && [self.delegate respondsToSelector:@selector(searchDidEndWithError:)])
+    NSLog(@"FAILED_CONNECTION: %@", connectionIdentifier);
+    NSString *query = [_connections objectForKey:connectionIdentifier];
+    if (query) 
+    {
+        [_connections removeObjectForKey:connectionIdentifier];
+    } 
+    else 
+    {
+        query = [self queryForIdentifier:connectionIdentifier];
+    }
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(searchDidEndWithError:)]) 
     {
         [self.delegate performSelector:@selector(searchDidEndWithError:) withObject:query];
     }
@@ -277,7 +314,26 @@ static SearchProvider *sharedProvider = nil;
 #pragma mark Unusable MGTwitterEngineDelegate methods
 - (void)requestSucceeded:(NSString *)connectionIdentifier {}
 - (void)receivedObject:(NSDictionary *)dictionary forRequest:(NSString *)connectionIdentifier {}
-- (void)statusesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier {}
+
+- (void)statusesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier 
+{
+    NSLog(@"ALL CONNECTIONS: %@", _connections);
+    NSString *searchIdentifier = [_connections objectForKey:connectionIdentifier];
+    [_connections removeObjectForKey:connectionIdentifier];
+    if (statuses && [statuses count] > 0) 
+    {
+        NSString *query = nil;
+        NSDictionary *item = [statuses objectAtIndex:0];
+        if (item != nil && [item objectForKey:@"id"]) 
+        {
+            query = [self queryForIdentifier:searchIdentifier];
+            [_searchResult addObject:item];
+        }
+        if (query)
+            [self notifyAboutEndOfSearch:statuses forQuery:query];
+    }
+}
+
 - (void)directMessagesReceived:(NSArray *)messages forRequest:(NSString *)connectionIdentifier {}
 - (void)userInfoReceived:(NSArray *)userInfo forRequest:(NSString *)connectionIdentifier {}
 - (void)miscInfoReceived:(NSArray *)miscInfo forRequest:(NSString *)connectionIdentifier {}
@@ -348,6 +404,14 @@ static SearchProvider *sharedProvider = nil;
 
 @implementation SearchProvider(Private)
 
+- (void)notifyAboutEndOfSearch:(NSArray*)result forQuery:(NSString*)query
+{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(searchDidEnd:forQuery:)])
+    {
+        [self.delegate performSelector:@selector(searchDidEnd:forQuery:) withObject:result withObject:query];
+    }
+}
+
 - (void)setNotificationValue:(SPNotificationValue)value forIdentifier:(NSString *)identifier
 {
     [self setNotificationValue:value forIdentifier:identifier forQuery:nil];
@@ -375,10 +439,16 @@ static SearchProvider *sharedProvider = nil;
 
 - (NSString *)queryForIdentifier:(NSString *)identifier
 {
-    NSArray *value = [_twitterConnection objectForKey:identifier];
-    if (value == nil || [value count] < 2)
-        return nil;
-    return [value objectAtIndex:1];
+    @try
+    {
+        NSArray *value = [_twitterConnection objectForKey:identifier];
+        if (value == nil || [value count] < 2)
+            return nil;
+        return [value objectAtIndex:1];
+    }
+    @catch (...) {
+    }
+    return nil;
 }
 
 - (BOOL)validateQuery:(NSString *)query
