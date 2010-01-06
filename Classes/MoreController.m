@@ -117,6 +117,8 @@
     
     self.parentViewController.navigationItem.title = NSLocalizedString(@"More", @"");
     self.parentViewController.navigationItem.rightBarButtonItem = nil;
+    
+    [self.tableView reloadData];
 }
 
 #pragma mark UITableView dataSource

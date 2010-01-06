@@ -9,6 +9,7 @@
 - (void)saveAccountNotification:(NSNotification*)notification;
 - (void)showTabController;
 - (void)verifySelectedAccount;
+- (void)closeAndReleaserTwitter;
 @end
 
 @implementation AccountController
@@ -67,7 +68,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_tableAccounts release];
     [_manager release];
-    
+    [self closeAndReleaserTwitter];
     [super dealloc];
 }
 
@@ -76,6 +77,11 @@
     self.canAnimate = YES;
     self.navigationItem.rightBarButtonItem.enabled = YES;
     self.navigationItem.leftBarButtonItem.enabled = YES;
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [self closeAndReleaserTwitter];
 }
 
 - (void)viewDidLoad
@@ -232,15 +238,24 @@
 
 - (void)verifySelectedAccount
 {
+    [self closeAndReleaserTwitter];
     _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
     
     _credentialIdentifier = [_twitter checkUserCredentials];
 }
 
+- (void)closeAndReleaserTwitter
+{
+    if (_twitter) {
+        [_twitter closeAllConnections];
+        [_twitter release];
+        _twitter = nil;
+    }
+}
+
 #pragma mark MGTwitterEngine delegate methods
 - (void)requestSucceeded:(NSString *)connectionIdentifier
 {
-    [_twitter release];
     if ([connectionIdentifier isEqualToString:_credentialIdentifier])
         [self showTabController];
     _credentialIdentifier = nil;
@@ -257,7 +272,6 @@
     [alert show];
     [alert release];
     
-    [_twitter release];
     _credentialIdentifier = nil;
     
     self.navigationItem.rightBarButtonItem.enabled = YES;
