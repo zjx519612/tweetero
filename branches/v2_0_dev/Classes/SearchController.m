@@ -123,11 +123,11 @@
 
 - (IBAction)clickActionButton
 {
+    [self activateActionButton:NO];
     if ([self.searchProvider hasQuery:self.query])
         [self.searchProvider removeQuery:self.query];
     else
         [self.searchProvider saveQuery:self.query forId:0];
-    [self activateActionButton:NO];
 }
 
 - (void)clear
@@ -191,8 +191,8 @@
 
 - (void)searchProviderDidUpdated
 {
-    [self activateActionButton:YES];
     [self updateActionButton];
+    [self activateActionButton:YES];
 }
 
 #pragma mark UITableView DataSource
@@ -408,6 +408,7 @@
             systemItem = UIBarButtonSystemItemAdd;
         
         UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem: systemItem target: self action: @selector(clickActionButton)];
+        item.enabled = YES;
         self.navigationItem.rightBarButtonItem = item;
         [item release];
     }

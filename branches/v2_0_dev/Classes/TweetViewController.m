@@ -420,7 +420,8 @@
 - (void)updateFavoriteIcon
 {
     UIImage *icon = (isFavorited ? [UIImage imageNamed:@"unfavorite.png"] : [UIImage imageNamed:@"favorite.png"]);
-    [_actionSegment setImage:icon forSegmentAtIndex:1];
+    if (icon && _actionSegment)
+        [_actionSegment setImage:icon forSegmentAtIndex:1];
 }
 
 - (void)enableFavoriteButton:(BOOL)enable
