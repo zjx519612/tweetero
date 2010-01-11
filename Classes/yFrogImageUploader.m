@@ -102,6 +102,7 @@
     
     NSDictionary *authFields = [factory createTwitterAuthorizationFields:account];
     
+    //return;//DEBUG
     if (authFields == nil) {
 		[delegate uploadedImage:nil sender:self];
         return;
@@ -212,6 +213,27 @@
     
     [self retain];
     ISVideoUploadEngine *videoUploadEngine = [[ISVideoUploadEngine alloc] initWithData:movieData delegate:self];
+    
+    UserAccount *account = [[AccountManager manager] loggedUserAccount];
+    MGTwitterEngineFactory *factory = [MGTwitterEngineFactory factory];
+    NSDictionary *authFields = [factory createTwitterAuthorizationFields:account];
+    
+    if (authFields) {
+        NSString *val = [authFields objectForKey:@"username"];
+        if (val)
+            videoUploadEngine.username = val;
+        val = [authFields objectForKey:@"password"];
+        if (val)
+            videoUploadEngine.password = val;
+        else {
+            val = [authFields objectForKey:@"verify_url"];
+            if (val)
+                videoUploadEngine.verifyUrl = val;
+        }
+
+    }
+
+    
     if (![videoUploadEngine upload])
         [self release];
     [videoUploadEngine release];

@@ -43,6 +43,7 @@
 @synthesize linkUrl;
 @synthesize putUrl;
 @synthesize getLengthUrl;
+@synthesize verifyUrl;
 
 - (id)initWithData:(NSData *)theData delegate:(id<ISVideoUploadEngineDelegate>) dlgt
 {
@@ -65,7 +66,7 @@
     self.linkUrl = nil;
     self.putUrl = nil;
     self.getLengthUrl = nil;
-    
+    self.verifyUrl = nil;
     if (connection)
         [connection release];
     [result release];
@@ -258,9 +259,19 @@
 	[body appendData:[@"Content-Disposition: form-data; name=\"username\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
 	[body appendData:[self.username dataUsingEncoding:NSUTF8StringEncoding]];
 	
-    [body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-	[body appendData:[@"Content-Disposition: form-data; name=\"password\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-	[body appendData:[self.password dataUsingEncoding:NSUTF8StringEncoding]];
+    if (self.password != nil) {
+        [body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[@"Content-Disposition: form-data; name=\"password\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[self.password dataUsingEncoding:NSUTF8StringEncoding]];
+    } else if (self.verifyUrl) {
+        [body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[@"Content-Disposition: form-data; name=\"auth\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[@"oauth" dataUsingEncoding:NSUTF8StringEncoding]];
+        
+        [body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[@"Content-Disposition: form-data; name=\"verify_url\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[self.verifyUrl dataUsingEncoding:NSUTF8StringEncoding]];
+    }
 
 	if([[LocationManager locationManager] locationDefined])
 	{

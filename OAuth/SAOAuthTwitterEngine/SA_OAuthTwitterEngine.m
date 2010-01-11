@@ -114,13 +114,12 @@
 															  signatureProvider:nil] autorelease];
     [theRequest prepare];
     
-    NSLog(@"SIGNATURE %@", [theRequest signature]);
     NSMutableDictionary *fields = [NSMutableDictionary dictionary];
     
     NSString *authParam = [[theRequest allHTTPHeaderFields] objectForKey:@"Authorization"];
     
     if ([authParam hasPrefix:@"OAuth "])
-        authParam = [authParam substringFromIndex:5];
+        authParam = [authParam substringFromIndex:6];
     
     NSArray *allFields = [authParam componentsSeparatedByString:@", "];
 
@@ -130,18 +129,13 @@
     NSString *key, *value;
     for (NSString *field in allFields) {
         NSArray *keyValue = [field componentsSeparatedByString:@"="];
-        
         key = value = nil;
         if (keyValue && [keyValue count] == 2) {
             key = [keyValue objectAtIndex:0];
             value = [keyValue objectAtIndex:1];
-            
             if (key && value) {
                 key = [key stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-
-                value = [value stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\""]];
-                value = [value stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-                
+                value = [value substringWithRange:NSMakeRange(1, [value length]-2)];
                 [fields setObject:value forKey:key];
             }
         }

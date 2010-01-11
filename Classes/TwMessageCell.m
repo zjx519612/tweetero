@@ -103,7 +103,7 @@
         [_screennameLabel setText:object.screenname];
         
         [_messageLabel setText:object.message];
-        [_messageLabel setFrame:CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH + YFROG_IMAGE_WIDTH, TEXT_HEIGHT)];
+        [_messageLabel setFrame:CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH + YFROG_IMAGE_WIDTH - 10, TEXT_HEIGHT)];
         [_messageLabel sizeToFit];
 
         [_dateLabel setText:object.creationFormattedDate];
