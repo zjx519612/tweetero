@@ -82,27 +82,16 @@
         
         NSDictionary *oauthFields = [oaEngine authRequestFields];
         
-        //https://twitter.com/account/verify_credentials.xml?
-        //      oauth_version=%@&
-        //      oauth_nonce=%@&
-        //      oauth_timestamp=%@&
-        //      oauth_consumer_key=%@&
-        //      oauth_token=%@&
-        //      oauth_signature_method=%@&
-        //      oauth_signature=%@
+        NSMutableString *credential = [NSMutableString stringWithString:@"https://twitter.com/account/verify_credentials.xml?"];
+        for (NSString *param_name in [oauthFields allKeys]) {
+            NSString *param_val = [oauthFields objectForKey:param_name];
+            if ((param_name && [param_name length] > 0) && (param_val && [param_val length] > 0)) {
+                [credential appendFormat:@"%@=%@&", param_name, param_val];
+            }
+        }
+        NSString *verify_url_value = [credential substringToIndex:[credential length] - 1];
         
-        NSString *credential = [NSString stringWithFormat:kYFrogVerifyCredentialUrlMask,
-                                    [oauthFields objectForKey:@"oauth_version"],
-                                    [oauthFields objectForKey:@"oauth_nonce"],
-                                    [oauthFields objectForKey:@"oauth_timestamp"],
-                                    [oauthFields objectForKey:@"oauth_consumer_key"],
-                                    [oauthFields objectForKey:@"oauth_token"],
-                                    [oauthFields objectForKey:@"oauth_signature_method"],
-                                    [oauthFields objectForKey:@"oauth_signature"]
-                                ];
-        
-        [params setObject:credential forKey:@"verify_url"];
-        
+        [params setObject:verify_url_value forKey:@"verify_url"];
         [oaEngine release];
     }
     

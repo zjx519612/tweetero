@@ -39,6 +39,7 @@ typedef enum {
     NSData                          *uploadData;
     NSString                        *username;
     NSString                        *password;
+    NSString                        *verifyUrl;
     NSMutableData                   *result;
     NSString                        *linkUrl;
     NSString                        *putUrl;
@@ -51,6 +52,7 @@ typedef enum {
 
 @property (nonatomic, copy) NSString *username;
 @property (nonatomic, copy) NSString *password;
+@property (nonatomic, copy) NSString *verifyUrl;
 @property (readonly)        NSData   *uploadData;
 @property (nonatomic, copy) NSString *linkUrl;
 @property (nonatomic, copy) NSString *putUrl;
