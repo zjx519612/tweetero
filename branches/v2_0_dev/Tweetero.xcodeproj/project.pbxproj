@@ -303,7 +303,7 @@
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* TweetterAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetterAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* TweetterAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweetterAppDelegate.m; sourceTree = "<group>"; };
-		1D6058910D05DD3D006BFB54 /* Tweetero.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tweetero.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6058910D05DD3D006BFB54 /* yfrog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = yfrog.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765070DF74369002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		28A0AB4B0D9B1048005BE974 /* Tweetter_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweetter_Prefix.pch; sourceTree = "<group>"; };
@@ -694,7 +694,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D6058910D05DD3D006BFB54 /* Tweetero.app */,
+				1D6058910D05DD3D006BFB54 /* yfrog.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -851,9 +851,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1D6058900D05DD3D006BFB54 /* Tweetero */ = {
+		1D6058900D05DD3D006BFB54 /* yfrog */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Tweetero" */;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "yfrog" */;
 			buildPhases = (
 				1D60588D0D05DD3D006BFB54 /* Resources */,
 				1D60588E0D05DD3D006BFB54 /* Sources */,
@@ -863,9 +863,9 @@
 			);
 			dependencies = (
 			);
-			name = Tweetero;
+			name = yfrog;
 			productName = Tweetter;
-			productReference = 1D6058910D05DD3D006BFB54 /* Tweetero.app */;
+			productReference = 1D6058910D05DD3D006BFB54 /* yfrog.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -891,7 +891,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1D6058900D05DD3D006BFB54 /* Tweetero */,
+				1D6058900D05DD3D006BFB54 /* yfrog */,
 			);
 		};
 /* End PBXProject section */
@@ -1207,6 +1207,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
+				PRODUCT_NAME = yfrog;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos2.2.1;
 			};
@@ -1226,7 +1227,7 @@
 					"\"$(SRCROOT)/libs/yajl-1.0.5/lib\"",
 					"\"$(SRCROOT)/OAuth/OAuthConsumerLib\"",
 				);
-				PRODUCT_NAME = Tweetero;
+				PRODUCT_NAME = yfrog;
 			};
 			name = Distribution;
 		};
@@ -1246,7 +1247,7 @@
 					"\"$(SRCROOT)/libs/yajl-1.0.5/lib\"",
 					"\"$(SRCROOT)/OAuth/OAuthConsumerLib\"",
 				);
-				PRODUCT_NAME = Tweetero;
+				PRODUCT_NAME = yfrog;
 			};
 			name = Debug;
 		};
@@ -1264,7 +1265,7 @@
 					"\"$(SRCROOT)/libs/yajl-1.0.5/lib\"",
 					"\"$(SRCROOT)/OAuth/OAuthConsumerLib\"",
 				);
-				PRODUCT_NAME = Tweetero;
+				PRODUCT_NAME = yfrog;
 			};
 			name = Release;
 		};
@@ -1280,7 +1281,7 @@
 				HEADER_SEARCH_PATHS = "Libs/include/**";
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
-				PRODUCT_NAME = TweetSnap;
+				PRODUCT_NAME = yfrog;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos3.0;
 				USER_HEADER_SEARCH_PATHS = "";
@@ -1297,6 +1298,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = Libs/include;
 				PREBINDING = NO;
+				PRODUCT_NAME = yfrog;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos2.2.1;
 			};
@@ -1305,7 +1307,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "Tweetero" */ = {
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "yfrog" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1D6058940D05DD3E006BFB54 /* Debug */,
