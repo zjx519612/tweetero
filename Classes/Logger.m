@@ -30,7 +30,7 @@
     NSMutableString *title = [NSMutableString string];
     
     [title appendString:@"----------------------------------------------\n"];
-    [title appendString:@" Tweetero\n"];
+    [title appendString:@" yfrog\n"];
     [title appendFormat:@" %@\n", dt];
     [title appendString:@"----------------------------------------------\n"];
     
@@ -42,14 +42,14 @@
     self = [super init];
     
     _data = [[NSMutableData alloc] init];
-    _path = @"/Users/shkrabak/Desktop/tweetero.log";
+    _path = @"/Users/shkrabak/Desktop/yfrog.log";
 #ifndef DEBUG
     _path = @"/tmp/isuploader.log";
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     if ([paths count] > 0) 
     {
         NSString *userDocumentsPath = [paths objectAtIndex:0];
-        _path = [[NSString stringWithFormat:@"%@/tweetero.log", userDocumentsPath] retain];
+        _path = [[NSString stringWithFormat:@"%@/yfrog.log", userDocumentsPath] retain];
         NSLog(_path);
     }
 #endif
