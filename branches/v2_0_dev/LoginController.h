@@ -29,6 +29,7 @@
 
 #import "SA_OAuthTwitterController.h"
 #import "SA_OAuthTwitterEngine.h"
+#import "TwActivityIndicator.h"
 
 extern const NSString *kNewAccountLoginDataKey;
 extern const NSString *kOldAccountLoginDataKey;
@@ -50,6 +51,9 @@ extern const NSString *LoginControllerAccountDidChange;
     IBOutlet UIView *oAuthView;    
     UserAccount *_currentAccount;
     BOOL oAuthAuthorization;
+    MGTwitterEngine *twitter;
+    NSString *twitterUserCredentialID;
+    TwActivityIndicator *progress;
 }
 
 - (id)initWithUserAccount:(UserAccount*)account;

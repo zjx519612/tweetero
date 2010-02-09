@@ -27,7 +27,7 @@
 #import "LoginController.h"
 #import "WebViewController.h"
 #import "UserAccount.h"
-
+#import "MGTwitterEngine.h"
 #include "config.h"
 
 #define AccountSegmentIndex     0
@@ -70,27 +70,38 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-- (IBAction)login:(id)sender 
+- (void)processAccountInfo
 {
     // Create new UserAccount object and send it as parameter of notification
-    //TwitterCommonUserAccount *newAccount = [[TwitterCommonUserAccount alloc] init];
     UserAccount *newAccount = [[UserAccount alloc] init];
-
     newAccount.username = [loginField text];
     newAccount.secretData = [passwordField text];
-    //newAccount.password = [passwordField text];
-    
     // Notification parameters
     NSDictionary *loginData = [NSDictionary dictionaryWithObjectsAndKeys: newAccount, kNewAccountLoginDataKey, _currentAccount, kOldAccountLoginDataKey, nil];
     [newAccount release];
-    
     // Post LoginControllerAccountDidChange notifiaction
     [[NSNotificationCenter defaultCenter] postNotificationName: (NSString *)LoginControllerAccountDidChange 
                                                         object: nil
                                                       userInfo: loginData];
-    
     // Pop self controller from navigation bar
     [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)login:(id)sender
+{
+    twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+    [MGTwitterEngine setUsername:[loginField text] password:[passwordField text]];
+    twitterUserCredentialID = [twitter checkUserCredentials];
+    [loginField resignFirstResponder];
+    [passwordField resignFirstResponder];
+    // Show progress indicator
+    progress = [[TwActivityIndicator alloc] init];
+    [progress.messageLabel setText:@"Verify account..."];
+    [progress show];
+    self.navigationItem.rightBarButtonItem.enabled = NO;
+    self.navigationItem.leftBarButtonItem.enabled = NO;
+    [authTypeSegment setEnabled:NO forSegmentAtIndex:0];
+    [authTypeSegment setEnabled:NO forSegmentAtIndex:1];
 }
 
 - (IBAction)changeAuthTypeClick:(id)sender
@@ -131,10 +142,11 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
 		[engine sendUpdate: [NSString stringWithFormat: @"Already Updated. %@", [NSDate date]]];
 }
 
-- (void)viewDidLoad 
+//- (void)viewDidLoad 
+- (void)loadView
 {
-    [super viewDidLoad];
-    
+    //[super viewDidLoad];
+    [super loadView];
     accountView = self.view;
     
  	self.navigationItem.rightBarButtonItem = loginButton;
@@ -148,7 +160,7 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
         [rememberSwitch setOn: NO];
     }
     
-    self.navigationItem.leftBarButtonItem = nil;
+    //self.navigationItem.leftBarButtonItem = nil;
     
 	UIImage *icon = [UIImage imageNamed:@"Frog.tiff"];
 	if(icon)
@@ -211,5 +223,39 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
     return nil;
 }
 
+#pragma mark MGTwitterEngine delegate methods
+- (void)requestSucceeded:(NSString *)connectionIdentifier
+{
+    if ([connectionIdentifier isEqualToString:twitterUserCredentialID])
+        [self processAccountInfo];
+    twitterUserCredentialID = nil;
+    [twitter autorelease];
+    twitter = nil;
+    [progress hide];
+    [progress release];
+    self.navigationItem.rightBarButtonItem.enabled = YES;
+    self.navigationItem.leftBarButtonItem.enabled = YES;
+    [authTypeSegment setEnabled:YES forSegmentAtIndex:0];
+    [authTypeSegment setEnabled:YES forSegmentAtIndex:1];
+}
+
+- (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
+{
+    [progress hide];
+    [progress release];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Authorization_Title", @"") 
+                                                    message:NSLocalizedString(@"Authorization_Message", @"")
+                                                   delegate:nil
+                                          cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
+    [alert show];
+    [alert release];
+    twitterUserCredentialID = nil;
+    [twitter autorelease];
+    twitter = nil;
+    self.navigationItem.rightBarButtonItem.enabled = YES;
+    self.navigationItem.leftBarButtonItem.enabled = YES;
+    [authTypeSegment setEnabled:YES forSegmentAtIndex:0];
+    [authTypeSegment setEnabled:YES forSegmentAtIndex:1];
+}
 
 @end
