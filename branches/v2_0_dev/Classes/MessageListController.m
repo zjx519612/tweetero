@@ -329,7 +329,7 @@
 - (void)statusesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier
 {
     ISLog(@"Receive status");
-    
+    NSLog(@"%@", statuses);
     /*
 	if([statuses count] < MESSAGES_PER_PAGE)
 	{
@@ -647,7 +647,7 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
     NSString *messageId = [data objectForKey:@"id"];
     NSArray *links = [data objectForKey:@"links"];
     
-    CGSize thumbSize = CGSizeMake(48., 48.);
+    CGSize thumbSize = CGSizeMake(kImageGridThumbnailWidth, kImageGridThumbnailHeight);
     
     NSMutableArray *images = [NSMutableArray array]; //[[NSMutableArray alloc] init];
 

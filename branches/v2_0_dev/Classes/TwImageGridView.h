@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+extern const float kImageGridThumbnailWidth;
+extern const float kImageGridThumbnailHeight;
+
 @interface TwImageGridView : UIView {
 @private
     NSArray *_images;
