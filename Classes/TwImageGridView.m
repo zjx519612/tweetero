@@ -9,8 +9,8 @@
 #import "TwImageGridView.h"
 #import "CustomImageView.h"
 
-const float thumbnail_width = 48.0f;
-const float thumbnail_height = 48.0f;
+const float kImageGridThumbnailWidth = 84.0f;
+const float kImageGridThumbnailHeight = 84.0f;
 
 @implementation TwImageGridView
 
@@ -43,7 +43,7 @@ const float thumbnail_height = 48.0f;
     
     float parent_width = self.frame.size.width;
     
-    CGRect frame = CGRectMake(0, 0, thumbnail_width, thumbnail_height);
+    CGRect frame = CGRectMake(0, 0, kImageGridThumbnailWidth, kImageGridThumbnailHeight);
     // Set new images
     for (UIImage *image in _images) {
         CustomImageView *imageView = [[CustomImageView alloc] initWithFrame:CGRectZero];
@@ -57,14 +57,14 @@ const float thumbnail_height = 48.0f;
         
         if (frame.origin.x + frame.size.width > parent_width) {
             frame.origin.x = 0;
-            frame.origin.y += thumbnail_height;
+            frame.origin.y += kImageGridThumbnailHeight;
         }
         
-        frame.origin.x += thumbnail_width + 2;
+        frame.origin.x += kImageGridThumbnailWidth + 2;
         [imageView release];
     }
     
-    float max_height = frame.origin.y + thumbnail_height;
+    float max_height = frame.origin.y + kImageGridThumbnailHeight;
     
     frame = self.frame;
     frame.size.height = max_height;
@@ -144,13 +144,13 @@ const float thumbnail_height = 48.0f;
     if (_imageLinks) {
         int count = [_imageLinks count];
         
-        int cols = (int)(maxWidth / (thumbnail_width + 2.));
+        int cols = (int)(maxWidth / (kImageGridThumbnailWidth + 2.));
         int rows = count / cols;
         if (count % cols > 0)
             rows++;
         
-        size.width = cols * (thumbnail_width + 2.);
-        size.height = rows * (thumbnail_height + 2.);
+        size.width = cols * (kImageGridThumbnailWidth + 2.);
+        size.height = rows * (kImageGridThumbnailHeight + 2.);
     }
     return size;
 }
