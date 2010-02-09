@@ -67,20 +67,25 @@
     {
         // Add and save new account
         NSString *securityString = [account secretData];
-            
         NSData *secData = [securityString dataUsingEncoding:NSUTF8StringEncoding];
 
-        //NSNumber *accType = [NSNumber numberWithInt:[account authType]];
-        
         // Prepate SecItemEnty
         NSMutableDictionary *secItemEntry = [self prepareSecItemEntry:SEC_ATTR_SERVER user:account.username];
-        //[secItemEntry setObject:accType forKey:(id)kSecAttrType];
         [secItemEntry setObject:secData forKey:(id)kSecValueData];
         
         OSStatus err = SecItemAdd((CFDictionaryRef)secItemEntry, NULL);
+        if (err == errSecDuplicateItem)
+        {
+            [secItemEntry removeObjectForKey:(id)kSecValueData];
+            NSMutableDictionary *attrToUpdate = [[NSMutableDictionary alloc] init];
+            
+            [attrToUpdate setObject:secData forKey:(id)kSecValueData];
+            err = SecItemUpdate((CFDictionaryRef)secItemEntry, (CFDictionaryRef)attrToUpdate);
+            [attrToUpdate release];
+        }
         
         NSLog(@"SecItemAdd result = %i (noErr = %i)", err, noErr);
-        if (err == noErr)
+        if (err == noErr || err == errSecDuplicateItem)
         {
             // Add account to dictionary
             [_accounts setObject:account forKey:account.username];

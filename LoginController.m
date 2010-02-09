@@ -96,7 +96,7 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
     [passwordField resignFirstResponder];
     // Show progress indicator
     progress = [[TwActivityIndicator alloc] init];
-    [progress.messageLabel setText:@"Verify account..."];
+    [progress.messageLabel setText:NSLocalizedString(@"Account_Verification", @"")];
     [progress show];
     self.navigationItem.rightBarButtonItem.enabled = NO;
     self.navigationItem.leftBarButtonItem.enabled = NO;
