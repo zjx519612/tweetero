@@ -10,10 +10,12 @@
 
 #import "MGTwitterYAJLParser.h"
 
-@interface MGTwitterStatusesYAJLParser : MGTwitterYAJLParser {
-
-	NSMutableDictionary *_status;
-	NSMutableDictionary *_user;
+@interface MGTwitterStatusesYAJLParser : MGTwitterYAJLParser
+{
+	@private
+	
+		NSMutableDictionary *_root;
+		NSMutableArray *_childs;
 }
 
 @end
