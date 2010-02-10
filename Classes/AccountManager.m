@@ -295,8 +295,8 @@
         [secItemEntry setObject:(id)kSecMatchLimitOne forKey:(id)kSecMatchLimit];
         [secItemEntry setObject:(id)kCFBooleanTrue forKey:(id)kSecReturnData];
         
-        NSData *result = nil;
-        OSStatus err = SecItemCopyMatching((CFDictionaryRef)secItemEntry, (CFTypeRef*)&result);
+        CFTypeRef result = NULL;
+        OSStatus err = SecItemCopyMatching((CFDictionaryRef)secItemEntry, &result);
         
         NSString *secData = nil;
         if (err == noErr && result)
@@ -314,6 +314,11 @@
             [account release];
             [secData release];
         }
+		
+		if (NULL != result)
+		{
+			CFRelease(result);
+		}
     }
     
     NSString *lastAccountUsername = [[NSUserDefaults standardUserDefaults] stringForKey:ACCOUNT_MANAGER_LAST_USER_KEY];
