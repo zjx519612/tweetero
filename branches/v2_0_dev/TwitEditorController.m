@@ -217,9 +217,9 @@
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
 {
 	self = [super initWithNibName:nibName bundle:nibBundle];
-	if(self)
-		[self initData];
-
+	if(self) {
+        [self initData];
+    }
 	return self;
 }
 
@@ -248,15 +248,13 @@
 
 - (void)dealloc 
 {
+    NSLog(@"tweetEditor - DEALLOC");
 	while (_indicatorCount) 
 		[self releaseActivityIndicator];
-
 	[_twitter closeAllConnections];
 	[_twitter removeDelegate];
 	[_twitter release];
-
 	[_indicator release];
-
 	[defaultTintColor release];
 	[segmentBarItem release];
 	[photoURLPlaceholderMask release];
@@ -266,6 +264,7 @@
 	self._message = nil;
 	self.pickedPhoto = nil;
 	self.pickedVideo = nil;
+    [imgPicker release];
 	[self dismissProgressSheetIfExist];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
@@ -487,6 +486,7 @@
 	
 	self.navigationItem.title = NSLocalizedString(@"New Tweet", @"");
 
+    imgPicker->twitEditor = self;
 	imgPicker.delegate = self;	
 	messageText.delegate = self;
 	

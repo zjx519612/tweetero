@@ -921,7 +921,24 @@
     
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
     if ([error code] == 401)
+    {
         [AccountController showAccountController:self.navigationController];
+    }
+    else
+    {
+        NSString *msg = nil;
+        if ([error code] == 404) {
+            msg = NSLocalizedString(@"404_Not_Found", @"");
+        } else if ([error code] == 400) {
+            msg = NSLocalizedString(@"400_Bad_Request", @"");
+        } else {
+            msg = [error description];
+        }
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Twitter Error!" message:msg delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        [alert release];
+    }
+
 }
 
 - (void)statusesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier

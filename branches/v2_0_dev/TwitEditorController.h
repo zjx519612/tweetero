@@ -42,7 +42,8 @@ enum _TwitEditorSuspendedOperations
 
 @interface ImagePickerController : UIImagePickerController
 {
-	IBOutlet TwitEditorController* twitEditor;
+@public
+	TwitEditorController* twitEditor;
 }
 @end
 
