@@ -1,4 +1,15 @@
 ﻿/* Russian File */
+"304_Not_Modified"                              = "There was no new data to return.";
+"400_Bad_Request"                               = "Некорректный запрос.";
+"401_Unauthorized"                              = "Authentication credentials were missing or incorrect.";
+"403_Forbidden"                                 = "The request is understood, but it has been refused.";
+"404_Not_Found"                                 = "Запрашиваемый ресурс не найден.";
+"406_Not_Acceptable"                            = "Invalid format.";
+"420_Enhance_Your Calm"                         = "Rate limited.";
+"500_Internal_Server Error"                     = "Внутренняя ошибка сервера.";
+"502_Bad_Gateway"                               = "Сервер не отвечает.";
+"503_Service_Unavailable"                       = "The Twitter servers are up, but overloaded with requests. Try again later.";
+
 "Account_Verification"                          = "Проверка учетной записи...";
 "Search_NotFound"                               = "Не найдено ни одного сообщения...";
 "Search_IndicatorText"                          = "Поиск...";
