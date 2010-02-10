@@ -298,7 +298,7 @@ NSArray* linksFromText(NSString *text)
         NSString *word;
         while(word = [en nextObject])
         {
-            if([word hasPrefix:@"http://"] || [word hasPrefix:@"https://"] || [word hasPrefix:@"www"])
+            if([word hasPrefix:@"http://"] || [word hasPrefix:@"https://"] || [word hasPrefix:@"www."])
             {
                 [links addObject:word];
             }
@@ -375,8 +375,12 @@ NSString* ValidateYFrogLink(NSString *yfrogUrl)
 	range = [path rangeOfString:@":"];
 	if(range.location != NSNotFound)
 		path = [path substringToIndex:range.location];
-		
-	url = [[[NSURL alloc] initWithScheme:[url scheme]  host:[url host] path:path] autorelease];
+	
+	if (nil != [url scheme] && nil != [url host] && nil != path)
+	{
+		url = [[[NSURL alloc] initWithScheme:[url scheme] host:[url host] path:path] autorelease];
+	}
+	
 	return [url absoluteString];
 }
 
