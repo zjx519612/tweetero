@@ -29,6 +29,7 @@
 #import "UserAccount.h"
 #import "MGTwitterEngine.h"
 #include "config.h"
+#include "util.h"
 
 #define AccountSegmentIndex     0
 #define OAuthSegmentIndex       1
@@ -243,12 +244,10 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
 {
     [progress hide];
     [progress release];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Authorization_Title", @"") 
-                                                    message:NSLocalizedString(@"Authorization_Message", @"")
-                                                   delegate:nil
-                                          cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
-    [alert show];
-    [alert release];
+	
+	UIAlertView *theAlert = CreateAlertWithError(error);
+    [theAlert show];
+    [theAlert release];
     twitterUserCredentialID = nil;
     [twitter autorelease];
     twitter = nil;

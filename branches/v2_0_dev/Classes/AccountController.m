@@ -4,6 +4,7 @@
 #import "UserAccount.h"
 #import "MGTwitterEngineFactory.h"
 #import "TwTabController.h"
+#include "util.h"
 
 @interface AccountController(Private)
 - (void)saveAccountNotification:(NSNotification*)notification;
@@ -265,12 +266,9 @@
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Authorization_Title", @"") 
-                                                    message:NSLocalizedString(@"Authorization_Message", @"")
-                                                   delegate:nil
-                                          cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
-    [alert show];
-    [alert release];
+    UIAlertView *theAlert = CreateAlertWithError(error);
+    [theAlert show];
+    [theAlert release];
     
     _credentialIdentifier = nil;
     

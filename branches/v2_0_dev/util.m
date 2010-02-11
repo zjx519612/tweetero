@@ -684,3 +684,39 @@ NSDictionary* GoogleMapsCoordsFromUrl(NSURL *url)
     }
     return params;
 }
+
+UIAlertView *CreateAlertWithError(NSError *inError)
+{
+	NSString *theAlertTitle = nil;
+	NSString *theAlertMessage = nil;
+	
+	if (401 == [inError code])
+	{
+		theAlertTitle = @"Authorization_Title";
+		theAlertMessage = @"Authorization_Message";
+	}
+	else if (500 == [inError code])
+	{
+		theAlertTitle = @"Server_Error_Title";
+		theAlertMessage = @"500_Internal_Server Error";
+	}
+	else if (502 == [inError code])
+	{
+		theAlertTitle = @"Server_Error_Title";
+		theAlertMessage = @"502_Bad_Gateway";
+	}
+	else if (503 == [inError code])
+	{
+		theAlertTitle = @"Server_Error_Title";
+		theAlertMessage = @"503_Service_Unavailable";
+	}
+	else
+	{
+		theAlertTitle = @"Unknown_Error_Title";
+		theAlertMessage = @"Unknown_Error_Message";
+	}
+	
+	return [[UIAlertView alloc] initWithTitle:NSLocalizedString(theAlertTitle, @"") 
+				message:NSLocalizedString(theAlertMessage, @"") delegate:nil
+				cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
+}
