@@ -52,6 +52,7 @@ enum {
     IBOutlet UIButton *followBtn;
     
 	BOOL _gotInfo;
+	BOOL _shouldUpdateUserInfo;
 	MGTwitterEngine *_twitter;
 	NSString *_username;
     BOOL _following;
