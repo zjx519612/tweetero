@@ -225,7 +225,8 @@ const int kHeadTagLocation = 4;
     
     // Detail button
     detailButton = [[UIButton buttonWithType:UIButtonTypeDetailDisclosure] retain];
-    detailButton.frame = CGRectMake(290, 27, 10, 10);
+	
+    detailButton.frame = CGRectMake(285, 18, 25, 25);
     [detailButton addTarget:self action:@selector(detailPressed) forControlEvents:UIControlEventTouchUpInside];
     
     // Following segment
