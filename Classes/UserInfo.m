@@ -160,6 +160,10 @@ static NSString* kActionCell = @"UserInfoActionCell";
         ident = [_twitter enableUpdatesFor:_username];  // FOLLOWING
     
     [_userInfoView disableFollowingButton:YES];
+	
+	// responce on enable/disable request not always contains valid data
+	// so we need in addition to send "get user data" request
+	_shouldUpdateUserInfo = YES;
     
     if (self.userInfoConnectionID == nil)
         self.userInfoConnectionID = ident;
@@ -348,12 +352,31 @@ static NSString* kActionCell = @"UserInfoActionCell";
     [infoView loadHTMLString:info baseURL:nil];
 
     // Update notify switch
-	id notifyOn = [userData objectForKey:@"notifications"];
-	if(notifyOn && notifyOn != [NSNull null])
-		notifySwitch.on = [notifyOn boolValue];
+	if (_following)
+	{
+		notifySwitch.enabled = YES;
+		
+		id notifyOn = [userData objectForKey:@"notifications"];
+		if(notifyOn && notifyOn != [NSNull null])
+		{
+			notifySwitch.on = [notifyOn boolValue];
+		}
+	}
+	else
+	{
+		// Device Update functionality is not available. See Issue #47 for more information
+		notifySwitch.on = NO;
+		notifySwitch.enabled = NO;
+	}
+	
 	_gotInfo = YES;
-    
     self.userInfoConnectionID = nil;
+	
+	if (_shouldUpdateUserInfo)
+	{
+		_shouldUpdateUserInfo = NO;
+		self.userInfoConnectionID = [_twitter getUserInformationFor:_username];
+	}
 }
 
 #pragma mark UIAlertView Delegate
