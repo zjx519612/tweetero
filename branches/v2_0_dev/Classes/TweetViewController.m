@@ -164,12 +164,7 @@
         
         if (section == kMessageTableSection)
         {
-            cell.selectionStyle = UITableViewCellSelectionStyleNone;
-
-            _webView.frame = CGRectMake(10, 5, 280, 235);
-            _webView.backgroundColor = [UIColor clearColor];
-            _webView.scalesPageToFit = NO;
-            
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;            
             [cell.contentView addSubview:_webView];
         }
         else if (section == kActionTableSection)
@@ -344,13 +339,13 @@
 - (NSString*)makeHTMLMessage
 {
 	NSString *text = [_message objectForKey:@"text"];
-	NSString *html;
 	
     if (isNullable(text))
         return nil;
     
 	NSArray *lines = [text componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 	NSString *line;
+	NSInteger theWebViewWidth = (int)_webView.frame.size.width - 10;
 	_newLineCounter = [lines count];
 	NSMutableArray *filteredLines = [[NSMutableArray alloc] initWithCapacity:_newLineCounter];
 	NSEnumerator *en = [lines objectEnumerator];
@@ -362,9 +357,9 @@
 		NSMutableArray *filteredWords = [[NSMutableArray alloc] initWithCapacity:[words count]];
 		while(word = [en nextObject])
 		{
-			if([word hasPrefix:@"http://"] || [word hasPrefix:@"https://"] || [word hasPrefix:@"www"])
+			if([word hasPrefix:@"http://"] || [word hasPrefix:@"https://"] || [word hasPrefix:@"www."])
 			{
-				if([word hasPrefix:@"www"])
+				if([word hasPrefix:@"www."])
 					word = [@"http://" stringByAppendingString:word];
                 
 				NSString *yFrogURL = ValidateYFrogLink(word);
@@ -390,7 +385,7 @@
                     if (isVideoLink(yFrogURL))
                     {
                         NSString *videoSrc = [yFrogURL stringByAppendingString:@":iphone"];
-                        word = [NSString stringWithFormat:@"<br><video poster=\"%@.th.jpg\" src=\"%@\"></video>", yFrogURL, videoSrc];
+                        word = [NSString stringWithFormat:@"<br><video poster=\"%@.th.jpg\" src=\"%@\" width=\"%d\"></video>", yFrogURL, videoSrc, theWebViewWidth];
                     }
                     else
                     {
@@ -411,8 +406,8 @@
 		[filteredWords release];
 	}
 	
-	NSString *htmlTemplate = @"<html></script></head><body style=\"width:%d; overflow:visible; padding:0; margin:0\"><big>%@</big></body></html>";
-	html = [NSString stringWithFormat:htmlTemplate, (int)_webView.frame.size.width - 10, [filteredLines componentsJoinedByString:@"<br>"]];
+	NSString *htmlTemplate = @"<html><body style=\"width:%d; overflow:visible; padding:0; margin:0\"><big>%@</big></body></html>";
+	NSString *html = [NSString stringWithFormat:htmlTemplate, theWebViewWidth, [filteredLines componentsJoinedByString:@"<br>"]];
 	[filteredLines release];
 	return html;
 }
@@ -469,7 +464,11 @@
 		_imagesLinks = nil;
 		_connectionsDelegates = nil;
 		_suspendedOperation =  TVNoMVOperations;
+		
         _webView = [[UIWebView alloc] init];
+		_webView.frame = CGRectMake(10, 5, 280, 235);
+		_webView.backgroundColor = [UIColor clearColor];
+		_webView.scalesPageToFit = NO;		
         _webView.delegate = self;
         
         [_twitter setUsesSecureConnection:NO];
