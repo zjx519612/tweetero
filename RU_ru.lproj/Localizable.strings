@@ -8,13 +8,16 @@
 "420_Enhance_Your Calm"                         = "Rate limited.";
 "500_Internal_Server Error"                     = "Внутренняя ошибка сервера.";
 "502_Bad_Gateway"                               = "Сервер не отвечает.";
-"503_Service_Unavailable"                       = "The Twitter servers are up, but overloaded with requests. Try again later.";
+"503_Service_Unavailable"                       = "Сервера Twitter работают, но они перегружены запросами. Пробуйте снова позже.";
 
 "Account_Verification"                          = "Проверка учетной записи...";
 "Search_NotFound"                               = "Не найдено ни одного сообщения...";
 "Search_IndicatorText"                          = "Поиск...";
 "Authorization_Message"                         = "Некорректное имя пользователя или пароль!";
 "Authorization_Title"                           = "Ошибка авторизации!";
+"Server_Error_Title"                            = "Ошибка сервера!";
+"Unknown_Error_Title"                           = "Неизвестная ошибка!";
+"Unknown_Error_Message"                         = "Произошла неизвестная ошибка";
 
 "Post Image"                                    = "Отправить изображение";
 "New Tweet"                                     = "Новое сообщение";

@@ -62,4 +62,6 @@ NSString* FormatNSDate(NSDate* date);
 
 NSDictionary* GoogleMapsCoordsFromUrl(NSURL *url);
 
+UIAlertView *CreateAlertWithError(NSError *inError);
+
 #endif
