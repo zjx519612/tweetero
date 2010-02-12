@@ -538,6 +538,18 @@
     [self updateSegmentButtonState];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [self.navigationController.view setNeedsLayout];
+    TweetterAppDelegate *app = (TweetterAppDelegate*)[UIApplication sharedApplication].delegate;
+    NSLog(@"TweetViewController: app.window.frame: %@", NSStringFromCGRect(app.window.frame));
+    NSLog(@"TweetViewController: self.view.frame: %@", NSStringFromCGRect(self.view.frame));
+    [self.view.superview setFrame:CGRectMake(0, 64, 320, 416)];
+    [self.view.superview setNeedsLayout];
+    [self.navigationController.view setNeedsLayout];
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
@@ -551,7 +563,7 @@
     {
 		tweetNavigate.tintColor = _defaultTintColor;
     }
-    
+    self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
     [self updateFavoriteIcon];
     [self updateActionState];
 }

@@ -198,47 +198,55 @@
 	[self postData:imageJPEGData contentType:JPEG_CONTENT_TYPE];
 }
 
-- (void)postMP4Data:(NSData*)movieData delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
+- (void)postMP4DataWithUploadEngine:(ISVideoUploadEngine*)engine delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
 {
 	self.delegate = dlgt;
 	self.userData = data;
-	
+	[TweetterAppDelegate increaseNetworkActivityIndicator];
+    [self retain];
+    
+    UserAccount *account = [[AccountManager manager] loggedUserAccount];
+    MGTwitterEngineFactory *factory = [MGTwitterEngineFactory factory];
+    NSDictionary *authFields = [factory createTwitterAuthorizationFields:account];
+    if (authFields) {
+        NSString *val = [authFields objectForKey:@"username"];
+        if (val)
+            engine.username = val;
+        val = [authFields objectForKey:@"password"];
+        if (val)
+            engine.password = val;
+        else {
+            val = [authFields objectForKey:@"verify_url"];
+            if (val)
+                engine.verifyUrl = val;
+        }
+    }
+    if (![engine upload])
+        [self release];
+}
+
+- (void)postMP4DataWithPath:(NSString*)path delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
+{
+	if(!path)
+	{
+		[delegate uploadedImage:nil sender:self];
+		return;
+	}
+    ISVideoUploadEngine *videoUploadEngine = [[ISVideoUploadEngine alloc] initWithPath:path delegate:self];
+    [self postMP4DataWithUploadEngine:videoUploadEngine delegate:dlgt userData:data];
+    [videoUploadEngine release];
+}
+
+- (void)postMP4Data:(NSData*)movieData delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
+{
 	if(!movieData)
 	{
 		[delegate uploadedImage:nil sender:self];
 		return;
 	}
-    
-	[TweetterAppDelegate increaseNetworkActivityIndicator];
-    
-    [self retain];
     ISVideoUploadEngine *videoUploadEngine = [[ISVideoUploadEngine alloc] initWithData:movieData delegate:self];
-    
-    UserAccount *account = [[AccountManager manager] loggedUserAccount];
-    MGTwitterEngineFactory *factory = [MGTwitterEngineFactory factory];
-    NSDictionary *authFields = [factory createTwitterAuthorizationFields:account];
-    
-    if (authFields) {
-        NSString *val = [authFields objectForKey:@"username"];
-        if (val)
-            videoUploadEngine.username = val;
-        val = [authFields objectForKey:@"password"];
-        if (val)
-            videoUploadEngine.password = val;
-        else {
-            val = [authFields objectForKey:@"verify_url"];
-            if (val)
-                videoUploadEngine.verifyUrl = val;
-        }
-
-    }
-
-    
-    if (![videoUploadEngine upload])
-        [self release];
+    [self postMP4DataWithUploadEngine:videoUploadEngine delegate:dlgt userData:data];
     [videoUploadEngine release];
-    
-	//[self postData:movieData contentType:MP4_CONTENT_TYPE];
 }
 
 - (void)convertImageThreadAndStartUpload:(UIImage*)image

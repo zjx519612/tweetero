@@ -735,14 +735,14 @@
 	self.connectionDelegate = uploader;
 	[self retainActivityIndicator];
 #if 0
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"test" ofType:@"mp4"];
-    [uploader postMP4Data:[NSData dataWithContentsOfFile:path] delegate:self userData:pickedPhoto];
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"DeleteMe" ofType:@"mp4"];
+    [uploader postMP4DataWithPath:path delegate:self userData:pickedPhoto];
     return;
 #else
 	if(pickedPhoto)
 		[uploader postImage:pickedPhoto delegate:self userData:pickedPhoto];
 	else
-		[uploader postMP4Data:[NSData dataWithContentsOfURL:pickedVideo] delegate:self userData:pickedVideo];
+        [uploader postMP4DataWithPath:[pickedVideo absoluteString] delegate:self userData:pickedVideo];
 #endif
 	//[uploader release];
 }

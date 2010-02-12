@@ -48,6 +48,8 @@ typedef enum {
     NSUInteger                       currentDataLocation;
     int                              phase;
     id<ISVideoUploadEngineDelegate>  delegate;
+    NSString                        *path;
+    unsigned long long               internalDataSize;
 }
 
 @property (nonatomic, copy) NSString *username;
@@ -57,14 +59,18 @@ typedef enum {
 @property (nonatomic, copy) NSString *linkUrl;
 @property (nonatomic, copy) NSString *putUrl;
 @property (nonatomic, copy) NSString *getLengthUrl;
+@property (nonatomic, retain) NSString *path;
 
 // Init upload ojbect
 - (id)initWithData:(NSData *)theData delegate:(id<ISVideoUploadEngineDelegate>) dlgt;
 
+- (id)initWithPath:(NSString*)path delegate:(id<ISVideoUploadEngineDelegate>) dlgt;
 // Upload media data to server
 - (BOOL)upload;
 
 // Cancel uploading process
 - (void)cancel;
+
+- (BOOL)fromFile;
 
 @end
