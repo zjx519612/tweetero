@@ -731,6 +731,8 @@
 	if(![self mediaIsPicked])
 		return;
 
+	// Image uploader will be released after finishing upload process by setting
+	// self.connectionDelegate property to nil on uploadedImage: sender method
 	ImageUploader * uploader = [[ImageUploader alloc] init];
 	self.connectionDelegate = uploader;
 	[self retainActivityIndicator];
@@ -744,7 +746,8 @@
 	else
         [uploader postMP4DataWithPath:[pickedVideo absoluteString] delegate:self userData:pickedVideo];
 #endif
-	//[uploader release];
+	
+	[uploader release];
 }
 
 - (void)startUploadingOfPickedMediaIfNeed

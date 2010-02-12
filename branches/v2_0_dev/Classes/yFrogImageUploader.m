@@ -166,14 +166,13 @@
 	[req setHTTPBody:postBody];
 
     [delegate uploadedDataSize:[postBody length]];
-    
-	[self retain];
-	self.connection = [[NSURLConnection alloc] initWithRequest:req delegate:self startImmediately:YES];
+	
+	self.connection = [[[NSURLConnection alloc] initWithRequest:req delegate:self startImmediately:YES] autorelease];
 	if (!self.connection) 
 	{
 		[delegate uploadedImage:nil sender:self];
-		[self release];
 	}
+	
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
 }
 
@@ -203,7 +202,6 @@
 	self.delegate = dlgt;
 	self.userData = data;
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
-    [self retain];
     
     UserAccount *account = [[AccountManager manager] loggedUserAccount];
     MGTwitterEngineFactory *factory = [MGTwitterEngineFactory factory];
@@ -222,7 +220,7 @@
         }
     }
     if (![engine upload])
-        [self release];
+        [delegate uploadedImage:nil sender:self];
 }
 
 - (void)postMP4DataWithPath:(NSString*)path delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
@@ -262,7 +260,7 @@
 
 - (void)postImage:(UIImage*)image delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
 {
-	delegate = [dlgt retain];
+	self.delegate = dlgt;
 	self.userData = data;
 
 	UIImage* modifiedImage = nil;
@@ -295,7 +293,6 @@
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	[delegate uploadedImage:nil sender:self];
-    [self release];
 }
 
 - (void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten 
@@ -359,7 +356,6 @@
 	[result setLength:0];
 	
 	[delegate uploadedImage:self.newURL sender:self];
-	[self release];
 }
 
 - (void)cancel
@@ -369,8 +365,8 @@
 	{
 		[connection cancel];
 		[TweetterAppDelegate decreaseNetworkActivityIndicator];
-		[self release];
 	}
+	
 	[delegate uploadedImage:nil sender:self];
 }
 
@@ -389,14 +385,12 @@
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	[delegate uploadedImage:link sender:self];
-    [self release];
 }
 
 - (void)didFailWithErrorMessage:(ISVideoUploadEngine *)engine errorMessage:(NSString *)error
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	[delegate uploadedImage:nil sender:self];
-    [self release];
 }
 
 - (void)didFinishUploadingChunck:(ISVideoUploadEngine *)engine uploadedSize:(NSUInteger)totalUploadedSize totalSize:(NSUInteger)size

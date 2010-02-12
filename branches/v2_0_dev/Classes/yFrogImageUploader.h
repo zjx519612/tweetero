@@ -71,6 +71,6 @@
 @property (nonatomic, retain) NSString* newURL;
 @property (nonatomic, retain) NSString* contentType;
 @property (nonatomic, retain) id userData;
-@property (nonatomic, retain) id <ImageUploaderDelegate> delegate;
+@property (nonatomic, assign) id <ImageUploaderDelegate> delegate;
 
 @end
