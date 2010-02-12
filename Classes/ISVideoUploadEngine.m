@@ -32,7 +32,8 @@
 - (void)clearResult;
 - (BOOL)openConnection:(NSURLRequest *)request;
 - (NSString *)errorMessage;
-
+- (NSData*)dataWithRange:(NSRange)range;
+- (unsigned long long)dataSize;
 @end
 
 @implementation ISVideoUploadEngine
@@ -44,18 +45,38 @@
 @synthesize putUrl;
 @synthesize getLengthUrl;
 @synthesize verifyUrl;
+@synthesize path;
 
-- (id)initWithData:(NSData *)theData delegate:(id<ISVideoUploadEngineDelegate>) dlgt
+- (id)init
 {
-    NSAssert([kTweeteroDevKey length] == 0, @"Dev key is empty");
-    
-    if ((self = [super init]))
+    if (self = [super init])
     {
-        uploadData = [theData retain];
         boundary = [NSString stringWithFormat:@"------%ld__%ld__%ld", random(), random(), random()];
         connection = nil;
         result = [[NSMutableData alloc] init];
         phase = ISUploadPhaseNone;
+        path = nil;
+        uploadData = nil;
+        internalDataSize = 0;
+    }
+    return self;
+}
+
+- (id)initWithData:(NSData *)theData delegate:(id<ISVideoUploadEngineDelegate>) dlgt
+{
+    if ((self = [self init]))
+    {
+        delegate = dlgt;
+        uploadData = [theData retain];
+    }
+    return self;
+}
+
+- (id)initWithPath:(NSString*)path delegate:(id<ISVideoUploadEngineDelegate>) dlgt
+{
+    if (self = [self init])
+    {
+        self.path = path;
         delegate = dlgt;
     }
     return self;
@@ -63,6 +84,7 @@
 
 - (void)dealloc
 {
+    self.path = nil;
     self.linkUrl = nil;
     self.putUrl = nil;
     self.getLengthUrl = nil;
@@ -93,6 +115,11 @@
     if (connection)
         [connection release];
     [self release];
+}
+
+- (BOOL)fromFile
+{
+    return (uploadData == nil && self.path != nil);
 }
 
 #pragma mark NSURLConnection connection callbacks
@@ -141,7 +168,8 @@
         }
         else if (phase == ISUploadPhaseUploadData && statusCode == 202)
         {
-            [delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[uploadData length]];
+            //[delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[uploadData length]];
+            [delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[self dataSize]];
             [self uploadNextChunk];
         }
     }
@@ -222,7 +250,8 @@
             [self sendInitData];
             break;
         case ISUploadPhaseUploadData:
-            [delegate didStartUploading:self totalSize:[uploadData length]];
+            //[delegate didStartUploading:self totalSize:[uploadData length]];
+            [delegate didStartUploading:self totalSize:[self dataSize]];
             [self uploadNextChunk];
             break;
         case ISUploadPhaseResumeUpload:
@@ -235,7 +264,8 @@
             [self release];
             break;
         case ISUploadPhaseFinish:
-            [delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[uploadData length]];
+            //[delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[uploadData length]];
+            [delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[self dataSize]];
             [delegate didFinishUploading:self videoUrl:self.linkUrl];
             currentDataLocation = 0;
             phase = ISUploadPhaseNone;
@@ -306,16 +336,22 @@
     NSRange range = {0, 1024};
 
     range.location = currentDataLocation;
-    if ([uploadData length] <= range.location)
+    //if ([uploadData length] <= range.location)
+    unsigned long long size = [self dataSize];
+    if (size <= range.location)
         return;
     
-    if (([uploadData length] - range.location) < range.length)
-        range.length = [uploadData length] - range.location;
+    //if (([uploadData length] - range.location) < range.length)
+    if ((size - range.location) < range.length)
+        range.length = size - range.location;
     
-    NSData *dataChunck = [uploadData subdataWithRange:range];
+    //NSData *dataChunck = [uploadData subdataWithRange:range];
+    NSData *dataChunck = [self dataWithRange:range];
     
-    NSString *contentLength = [NSString stringWithFormat:@"%d", [uploadData length]];
-    NSString *contentRange = [NSString stringWithFormat:@"bytes %d-%d/%d", range.location, range.location + range.length-1, [uploadData length]];
+    //NSString *contentLength = [NSString stringWithFormat:@"%d", [uploadData length]];
+    NSString *contentLength = [NSString stringWithFormat:@"%d", size];
+    //NSString *contentRange = [NSString stringWithFormat:@"bytes %d-%d/%d", range.location, range.location + range.length-1, [uploadData length]];
+    NSString *contentRange = [NSString stringWithFormat:@"bytes %d-%d/%d", range.location, range.location + range.length-1, size];
     
     NSMutableURLRequest *request = tweeteroMutableURLRequest([NSURL URLWithString:self.putUrl]);
     [request setHTTPMethod:@"PUT"];
@@ -369,6 +405,43 @@
         default:
             return NSLocalizedString(@"Unknown error", @"");
     }
+}
+
+- (NSData*)dataWithRange:(NSRange)range
+{
+    NSData *data = nil;
+    if ([self fromFile])
+    {
+        NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:self.path];
+        [file seekToFileOffset:range.location];
+        data = [file readDataOfLength:range.length];
+        [file closeFile];
+    }
+    else {
+        data = [uploadData subdataWithRange:range];
+    }
+    return data;
+}
+
+- (unsigned long long)dataSize
+{
+    if (internalDataSize > 0)
+        return internalDataSize;
+    if ([self fromFile])
+    {
+        NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:self.path];
+        if (file)
+        {
+            [file seekToEndOfFile];
+            internalDataSize = [file offsetInFile];
+            [file closeFile];
+        }
+    }
+    else
+    {
+        internalDataSize = [uploadData length];
+    }
+    return internalDataSize;
 }
 
 @end

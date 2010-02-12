@@ -26,6 +26,7 @@
 
 #import "ImageViewController.h"
 #import "TwitEditorController.h"
+#import "TweetterAppDelegate.h"
 
 #define	PICTURE_SAVING_ALERT				165
 #define	PICTURE_DOWNLOADING_ERROR_ALERT		80
@@ -83,8 +84,8 @@
 	if(self._image)
 		[self applyImage];
 	
-	_tabBarTransform = self.tabBarController.view.transform;
-	_tabBarFrame = self.tabBarController.view.frame;
+	//_tabBarTransform = self.tabBarController.view.transform;
+	//_tabBarFrame = self.tabBarController.view.frame;
 	
 	defaultTintColor = [imageActionsSegmentedControl.tintColor retain];	// keep track of this for later
 	
@@ -115,15 +116,24 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
-	
 	if(connectionDelegate)
 		[connectionDelegate cancel];
-
-	[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationPortrait];
-	self.tabBarController.view.transform = _tabBarTransform;
-	self.tabBarController.view.frame = _tabBarFrame;
-	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
+	//[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationPortrait];
+	//self.tabBarController.view.transform = _tabBarTransform;
+	//self.tabBarController.view.frame = _tabBarFrame;
+	//self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
+    TweetterAppDelegate *app = (TweetterAppDelegate*)[UIApplication sharedApplication].delegate;
+    [UIView beginAnimations:NULL context:NULL];
+    [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:app.window cache:NO];
+    NSLog(@"ImageViewController: %@", NSStringFromCGRect(app.window.frame));
+    app.window.transform = CGAffineTransformIdentity;
+    app.window.transform = CGAffineTransformMakeRotation(3.1415);
+    app.window.bounds = CGRectMake(0.0f, 0.0f, 320.0f, 480.0f);
+    app.window.center = CGPointMake(160.0f, 240.0f);
+    [UIView commitAnimations];
 	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+    [[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationPortrait];
+    self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
 }
 
 
