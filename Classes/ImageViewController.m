@@ -30,7 +30,13 @@
 
 #define	PICTURE_SAVING_ALERT				165
 #define	PICTURE_DOWNLOADING_ERROR_ALERT		80
+#define kImageRotationAnimation				0.75
 
+@interface ImageViewController()
+
+- (void)orientationDidChangeHandler:(NSNotification*)notification;
+
+@end
 
 @implementation ImageViewController
 
@@ -99,7 +105,11 @@
 		[segmentBarItem release];
 	}
 	else
-		self.navigationItem.rightBarButtonItem = saveButton;	
+		self.navigationItem.rightBarButtonItem = saveButton;
+	
+	[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+				selector:@selector(orientationDidChangeHandler:) name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -107,42 +117,39 @@
 	[super viewWillAppear:animated];
 	self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
 	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:YES];
-	if (self.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent || self.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque) 
+	
+	if (self.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent ||
+				self.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque)
+	{
 		imageActionsSegmentedControl.tintColor = [UIColor darkGrayColor];
+	}
 	else
+	{
 		imageActionsSegmentedControl.tintColor = defaultTintColor;
+	}
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
 	[super viewWillDisappear:animated];
+	
 	if(connectionDelegate)
+	{
 		[connectionDelegate cancel];
-	//[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationPortrait];
-	//self.tabBarController.view.transform = _tabBarTransform;
-	//self.tabBarController.view.frame = _tabBarFrame;
-	//self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
-    TweetterAppDelegate *app = (TweetterAppDelegate*)[UIApplication sharedApplication].delegate;
-    [UIView beginAnimations:NULL context:NULL];
-    [UIView setAnimationTransition:UIViewAnimationTransitionCurlUp forView:app.window cache:NO];
-    NSLog(@"ImageViewController: %@", NSStringFromCGRect(app.window.frame));
-    app.window.transform = CGAffineTransformIdentity;
-    app.window.transform = CGAffineTransformMakeRotation(3.1415);
-    app.window.bounds = CGRectMake(0.0f, 0.0f, 320.0f, 480.0f);
-    app.window.center = CGPointMake(160.0f, 240.0f);
-    [UIView commitAnimations];
+	}
+	
+	[[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationPortrait];
+	self.tabBarController.view.transform = _tabBarTransform;
+	self.tabBarController.view.frame = _tabBarFrame;
+	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
 	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
-    [[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationPortrait];
-    self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
 }
-
 
 - (void)didReceiveMemoryWarning 
 {
     [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
     // Release anything that's not essential, such as cached data
 }
-
 
 - (void)dealloc 
 {
@@ -151,9 +158,12 @@
 	[defaultTintColor release];
 	self.connectionDelegate = nil;
 	self.originalMessage = nil;
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+	
     [super dealloc];
 }
-
 
 - (UIView *) viewForZoomingInScrollView: (UIScrollView *) scrollView
 {
@@ -169,7 +179,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-	return YES;
+	return NO;
 }
 
 -(void)setFullScreen:(BOOL)fullScreen
@@ -307,6 +317,67 @@
 	alert.tag = PICTURE_SAVING_ALERT;
 	[alert show];
 	[alert release];
+}
+
+- (void)orientationDidChangeHandler:(NSNotification*)notification
+{
+	UIDeviceOrientation theDeviceOrientation = [[UIDevice currentDevice] orientation];
+	
+	CGFloat theAngle = 0.0;
+	CGFloat theScaleRate = 1.0;
+	BOOL isPortraitOrientation = YES;
+			
+	switch(theDeviceOrientation)
+	{
+		case UIDeviceOrientationLandscapeLeft:
+			theAngle = M_PI / 2.0;
+			isPortraitOrientation = NO;
+			break;
+			
+		case UIDeviceOrientationLandscapeRight:
+			theAngle = 3 * M_PI / 2.0;
+			isPortraitOrientation = NO;
+			break;
+			
+		case UIDeviceOrientationPortrait:
+			theAngle = 0;
+			isPortraitOrientation = YES;
+			break;
+			
+		case UIDeviceOrientationPortraitUpsideDown:
+			theAngle = M_PI;
+			isPortraitOrientation = YES;
+			break;
+			
+		default:
+			// do nothing
+			return;
+	}
+	
+	[UIView beginAnimations:NULL context:NULL];
+	[UIView setAnimationDuration:kImageRotationAnimation];
+	
+	imageView.transform = CGAffineTransformMakeRotation(theAngle);
+	
+	if (isPortraitOrientation)
+	{
+		theScaleRate = (_image.size.width < _image.size.height) ?
+					imageView.superview.frame.size.height / _image.size.height :
+					imageView.superview.frame.size.width / _image.size.width;
+	}
+	else
+	{
+		theScaleRate = (_image.size.width < _image.size.height) ?
+					imageView.superview.frame.size.width / _image.size.height :
+					imageView.superview.frame.size.height / _image.size.width;		
+	}
+
+	NSInteger theWidth = _image.size.width * theScaleRate;
+	NSInteger theHeight = _image.size.height * theScaleRate;
+		
+	imageView.bounds = CGRectMake(0, 0, theWidth, theHeight);
+
+	[UIView commitAnimations];	
 }
 
 @end
