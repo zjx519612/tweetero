@@ -112,8 +112,11 @@
 {
     phase = ISUploadPhaseNone;
     currentDataLocation = 0;
-    if (connection)
+    if (connection) {
+        [connection cancel];
         [connection release];
+        connection = nil;
+    }
     [self release];
 }
 
@@ -168,7 +171,6 @@
         }
         else if (phase == ISUploadPhaseUploadData && statusCode == 202)
         {
-            //[delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[uploadData length]];
             [delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[self dataSize]];
             [self uploadNextChunk];
         }
@@ -180,13 +182,11 @@
 {
     if (phase == ISUploadPhaseResumeUpload)
     {
-        char *ptr = (char *)malloc([data length] + 1);
-        memcpy(ptr, [data bytes], [data length]);
-        *(ptr + [data length]) = 0;
-        
-        NSString *str = [NSString stringWithCString:ptr];
-        currentDataLocation = [str intValue];
-        //currentDataLocation = 0;
+        //Parse the uploaded chunck size
+        NSString *value = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        currentDataLocation = [value intValue];
+        [value release];
+        //Call the delegate method
         [delegate didResumeUploading:self];
         [self doPhase:ISUploadPhaseUploadData];
     }

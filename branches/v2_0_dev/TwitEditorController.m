@@ -38,6 +38,12 @@
 #import "AccountManager.h"
 #import "Logger.h"
 
+#define DEBUG_VIDEO_UPLOAD              0
+#if DEBUG_VIDEO_UPLOAD
+#   define DEBUG_VIDEO_FILE_NAME        @"test"
+#   define DEBUG_VIDEO_FILE_EXT         @"mov"
+#endif
+
 #define SEND_SEGMENT_CNTRL_WIDTH			130
 #define FIRST_SEND_SEGMENT_WIDTH			 66
 
@@ -389,11 +395,16 @@
 */
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-	
+#if DEBUG_VIDEO_UPLOAD
+    NSString *debugVideoFilePath = [[NSBundle mainBundle] pathForResource:DEBUG_VIDEO_FILE_NAME ofType:DEBUG_VIDEO_FILE_EXT];
+    NSURL *theMovieURL = [NSURL fileURLWithPath:debugVideoFilePath];
+    [self imagePickerController:picker didFinishWithPickingPhoto:nil pickingMovie:theMovieURL];
+#else
 	if([[info objectForKey:@"UIImagePickerControllerMediaType"] isEqualToString:K_UI_TYPE_IMAGE])
 		[self imagePickerController:picker didFinishWithPickingPhoto:[info objectForKey:@"UIImagePickerControllerOriginalImage"] pickingMovie:nil];
 	else if([[info objectForKey:@"UIImagePickerControllerMediaType"] isEqualToString:K_UI_TYPE_MOVIE])
 		[self imagePickerController:picker didFinishWithPickingPhoto:nil pickingMovie:[info objectForKey:@"UIImagePickerControllerMediaURL"]];
+#endif
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)img editingInfo:(NSDictionary *)editInfo 
@@ -476,9 +487,11 @@
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad 
+//- (void)viewDidLoad 
+- (void)loadView
 {
-    [super viewDidLoad];
+    //[super viewDidLoad];
+    [super loadView];
 	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
 	temporaryBarButtonItem.title = NSLocalizedString(@"Back", @"");
 	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
@@ -731,21 +744,25 @@
 	if(![self mediaIsPicked])
 		return;
 
+    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+    
 	// Image uploader will be released after finishing upload process by setting
 	// self.connectionDelegate property to nil on uploadedImage: sender method
 	ImageUploader * uploader = [[ImageUploader alloc] init];
 	self.connectionDelegate = uploader;
 	[self retainActivityIndicator];
-#if 0
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"DeleteMe" ofType:@"mp4"];
-    [uploader postMP4DataWithPath:path delegate:self userData:pickedPhoto];
-    return;
-#else
 	if(pickedPhoto)
 		[uploader postImage:pickedPhoto delegate:self userData:pickedPhoto];
 	else
-        [uploader postMP4DataWithPath:[pickedVideo absoluteString] delegate:self userData:pickedVideo];
-#endif
+    {
+        NSString *path;
+        if ([pickedVideo isFileURL]) {
+            path = [pickedVideo path];
+        } else {
+            path = [pickedVideo absoluteString];
+        }
+        [uploader postMP4DataWithPath:path delegate:self userData:pickedVideo];
+    }
 	
 	[uploader release];
 }
@@ -823,12 +840,11 @@
 	if(!self.progressSheet)
 		self.progressSheet = ShowActionSheet(NSLocalizedString(@"Send twit on Twitter", @""), self, NSLocalizedString(@"Cancel", @""), 
                                              self.view);
-		
-	postImageSegmentedControl.enabled = NO;
-
-	NSString* mgTwitterConnectionID = nil;
     
-    mgTwitterConnectionID = [self sendMessage:messageBody];
+    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+	postImageSegmentedControl.enabled = NO;
+    
+    NSString* mgTwitterConnectionID = [self sendMessage:messageBody];
 	//if(_message)
 	//	mgTwitterConnectionID = [_twitter sendUpdate:messageBody inReplyTo:[[_message objectForKey:@"id"] intValue]];
 	//else if(_queueIndex >= 0)
@@ -1029,10 +1045,12 @@
 	}
 	else
 	{
+        [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
 		suspendedOperation = noTEOperations;
 		[self dismissProgressSheetIfExist];
 		if(connectionDelegate)
 			[connectionDelegate cancel];
+        [TweetterAppDelegate decreaseNetworkActivityIndicator];
 	}
 }
 
@@ -1127,6 +1145,9 @@
 - (void)uploadedImage:(NSString*)yFrogURL sender:(ImageUploader*)sender
 {
 	[self releaseActivityIndicator];
+
+    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
+    
 	id userData = sender.userData;
 	if(([userData isKindOfClass:[UIImage class]] && userData == pickedPhoto)    ||
 		([userData isKindOfClass:[NSURL class]] && userData == pickedVideo)	) // don't kill later connection
@@ -1147,8 +1168,6 @@
 	if(suspendedOperation == send)
 	{
 		suspendedOperation == noTEOperations;
-        NSLog(@"Test");
-        NSLog(yFrogURL);
 		if(yFrogURL)
 			[self postImageAction];
 		else
@@ -1181,6 +1200,7 @@
 - (void)requestSucceeded:(NSString *)connectionIdentifier
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
+    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
 	[self dismissProgressSheetIfExist];
 	[[NSNotificationCenter defaultCenter] postNotificationName: @"TwittsUpdated" object: nil];
 	self.connectionDelegate = nil;
@@ -1196,6 +1216,8 @@
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
+    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
+    
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	[self dismissProgressSheetIfExist];
 	self.connectionDelegate = nil;
@@ -1212,6 +1234,7 @@
 
 - (void)MGConnectionCanceled:(NSString *)connectionIdentifier
 {
+    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
 	postImageSegmentedControl.enabled = YES;
 	self.connectionDelegate = nil;
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
@@ -1221,6 +1244,8 @@
 - (void)doCancel
 {
 	[self.navigationController popViewControllerAnimated:YES];
+    
+    [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
 	if(connectionDelegate)
 		[connectionDelegate cancel];
 	[self setImage:nil movie:nil];

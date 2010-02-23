@@ -523,13 +523,13 @@
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-    
+    /*
 	for (id view in _webView.subviews) 
 	{
 		if ([view respondsToSelector:@selector(setAllowsRubberBanding:)]) 
 			[view performSelector:@selector(setAllowsRubberBanding:) withObject:NO]; 
 	}
-    
+    */
     tweetNavigate.frame = CGRectMake(0, 0, 80, 30);
     UIBarButtonItem *navigateBarItem = [[[UIBarButtonItem alloc] initWithCustomView:tweetNavigate] autorelease];
     self.navigationItem.rightBarButtonItem = navigateBarItem;
