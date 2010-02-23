@@ -54,7 +54,7 @@
 	BOOL			scaleIfNeed;
 	
 	NSString*		contentType;
-
+    ISVideoUploadEngine *videoUploadEngine;
 }
 
 - (void)postJPEGData:(NSData*)imageJPEGData delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data;

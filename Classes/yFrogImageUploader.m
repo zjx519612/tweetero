@@ -54,6 +54,20 @@
 	return self;
 }
 
+- (void)setVideoUploadEngine:(ISVideoUploadEngine*)engine
+{
+    if (videoUploadEngine != engine)
+    {
+        //stop and release current upload process if current is exists
+        if (videoUploadEngine)
+        {
+            [videoUploadEngine cancel];
+            [videoUploadEngine release];
+        }
+        //set new ISVideoUploadEngine object
+        videoUploadEngine = [engine retain];
+    }
+}
 /*
 - (id)retain
 {
@@ -72,6 +86,8 @@
 
 -(void)dealloc
 {
+    //[self setVideoUploadEngine:nil];
+    [videoUploadEngine release];
 	self.delegate = nil;
 	self.connection = nil;
 	self.contentXMLProperty = nil;
@@ -221,6 +237,8 @@
     }
     if (![engine upload])
         [delegate uploadedImage:nil sender:self];
+    else
+        [self setVideoUploadEngine:engine];
 }
 
 - (void)postMP4DataWithPath:(NSString*)path delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
@@ -230,9 +248,9 @@
 		[delegate uploadedImage:nil sender:self];
 		return;
 	}
-    ISVideoUploadEngine *videoUploadEngine = [[ISVideoUploadEngine alloc] initWithPath:path delegate:self];
-    [self postMP4DataWithUploadEngine:videoUploadEngine delegate:dlgt userData:data];
-    [videoUploadEngine release];
+    ISVideoUploadEngine *engine = [[ISVideoUploadEngine alloc] initWithPath:path delegate:self];
+    [self postMP4DataWithUploadEngine:engine delegate:dlgt userData:data];
+    [engine release];
 }
 
 - (void)postMP4Data:(NSData*)movieData delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
@@ -242,9 +260,9 @@
 		[delegate uploadedImage:nil sender:self];
 		return;
 	}
-    ISVideoUploadEngine *videoUploadEngine = [[ISVideoUploadEngine alloc] initWithData:movieData delegate:self];
-    [self postMP4DataWithUploadEngine:videoUploadEngine delegate:dlgt userData:data];
-    [videoUploadEngine release];
+    ISVideoUploadEngine *engine = [[ISVideoUploadEngine alloc] initWithData:movieData delegate:self];
+    [self postMP4DataWithUploadEngine:engine delegate:dlgt userData:data];
+    [engine release];
 }
 
 - (void)convertImageThreadAndStartUpload:(UIImage*)image
@@ -340,21 +358,16 @@
 - (void) connectionDidFinishLoading:(NSURLConnection *)connection
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-    NSString *str = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
-    NSLog(str);
-    [str release];
     
 	NSXMLParser *parser = [[NSXMLParser alloc] initWithData:result];
 	[parser setDelegate:self];
 	[parser setShouldProcessNamespaces:NO];
 	[parser setShouldReportNamespacePrefixes:NO];
 	[parser setShouldResolveExternalEntities:NO];
-	
 	[parser parse];
 	[parser release];
-
+    
 	[result setLength:0];
-	
 	[delegate uploadedImage:self.newURL sender:self];
 }
 
@@ -366,7 +379,7 @@
 		[connection cancel];
 		[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	}
-	
+	[self setVideoUploadEngine:nil];
 	[delegate uploadedImage:nil sender:self];
 }
 
