@@ -250,21 +250,21 @@ UIImage* imageScaledToSizeThreadSafe(UIImage* image, int maxDimension)
     unsigned int image_width = bounds.size.width;
     size_t bits_per_component = CGImageGetBitsPerComponent(imgRef);
     
-    CGContextRef context;
+    UIImage *imageCopy = nil;
+	CGContextRef context = CGBitmapContextCreate(NULL, image_width, image_height, bits_per_component,
+				bytes_per_row, CGImageGetColorSpace(imgRef), CGImageGetBitmapInfo(imgRef));
+	if (NULL != context)
+	{
+		CGContextDrawImage(context, CGRectMake(0, 0, image_width, image_height), imgRef);
+		CGImageRef scaledImageRef = CGBitmapContextCreateImage(context);
     
-    context = CGBitmapContextCreate(NULL, image_width, image_height, bits_per_component, bytes_per_row, CGImageGetColorSpace(imgRef), CGImageGetBitmapInfo(imgRef));
-	
-    CGContextDrawImage(context, CGRectMake(0, 0, image_width, image_height), imgRef);
+		imageCopy = [UIImage imageWithCGImage:scaledImageRef];
     
-    CGImageRef scaledImageRef = CGBitmapContextCreateImage(context);
-    
-    UIImage *imageCopy = [UIImage imageWithCGImage:scaledImageRef];
-    
-    CFRelease(scaledImageRef);
-    CGContextRelease(context);
+		CFRelease(scaledImageRef);
+		CGContextRelease(context);
+	}
     
     return imageCopy;
-	
 }
 
 int isImageNeedToConvert(UIImage* testImage, BOOL *needToResize, BOOL *needToRotate)
