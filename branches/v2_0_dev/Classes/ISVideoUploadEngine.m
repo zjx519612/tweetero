@@ -72,11 +72,11 @@
     return self;
 }
 
-- (id)initWithPath:(NSString*)path delegate:(id<ISVideoUploadEngineDelegate>) dlgt
+- (id)initWithPath:(NSString*)aPath delegate:(id<ISVideoUploadEngineDelegate>) dlgt
 {
     if (self = [self init])
     {
-        self.path = path;
+        self.path = aPath;
         delegate = dlgt;
     }
     return self;
