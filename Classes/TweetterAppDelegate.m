@@ -137,7 +137,7 @@ static int NetworkActivityIndicatorCounter = 0;
 	MKAnnotationView *pinView = [mapView dequeueReusableAnnotationViewWithIdentifier:@"PhotoPlacePin"];
 	if(!pinView)
     {
-		pinView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"PhotoPlacePin"];
+		pinView = [[[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"PhotoPlacePin"] autorelease];
 	}
 	return pinView;
 }
@@ -193,7 +193,7 @@ static int NetworkActivityIndicatorCounter = 0;
 		[mapView addAnnotation:place];
 		
 		[self.navigationController pushViewController:container animated:NO];
-		
+        
 		[container release];
 	}
 }

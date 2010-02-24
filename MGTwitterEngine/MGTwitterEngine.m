@@ -1788,7 +1788,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
     NSString *body = [self _queryStringWithBase:nil parameters:params prefixed:NO];
     
     return [self _sendRequestWithMethod:HTTP_POST_METHOD path:path 
-                        queryParameters:params body:body 
+                        queryParameters:/*params*/nil body:body 
                             requestType:MGTwitterDirectMessageSend 
                            responseType:MGTwitterDirectMessage];
 }

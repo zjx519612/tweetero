@@ -312,12 +312,17 @@ static NSString* kActionCell = @"UserInfoActionCell";
 		[info appendString:@"Location: "];
 		
 		NSString *textPart;
-		[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&textPart];
-		if([textPart length] > 0 && [textPart characterAtIndex:[textPart length] - 1] == (unichar)'-')
+		BOOL success = [scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:(NSString **)&textPart];
+		if(success && ([textPart length] > 0 && [textPart characterAtIndex:[textPart length] - 1] == (unichar)'-'))
 		{
 			textPart = [textPart substringToIndex:[textPart length] - 1];
 			[scanner setScanLocation:[scanner scanLocation] - 1];
 		}
+        else
+        {
+            textPart = @"";
+        }
+
 		// Update head info view
         _userInfoView.location = textPart;
 		[info appendString:textPart];
@@ -338,7 +343,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 				[scanner scanDouble:&y];
 				[info appendFormat:@"<a href = http://maps.google.com/maps?q=%f,%f>%@</a>", x, y, @"Current Location"];
 				[info appendString:[item substringFromIndex:[scanner scanLocation]]];
-				
+				NSLog(@"INFO: %@", info);
 			}
 		}
 		[info appendString:@"<br>"];

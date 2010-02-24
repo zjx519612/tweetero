@@ -146,11 +146,17 @@ static NSString* const kGGTwitterLoadingBackgroundImage = @"twitter_load.png";
     }
 	
 	[_webView stringByEvaluatingJavaScriptFromString:dataSource]; //This line injects the jQuery to make it look better
-	
-	NSString					*authPin = [[_webView stringByEvaluatingJavaScriptFromString: @"document.getElementById('oauth-pin').innerHTML"] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	
-	if (authPin.length == 0) authPin = [[_webView stringByEvaluatingJavaScriptFromString: @"document.getElementById('oauth-pin').getElementsByTagName('a')[0].innerHTML"] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
-
+	//check for auth_pin element
+	NSString *authPin = [[_webView stringByEvaluatingJavaScriptFromString: @"document.getElementById('oauth_pin').innerHTML"] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+	if (authPin.length == 0)
+        authPin = [[_webView stringByEvaluatingJavaScriptFromString: @"document.getElementById('oauth_pin').getElementsByTagName('a')[0].innerHTML"] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    //if the auth pin not found than check for the auth-pin elenent
+    if (authPin == nil || authPin.length == 0) {
+        authPin = [[_webView stringByEvaluatingJavaScriptFromString: @"document.getElementById('oauth-pin').innerHTML"] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (authPin.length == 0)
+            authPin = [[_webView stringByEvaluatingJavaScriptFromString: @"document.getElementById('oauth-pin').getElementsByTagName('a')[0].innerHTML"] stringByTrimmingCharactersInSet: [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    }
+    
 	[_activityIndicator stopAnimating];
 	if (authPin.length) {
 		[self gotPin: authPin];

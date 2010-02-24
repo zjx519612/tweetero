@@ -828,6 +828,7 @@
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
+    NSLog(@"WebViewDidFinishLoad: Orientation is %d",[UIDevice currentDevice].orientation);
 }
 
 #pragma mark UIActionSheet Delegate
