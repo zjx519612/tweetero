@@ -1050,6 +1050,7 @@
 		[self dismissProgressSheetIfExist];
 		if(connectionDelegate)
 			[connectionDelegate cancel];
+        [cancelButton setEnabled:YES];
         [TweetterAppDelegate decreaseNetworkActivityIndicator];
 	}
 }

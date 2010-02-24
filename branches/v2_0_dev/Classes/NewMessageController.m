@@ -75,7 +75,6 @@
 	NSString* connectionID = [_twitter sendDirectMessage:body to:_user];
 	if(connectionID)
 	{
-		[TweetterAppDelegate increaseNetworkActivityIndicator];
 		[cancelButton setEnabled:NO];
 	}
     return connectionID;
