@@ -27,8 +27,6 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
-extern NSString * const WVOpenGoogleMapsNotification;
-
 @interface WebViewController : UIViewController <UIWebViewDelegate>
 {
     IBOutlet UIWebView* _webView;

@@ -475,8 +475,6 @@
         [self createHeadView];
         [self createFooterView];
         [self activeCurrentMessage];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onOpenGoogleMaps:) name:WVOpenGoogleMapsNotification object:nil];
     }
     return self;    
 }
@@ -577,21 +575,6 @@
 {
     [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
     // Release anything that's not essential, such as cached data
-}
-
-#pragma mark Google Maps notification handler
-- (void)onOpenGoogleMaps:(NSNotification*)note
-{
-    NSLog(@"openGoogleMaps");
-    
-    [self.navigationController popToViewController:self animated:NO];
-    
-    TweetterAppDelegate *appDel = (TweetterAppDelegate*)[[UIApplication sharedApplication] delegate];
-    
-    NSString *latitude = [[note userInfo] objectForKey:@"latitude"];
-    NSString *longtitude = [[note userInfo] objectForKey:@"longtitude"];
-    
-    [appDel openMapWithCoords:latitude longtitude:longtitude];
 }
 
 #pragma mark Actions

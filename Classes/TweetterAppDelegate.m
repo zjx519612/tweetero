@@ -43,6 +43,7 @@
 #import "TwTabController.h"
 #import "ISVideoUploadEngine.h"
 #import "AccountManager.h"
+#import "util.h"
 
 #import <MapKit/MapKit.h>
 
@@ -157,6 +158,40 @@ static int NetworkActivityIndicatorCounter = 0;
 	region.center = pinView.annotation.coordinate;
 	
 	[mapView setRegion:region animated:NO];
+}
+
+- (void)mapViewWillStartLoadingMap:(MKMapView *)mapView
+{
+	NSLog(@"mapViewWillStartLoadingMap");
+}
+
+- (void)mapViewDidFinishLoadingMap:(MKMapView *)mapView
+{
+	NSLog(@"mapViewDidFinishLoadingMap");
+}
+
+- (BOOL)startOpenGoogleMapsRequest:(NSURLRequest *)request
+{
+	BOOL success = NO;
+	
+	if([[[request URL] host] isEqualToString:@"maps.google.com"])
+	{      
+        NSDictionary *googleMapsCoords = GoogleMapsCoordsFromUrl([request URL]);
+        if (googleMapsCoords)
+		{
+			NSString *latitude = [googleMapsCoords objectForKey:@"latitude"];
+			NSString *longtitude = [googleMapsCoords objectForKey:@"longtitude"];
+			
+			[self openMapWithCoords:latitude longtitude:longtitude];
+            success = YES;
+        }
+		else
+		{
+            success = [[UIApplication sharedApplication] openURL: [request URL]];
+        }
+	}
+	
+	return success;
 }
 
 - (void)openMapWithCoords:(NSString*)latitude longtitude:(NSString*)longtitude
