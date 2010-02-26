@@ -311,37 +311,56 @@ static NSString* kActionCell = @"UserInfoActionCell";
 		NSScanner *scanner = [NSScanner scannerWithString:item];
 		[info appendString:@"Location: "];
 		
-		NSString *textPart;
-		BOOL success = [scanner scanUpToCharactersFromSet:[NSCharacterSet alphanumericCharacterSet] intoString:(NSString **)&textPart];
-		if(success && ([textPart length] > 0 && [textPart characterAtIndex:[textPart length] - 1] == (unichar)'-'))
+		NSString *textPart = nil;
+		BOOL success = [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:(NSString **)&textPart];
+		if (success && [textPart length] > 0)
 		{
-			textPart = [textPart substringToIndex:[textPart length] - 1];
-			[scanner setScanLocation:[scanner scanLocation] - 1];
+			// user location contains textual part
+			unichar lastCharacter = [textPart characterAtIndex:[textPart length] - 1];
+			if (lastCharacter == (unichar)'-')
+			{
+				textPart = [textPart substringToIndex:[textPart length] - 1];
+				[scanner setScanLocation:[scanner scanLocation] - 1];
+			}
+			
+			if (lastCharacter == (unichar)'(')
+			{
+				textPart = [textPart substringToIndex:[textPart length] - 1];
+			}
 		}
-        else
-        {
-            textPart = @"";
-        }
+		else
+		{
+			textPart = @"";
+		}
 
 		// Update head info view
         _userInfoView.location = textPart;
 		[info appendString:textPart];
-		double x, y;
+		
+		double x = 0.0;
+		double y = 0.0;
 		if(![scanner isAtEnd])
 		{
 			[scanner scanDouble:&x];
-			[scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&textPart];
+			success = [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:&textPart];
+			
 			if([scanner isAtEnd])
+			{
+				if (!success)
+					textPart = @"";
 				[info appendFormat:@"%f%@", x, textPart];
+			}
 			else
 			{
-				if([textPart length] > 0 && [textPart characterAtIndex:[textPart length] - 1] == (unichar)'-')
+				if(success && [textPart length] > 0 && [textPart characterAtIndex:[textPart length] - 1] == (unichar)'-')
 				{
 					textPart = [textPart substringToIndex:[textPart length] - 1];
 					[scanner setScanLocation:[scanner scanLocation] - 1];
 				}
+				
 				[scanner scanDouble:&y];
-				[info appendFormat:@"<a href = http://maps.google.com/maps?q=%f,%f>%@</a>", x, y, @"Current Location"];
+				[info appendFormat:@"<a href=http://maps.google.com/maps?q=%f,%f>%@</a>", x, y, @"Current Location"];
+				
 				[info appendString:[item substringFromIndex:[scanner scanLocation]]];
 				NSLog(@"INFO: %@", info);
 			}
@@ -408,9 +427,13 @@ static NSString* kActionCell = @"UserInfoActionCell";
 	if([[[request URL] absoluteString] isEqualToString:@"about:blank"])
 		return YES;
 
-	UIViewController *webViewCtrl = [[WebViewController alloc] initWithRequest:request];
-	[self.navigationController pushViewController:webViewCtrl animated:YES];
-	[webViewCtrl release];
+    TweetterAppDelegate *appDel = (TweetterAppDelegate*)[[UIApplication sharedApplication] delegate];
+	if (![appDel startOpenGoogleMapsRequest:request])
+	{
+		UIViewController *webViewCtrl = [[WebViewController alloc] initWithRequest:request];
+		[self.navigationController pushViewController:webViewCtrl animated:YES];
+		[webViewCtrl release];
+	}
 	
 	return NO;
 }

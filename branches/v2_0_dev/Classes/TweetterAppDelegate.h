@@ -45,6 +45,7 @@
 + (void)decreaseNetworkActivityIndicator;
 + (BOOL)isCurrentUserName:(NSString*)screenname;
 
+- (BOOL)startOpenGoogleMapsRequest:(NSURLRequest *)request;
 - (void)openMapWithCoords:(NSString*)latitude longtitude:(NSString*)longtitude;
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
