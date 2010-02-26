@@ -46,7 +46,7 @@
 + (BOOL)isCurrentUserName:(NSString*)screenname;
 
 - (BOOL)startOpenGoogleMapsRequest:(NSURLRequest *)request;
-- (void)openMapWithCoords:(NSString*)latitude longtitude:(NSString*)longtitude;
+- (UIViewController *)googleMapLoadControllerWithRequest:(NSURLRequest *)request;
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet UITabBarController *tabBarController;

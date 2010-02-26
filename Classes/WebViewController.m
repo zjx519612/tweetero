@@ -106,22 +106,33 @@
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-	self.navigationItem.title = NSLocalizedString(@"Failed!", @"");
+	if (!_webView.hidden)
+		self.navigationItem.title = NSLocalizedString(@"Failed!", @"");
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-	self.navigationItem.title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
+	if (!_webView.hidden)
+		self.navigationItem.title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
     NSLog(@"Load request");
 	
-    TweetterAppDelegate *appDel = (TweetterAppDelegate*)[[UIApplication sharedApplication] delegate];
-	[appDel startOpenGoogleMapsRequest:request];
-	
+	TweetterAppDelegate *appDel = (TweetterAppDelegate*)[[UIApplication sharedApplication] delegate];
+	UIViewController *googleMapLoadController = [appDel googleMapLoadControllerWithRequest:request];
+	if (nil != googleMapLoadController)
+	{
+		// remove curent request controller
+		_webView.hidden = YES;
+		self.view = googleMapLoadController.view;
+		self.title = googleMapLoadController.title;
+		
+		return NO;
+	}
+
 	return YES;
 }
 

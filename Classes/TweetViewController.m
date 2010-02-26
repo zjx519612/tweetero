@@ -782,16 +782,8 @@
 	}
     else if ([[[request URL] host] isEqualToString:@"maps.google.com"])
     {
-        NSDictionary *coords = GoogleMapsCoordsFromUrl([request URL]);
-        
-        if (coords) {
-            TweetterAppDelegate *appDel = (TweetterAppDelegate*)[[UIApplication sharedApplication] delegate];
-            
-            NSString *latitude = [coords objectForKey:@"latitude"];
-            NSString *longtitude = [coords objectForKey:@"longtitude"];
-            
-            [appDel openMapWithCoords:latitude longtitude:longtitude];
-        }
+		TweetterAppDelegate *appDel = (TweetterAppDelegate*)[[UIApplication sharedApplication] delegate];
+		[appDel startOpenGoogleMapsRequest:request];
     }
 	else
 	{

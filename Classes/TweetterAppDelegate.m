@@ -170,11 +170,9 @@ static int NetworkActivityIndicatorCounter = 0;
 	NSLog(@"mapViewDidFinishLoadingMap");
 }
 
-- (BOOL)startOpenGoogleMapsRequest:(NSURLRequest *)request
-{
-	BOOL success = NO;
-	
-	if([[[request URL] host] isEqualToString:@"maps.google.com"])
+- (UIViewController *)googleMapLoadControllerWithRequest:(NSURLRequest *)request
+{	
+	if ([[[request URL] host] isEqualToString:@"maps.google.com"])
 	{      
         NSDictionary *googleMapsCoords = GoogleMapsCoordsFromUrl([request URL]);
         if (googleMapsCoords)
@@ -182,55 +180,56 @@ static int NetworkActivityIndicatorCounter = 0;
 			NSString *latitude = [googleMapsCoords objectForKey:@"latitude"];
 			NSString *longtitude = [googleMapsCoords objectForKey:@"longtitude"];
 			
-			[self openMapWithCoords:latitude longtitude:longtitude];
-            success = YES;
-        }
-		else
-		{
-            success = [[UIApplication sharedApplication] openURL: [request URL]];
-        }
+			Class MapViewClass = NSClassFromString(@"MKMapView");
+			if (nil != MapViewClass)
+			{
+				CGRect mapViewFrame = self.window.frame;
+				id mapView = [[MapViewClass alloc] initWithFrame:mapViewFrame];
+				[mapView setDelegate:self];
+				
+				UIViewController *container = [[UIViewController alloc] init];
+				container.title = @"Maps";
+				container.view = mapView;
+				[mapView release];
+				
+				CLLocationCoordinate2D location;
+				
+				NSLog(@"Map: %@, %@", latitude, longtitude);
+				
+				location.latitude = [latitude doubleValue];
+				location.longitude = [longtitude doubleValue];
+				
+				MKPlacemark *place = [[MKPlacemark alloc] initWithCoordinate:location addressDictionary:[NSDictionary dictionary]];
+				[mapView addAnnotation:place];
+				
+				return [container autorelease];
+			}
+		}
 	}
 	
-	return success;
+	return nil;
 }
 
-- (void)openMapWithCoords:(NSString*)latitude longtitude:(NSString*)longtitude
+- (BOOL)startOpenGoogleMapsRequest:(NSURLRequest *)request
 {
+	BOOL success = NO;
+
 	Class MapViewClass = NSClassFromString(@"MKMapView");
-	
-	if(MapViewClass == nil)
+	if (MapViewClass == nil)
 	{
-		NSString* url = [NSString stringWithFormat:@"http://maps.google.com/maps?q=image+taken+here@%@,%@", latitude, longtitude];
-        
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:url]];
+        [[UIApplication sharedApplication] openURL:[request URL]];
 	}
 	else
 	{
-        CGRect mapViewFrame = self.window.frame;
-        
-		id mapView = [[MapViewClass alloc] initWithFrame:mapViewFrame];
-		[mapView setDelegate:self];
-        
-		UIViewController *container = [[UIViewController alloc] init];
-        container.title = @"Maps";
-		container.view = mapView;
-		
-        [mapView release];
-        
-		CLLocationCoordinate2D location;
-        
-        NSLog(@"Map: %@, %@", latitude, longtitude);
-        
-		location.latitude = [latitude doubleValue];
-		location.longitude = [longtitude doubleValue];
-        
-		MKPlacemark *place = [[MKPlacemark alloc] initWithCoordinate:location addressDictionary:[NSDictionary dictionary]];
-		[mapView addAnnotation:place];
-		
-		[self.navigationController pushViewController:container animated:NO];
-        
-		[container release];
+		UIViewController *mapLoadController = [self googleMapLoadControllerWithRequest:request];
+		if (nil != mapLoadController)
+		{
+			[self.navigationController pushViewController:mapLoadController animated:NO];
+			success = YES;
+		}
 	}
+	
+	return success;
 }
 
 @end
