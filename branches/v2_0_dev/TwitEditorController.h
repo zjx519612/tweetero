@@ -42,9 +42,12 @@ enum _TwitEditorSuspendedOperations
 
 @interface ImagePickerController : UIImagePickerController
 {
-@public
-	TwitEditorController* twitEditor;
+@private
+	TwitEditorController *twitEditor;
 }
+
+@property (nonatomic, assign) TwitEditorController *twitEditor;
+
 @end
 
 @interface TwitEditorController : UIViewController  <UINavigationControllerDelegate, 
