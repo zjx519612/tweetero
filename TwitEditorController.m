@@ -62,6 +62,8 @@
 
 @implementation ImagePickerController
 
+@synthesize twitEditor;
+
 - (void)viewDidDisappear:(BOOL)animated
 {
 	[super viewDidDisappear:NO];
@@ -499,7 +501,7 @@
 	
 	self.navigationItem.title = NSLocalizedString(@"New Tweet", @"");
 
-    imgPicker->twitEditor = self;
+    imgPicker.twitEditor = self;
 	imgPicker.delegate = self;	
 	messageText.delegate = self;
 	
