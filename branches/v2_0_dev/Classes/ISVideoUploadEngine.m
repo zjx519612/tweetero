@@ -98,6 +98,11 @@
 
 - (BOOL)upload
 {
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Starting Video Upload...");
+	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
+#endif
+	
     BOOL success = NO;
     if (phase == ISUploadPhaseNone)
     {
@@ -128,6 +133,11 @@
 #pragma mark NSURLConnection connection callbacks
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Executing connection:didFailWithError: method...");
+	NSLog(@"	YFrog_DEBUG: Error description %@", [error description]);
+#endif
+	
     [delegate didStopUploading:self];
     
     // Resume upload
@@ -136,6 +146,12 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Executing connectionDidFinishLoading: method...");
+	NSLog(@"	YFrog_DEBUG: Status code is %d", statusCode);
+	NSLog(@"	YFrog_DEBUG: Current phase is %d", phase);
+#endif
+	
     if (IsValidStatusCode(statusCode))
     {
         if (!(statusCode == 202 && phase == ISUploadPhaseUploadData))
@@ -161,11 +177,20 @@
 #pragma mark NSURLConnection data receive
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
-    if ([response isKindOfClass:[NSHTTPURLResponse self]])
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Executing connection:didReceiveResponse: method...");
+	NSLog(@"	YFrog_DEBUG: Received responce %@", [response description]);
+#endif			
+
+    if ([response isKindOfClass:[NSHTTPURLResponse class]])
     {
         NSHTTPURLResponse *httpResp = (NSHTTPURLResponse*)response;
         statusCode = [httpResp statusCode];
         
+#ifdef TRACE
+		NSLog(@"	YFrog_DEBUG: Responce status code is: %d", statusCode);
+#endif
+		
         if (phase == ISUploadPhaseResumeUpload)
         {
         }
@@ -180,6 +205,12 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Executing connection:didReceiveData: method...");
+	NSLog(@"	YFrog_DEBUG: Received data is %@", [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease]);
+	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
+#endif	
+	
     if (phase == ISUploadPhaseResumeUpload)
     {
         //Parse the uploaded chunck size
@@ -242,7 +273,13 @@
 
 - (void)doPhase:(int)phaseCode;
 {
-    phase = phaseCode;
+	phase = phaseCode;
+	
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Executing doPhase method...");
+	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
+#endif
+
     switch (phase)
     {
         case ISUploadPhaseStart:
@@ -275,6 +312,11 @@
 
 - (void)sendInitData
 {
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Executing sendInitData method...");
+	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
+#endif	
+	
     NSMutableData *body = [NSMutableData data];
     
 	[body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -325,6 +367,11 @@
     
     [self clearResult];
     currentDataLocation = 0;
+	
+#ifdef TRACE
+	NSLog(@"	YFrog_DEBUG: From sendInitData: Created HTTP request with body:");
+	NSLog(@"	YFrog_DEBUG: %@", [[[NSString alloc] initWithData:body encoding:NSUTF8StringEncoding] autorelease]);
+#endif	
     
     BOOL validConnection = [self openConnection:request];
     if (!validConnection)
@@ -333,6 +380,11 @@
 
 - (void)uploadNextChunk
 {
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Executing uploadNextChunk method...");
+	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
+#endif	
+	
     NSRange range = {0, 1024};
 
     range.location = currentDataLocation;
@@ -347,7 +399,7 @@
     
     //NSData *dataChunck = [uploadData subdataWithRange:range];
     NSData *dataChunck = [self dataWithRange:range];
-    
+
     //NSString *contentLength = [NSString stringWithFormat:@"%d", [uploadData length]];
     NSString *contentLength = [NSString stringWithFormat:@"%d", size];
     //NSString *contentRange = [NSString stringWithFormat:@"bytes %d-%d/%d", range.location, range.location + range.length-1, [uploadData length]];
@@ -358,6 +410,10 @@
     [request setHTTPBody:dataChunck];
     [request setValue:contentLength forHTTPHeaderField:@"Content-Length"];
     [request setValue:contentRange forHTTPHeaderField:@"Content-Range"];
+
+#ifdef TRACE
+	NSLog(@"	YFrog_DEBUG: Chank to upload %@", NSStringFromRange(range));
+#endif
     
     BOOL validConnection = [self openConnection:request];
     if (!validConnection)
@@ -382,6 +438,11 @@
 
 - (BOOL)openConnection:(NSURLRequest *)request
 {
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Executing openConnection method...");
+	NSLog(@"	YFrog_DEBUG: Creating and running new connection with request %@", [request description]);
+#endif		
+	
     if (connection)
         [connection release];
     connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
