@@ -76,6 +76,11 @@
 {
     if (self = [self init])
     {
+#ifdef TRACE
+		NSLog(@"YFrog_DEBUG: Executing initWithPath:delegate: method...");
+		NSLog(@"	YFrog_DEBUG: A path of the video file %@", aPath);
+#endif
+		
         self.path = aPath;
         delegate = dlgt;
     }

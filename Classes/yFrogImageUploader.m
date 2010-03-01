@@ -248,6 +248,12 @@
 		[delegate uploadedImage:nil sender:self];
 		return;
 	}
+	
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Executing postMP4DataWithPath:delegate: method...");
+	NSLog(@"	YFrog_DEBUG: Creating Video upload engine");
+#endif
+	
     ISVideoUploadEngine *engine = [[ISVideoUploadEngine alloc] initWithPath:path delegate:self];
     [self postMP4DataWithUploadEngine:engine delegate:dlgt userData:data];
     [engine release];

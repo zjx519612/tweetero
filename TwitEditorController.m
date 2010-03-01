@@ -743,10 +743,18 @@
 
 - (void)startUpload
 {
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Executing startUpload of TwitEditController method...");
+#endif	
+	
 	if(![self mediaIsPicked])
 		return;
 
     [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
+	
+#ifdef TRACE
+	NSLog(@"	YFrog_DEBUG: Media is picked");
+#endif
     
 	// Image uploader will be released after finishing upload process by setting
 	// self.connectionDelegate property to nil on uploadedImage: sender method
@@ -757,12 +765,22 @@
 		[uploader postImage:pickedPhoto delegate:self userData:pickedPhoto];
 	else
     {
+#ifdef TRACE
+		NSLog(@"	YFrog_DEBUG: Picked video URL description: %@", [pickedVideo description]);
+		NSLog(@"	YFrog_DEBUG: Picked video is file URL %d", (int)[pickedVideo isFileURL]);
+#endif
+		
         NSString *path;
         if ([pickedVideo isFileURL]) {
             path = [pickedVideo path];
         } else {
             path = [pickedVideo absoluteString];
         }
+		
+#ifdef TRACE
+		NSLog(@"	YFrog_DEBUG: Path of the video file %@", path);
+#endif		
+		
         [uploader postMP4DataWithPath:path delegate:self userData:pickedVideo];
     }
 	
