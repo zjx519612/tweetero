@@ -40,6 +40,8 @@ extern const NSString *LoginControllerAccountDidChange;
 @interface LoginController : UIViewController <UITextFieldDelegate, SA_OAuthTwitterControllerDelegate>
 {
 @private
+	IBOutlet UIButton *oAuthOKButton;
+	
     IBOutlet id cancelButton;
     IBOutlet id loginButton;
     IBOutlet id loginField;
