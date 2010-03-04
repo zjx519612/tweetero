@@ -42,7 +42,7 @@ static NSString* const kGGTwitterLoadingBackgroundImage = @"twitter_load.png";
 }
 
 + (SA_OAuthTwitterController *) controllerToEnterCredentialsWithTwitterEngine: (SA_OAuthTwitterEngine *) engine delegate: (id <SA_OAuthTwitterControllerDelegate>) delegate {
-	if (![self credentialEntryRequiredWithTwitterEngine: engine]) return nil;			//not needed
+	//if (![self credentialEntryRequiredWithTwitterEngine: engine]) return nil;			//not needed
 	
 	SA_OAuthTwitterController					*controller = [[[SA_OAuthTwitterController alloc] initWithEngine: engine] autorelease];
 	
