@@ -13,8 +13,9 @@
 @interface MoreController : UITableViewController {
     NSMutableArray      *_moreItems;
     SearchProvider      *_searchProvider;
+	BOOL				isSavedSearchesLoaded;
 }
 
-@property (nonatomic, retain) SearchProvider *searchProvider;
+@property (nonatomic, assign) SearchProvider *searchProvider;
 
 @end
