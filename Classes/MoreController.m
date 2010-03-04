@@ -61,6 +61,7 @@
 @interface MoreController(Private)
 - (void)initData;
 - (UIViewController*)controllerForItem:(MoreItem*)item;
+- (void)updateSavedSearches;
 @end
 
 @implementation MoreController
@@ -76,6 +77,7 @@
         
         self.tableView.dataSource = self;
         self.tableView.delegate = self;
+		isSavedSearchesLoaded = NO;
         
         [self initData];
     }
@@ -112,13 +114,21 @@
 {
     [super viewWillAppear:animated];
     
-    self.searchProvider = [SearchProvider sharedProviderUsingDelegate:self];
-    [self.searchProvider update];
-    
     self.parentViewController.navigationItem.title = NSLocalizedString(@"More", @"");
     self.parentViewController.navigationItem.rightBarButtonItem = nil;
     
+	[self updateSavedSearches];
     [self.tableView reloadData];
+}
+
+- (SearchProvider *)searchProvider
+{
+	if (nil == _searchProvider)
+	{
+		_searchProvider = [SearchProvider sharedProviderUsingDelegate:self];
+	}
+	
+	return _searchProvider;
 }
 
 #pragma mark UITableView dataSource
@@ -131,8 +141,10 @@
 {
     if (section == 0)
         return [_moreItems count];
-    else if (section == 1)
+    else if (section == 1 && isSavedSearchesLoaded)
         return [[self.searchProvider allQueries] count];
+	else if (section == 1 && !isSavedSearchesLoaded)
+		return 1;
     return 0;
 }
 
@@ -158,7 +170,28 @@
     }
     // Saved search cells
     else
-    {
+    {	
+		if (0 == [[self.searchProvider allQueries] count] && !isSavedSearchesLoaded)
+		{
+			cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:@""] autorelease];
+			
+			UILabel *loadingText = [[[UILabel alloc] initWithFrame:cell.contentView.frame] autorelease];
+			[loadingText setCenter:CGPointMake(loadingText.center.x + 7, cell.contentView.frame.size.height / 2.0)];
+			loadingText.text = NSLocalizedString(@"Loading saved searches...", @"");
+			loadingText.font = [UIFont boldSystemFontOfSize:16];
+			
+			UIActivityIndicatorView *spinner = [[[UIActivityIndicatorView alloc]
+						initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray] autorelease];
+			[spinner setCenter:CGPointMake(cell.contentView.frame.size.width - spinner.frame.size.width / 2 - 7,
+						cell.contentView.frame.size.height / 2.0)];
+			[spinner startAnimating];
+			
+			[cell.contentView addSubview:loadingText];
+			[cell.contentView addSubview:spinner];
+						
+			return cell;
+		}		
+		
         cell.imageView.image = nil;
         if (indexPath.row < [[self.searchProvider allQueries] count])
             cell.textLabel.text = [[self.searchProvider allQueries] objectAtIndex:indexPath.row];
@@ -205,6 +238,7 @@
 #pragma mark SearchProvider Delgate methods
 - (void)searchProviderDidUpdated
 {
+	isSavedSearchesLoaded = YES;
     [self.tableView reloadData];
 }
 
@@ -273,4 +307,10 @@
     theController.title = NSLocalizedString(item.title, @"");
     return theController;
 }
+
+- (void)updateSavedSearches
+{
+	[self.searchProvider update];
+}
+
 @end
