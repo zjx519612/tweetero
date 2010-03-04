@@ -121,7 +121,7 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
         else if (segmentSender.selectedSegmentIndex == OAuthSegmentIndex)
         {
             self.view = oAuthView;
-            self.navigationItem.rightBarButtonItem.enabled = NO;
+            self.navigationItem.rightBarButtonItem.enabled = NO;			
         }
     }
 }
@@ -166,6 +166,11 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
 	UIImage *icon = [UIImage imageNamed:@"Frog.tiff"];
 	if(icon)
 		[iconView setImage:icon];
+		
+	[oAuthOKButton setBackgroundImage:[UIImage imageNamed:@"oAuthButton.png"] forState:UIControlStateNormal];
+    oAuthOKButton.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	oAuthOKButton.frame = CGRectInset(oAuthOKButton.frame, -10, -15);
+	oAuthOKButton.titleLabel.textColor = [UIColor whiteColor];
 }
 
 - (void)viewWillAppear:(BOOL)animated

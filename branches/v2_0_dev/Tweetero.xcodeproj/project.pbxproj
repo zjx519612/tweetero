@@ -102,6 +102,7 @@
 		498D96D30F62EFA9004E1B20 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 498D96CC0F62EFA9004E1B20 /* MainWindow.xib */; };
 		498D96D40F62EFA9004E1B20 /* Login.xib in Resources */ = {isa = PBXBuildFile; fileRef = 498D96CE0F62EFA9004E1B20 /* Login.xib */; };
 		49B3F5B50F66A78000DFFE04 /* yFrogImageDownoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 49B3F5B30F66A78000DFFE04 /* yFrogImageDownoader.m */; };
+		A7C6CAFF113FCD9600A02E17 /* oAuthButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A7C6CAFE113FCD9600A02E17 /* oAuthButton.png */; };
 		AA47D5BC0F7B3BAA005E0EEC /* MessageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = AA47D5BB0F7B3BAA005E0EEC /* MessageUploader.m */; };
 		AA6492C90F75BBCC00E40348 /* MGConnectionWrap.m in Sources */ = {isa = PBXBuildFile; fileRef = AA6492C80F75BBCC00E40348 /* MGConnectionWrap.m */; };
 		AA6493DD0F75D4EE00E40348 /* map.tiff in Resources */ = {isa = PBXBuildFile; fileRef = AA6493DC0F75D4EE00E40348 /* map.tiff */; };
@@ -322,6 +323,7 @@
 		49B3F5B30F66A78000DFFE04 /* yFrogImageDownoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = yFrogImageDownoader.m; path = Classes/yFrogImageDownoader.m; sourceTree = SOURCE_ROOT; };
 		49B3F5B40F66A78000DFFE04 /* yFrogImageDownoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yFrogImageDownoader.h; path = Classes/yFrogImageDownoader.h; sourceTree = SOURCE_ROOT; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A7C6CAFE113FCD9600A02E17 /* oAuthButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = oAuthButton.png; path = Resource/Images/oAuthButton.png; sourceTree = "<group>"; };
 		AA47D5BA0F7B3BAA005E0EEC /* MessageUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageUploader.h; sourceTree = "<group>"; };
 		AA47D5BB0F7B3BAA005E0EEC /* MessageUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageUploader.m; sourceTree = "<group>"; };
 		AA6492C70F75BBCC00E40348 /* MGConnectionWrap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGConnectionWrap.h; sourceTree = "<group>"; };
@@ -814,6 +816,7 @@
 				D9A1D0FD0F75E4F20055E311 /* yfrog.tiff */,
 				AAA15A050F74849100548AE7 /* camera.tiff */,
 				AA6493DC0F75D4EE00E40348 /* map.tiff */,
+				A7C6CAFE113FCD9600A02E17 /* oAuthButton.png */,
 			);
 			name = Images;
 			sourceTree = "<group>";
@@ -958,6 +961,7 @@
 				0010988510A308C700DBD5A9 /* sendall.tif in Resources */,
 				00C666AE10C021010057D8CD /* unfavorite.png in Resources */,
 				00C6670D10C02D000057D8CD /* statusfav.png in Resources */,
+				A7C6CAFF113FCD9600A02E17 /* oAuthButton.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
