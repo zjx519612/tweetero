@@ -23,6 +23,8 @@
 #define ErrorRootName               @"error"
 #define ErrorCodeName               @"code"
 
+const NSTimeInterval kDefaultRetryInterval = 5.0;
+
 @interface ISVideoUploadEngine (Private)
 
 - (void)doPhase:(int)phaseCode;
@@ -34,6 +36,12 @@
 - (NSString *)errorMessage;
 - (NSData*)dataWithRange:(NSRange)range;
 - (unsigned long long)dataSize;
+- (void)retryUpload:(BOOL)isSession;
+- (void)retryOrProcessError:(NSError *)error;
+- (void)closeConnection;
+- (void)destroyRetryTimer;
+- (BOOL)canRetryChunkSession;
+- (void)retryChunkSession;
 @end
 
 @implementation ISVideoUploadEngine
@@ -46,12 +54,13 @@
 @synthesize getLengthUrl;
 @synthesize verifyUrl;
 @synthesize path;
+@synthesize isOpened;
 
 - (id)init
 {
     if (self = [super init])
     {
-        boundary = [NSString stringWithFormat:@"------%ld__%ld__%ld", random(), random(), random()];
+        boundary = [[NSString stringWithFormat:@"------%ld__%ld__%ld", random(), random(), random()] retain];
         connection = nil;
         result = [[NSMutableData alloc] init];
         phase = ISUploadPhaseNone;
@@ -98,6 +107,7 @@
         [connection release];
     [result release];
     [uploadData release];
+	[boundary release];
     [super dealloc];
 }
 
@@ -111,6 +121,8 @@
     BOOL success = NO;
     if (phase == ISUploadPhaseNone)
     {
+		sessionCount = 0;
+		retryCounter = 0;
         [self doPhase:ISUploadPhaseStart];
         success = YES;
     }
@@ -146,7 +158,7 @@
     [delegate didStopUploading:self];
     
     // Resume upload
-    [self doPhase:ISUploadPhaseResumeUpload];
+    [self retryOrProcessError:error];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -159,23 +171,37 @@
 	
     if (IsValidStatusCode(statusCode))
     {
-        if (!(statusCode == 202 && phase == ISUploadPhaseUploadData))
+        if (phase == ISUploadPhaseResumeUpload)
         {
-            NSXMLParser *parser = [[NSXMLParser alloc] initWithData:result];
-
-            [parser setDelegate:self];
-            [parser setShouldProcessNamespaces:NO];
-            [parser setShouldReportNamespacePrefixes:NO];
-            [parser setShouldResolveExternalEntities:NO];
-            [parser parse];
-            [parser release];
-            
-            [self clearResult];
+			[delegate didResumeUploading:self];
+            [self doPhase:ISUploadPhaseUploadData];            
         }
+		else
+		{
+			if (phase == ISUploadPhaseUploadData && statusCode == 202)
+            {
+				[delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[self dataSize]];
+                [self uploadNextChunk];
+            }
+			else
+			{
+				NSXMLParser *parser = [[NSXMLParser alloc] initWithData:result];
+
+				[parser setDelegate:self];
+				[parser setShouldProcessNamespaces:NO];
+				[parser setShouldReportNamespacePrefixes:NO];
+				[parser setShouldResolveExternalEntities:NO];
+				[parser parse];
+				[parser release];
+				
+				[self clearResult];
+			}
+		}
     }
     else
     {
-        [self doPhase:ISUploadPhaseProcessError];
+        NSError *error = [NSError errorWithDomain:@"yFrogVideoUploadEngine" code:statusCode userInfo:nil];
+        [self retryOrProcessError:error];
     }
 }
 
@@ -196,14 +222,14 @@
 		NSLog(@"	YFrog_DEBUG: Responce status code is: %d", statusCode);
 #endif
 		
-        if (phase == ISUploadPhaseResumeUpload)
-        {
-        }
-        else if (phase == ISUploadPhaseUploadData && statusCode == 202)
-        {
-            [delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[self dataSize]];
-            [self uploadNextChunk];
-        }
+//        if (phase == ISUploadPhaseResumeUpload)
+//        {
+//        }
+//        else if (phase == ISUploadPhaseUploadData && statusCode == 202)
+//        {
+//            [delegate didFinishUploadingChunck:self uploadedSize:currentDataLocation totalSize:[self dataSize]];
+//            [self uploadNextChunk];
+//        }
     }
     [self clearResult];
 }
@@ -379,8 +405,10 @@
 #endif	
     
     BOOL validConnection = [self openConnection:request];
-    if (!validConnection)
+    if (!validConnection || !self.isOpened)
+	{
         [self doPhase:ISUploadPhaseProcessError];
+	}
 }
 
 - (void)uploadNextChunk
@@ -390,7 +418,7 @@
 	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
 #endif	
 	
-    NSRange range = {0, 1024};
+    NSRange range = {0, 5 * 1024};
 
     range.location = currentDataLocation;
     //if ([uploadData length] <= range.location)
@@ -419,6 +447,8 @@
 #ifdef TRACE
 	NSLog(@"	YFrog_DEBUG: Chank to upload %@", NSStringFromRange(range));
 #endif
+	
+	[self closeConnection];
     
     BOOL validConnection = [self openConnection:request];
     if (!validConnection)
@@ -429,11 +459,31 @@
 
 - (void)resumeUpload
 {
-    NSMutableURLRequest *request = tweeteroMutableURLRequest([NSURL URLWithString:self.getLengthUrl]);
+#ifdef TRACE
+    NSLog(@"resumeUpload");
+#endif	
+	
+    if (self.isOpened)
+	{
+        [self closeConnection];
+	}
+	
+    if (self.getLengthUrl)
+    {
+#ifdef TRACE
+		NSLog(@"Run get length connection");
+#endif		
+
+        NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
+        
+        [request setURL:[NSURL URLWithString:self.getLengthUrl]];
+        [self openConnection:request];
+    }
     
-    BOOL validConnection = [self openConnection:request];
-    if (!validConnection)
+    if (!self.isOpened)
+	{
         [self doPhase:ISUploadPhaseProcessError];
+	}
 }
 
 - (void)clearResult
@@ -441,17 +491,96 @@
     [result setLength:0];
 }
 
-- (BOOL)openConnection:(NSURLRequest *)request
+- (BOOL)canRetryChunkSession
 {
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Executing openConnection method...");
-	NSLog(@"	YFrog_DEBUG: Creating and running new connection with request %@", [request description]);
-#endif		
+    NSLog(@"Can Retry chunk session = %i", sessionCount);
+#endif
+    
+    if (sessionCount++ < 3 && timer == nil)
+	{
+        return YES;
+	}
 	
-    if (connection)
-        [connection release];
-    connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
-    return (connection != nil);
+    return NO;
+}
+
+- (void)retryChunkSession
+{
+#ifdef TRACE
+    NSLog(@"Retry session");
+#endif
+	
+    [self retryUpload:YES];
+}
+
+- (void)retryUpload:(BOOL)isSession
+{
+#ifdef TRACE
+    NSLog(@"retry Upload");
+#endif
+	
+    [self destroyRetryTimer];
+    
+    NSNumber *isSessionNumber = [NSNumber numberWithBool:isSession];
+    timer = [[NSTimer scheduledTimerWithTimeInterval:kDefaultRetryInterval target:self
+				selector:@selector(retryTimerFired:) userInfo:isSessionNumber repeats:NO] retain];
+}
+
+- (void)destroyRetryTimer
+{
+    if (nil != timer)
+    {
+        [timer invalidate];
+        [timer autorelease];
+        timer = nil;
+    }
+}
+
+- (void)retryTimerFired:(NSTimer *)aTimer
+{
+#ifdef TRACE
+    NSLog(@"retryTimerFired");
+#endif
+    
+	NSNumber *isSession = [timer userInfo];
+    [self destroyRetryTimer];
+    if (nil != isSession && [isSession boolValue] == YES)
+    {
+        [self closeConnection];
+        [self doPhase:ISUploadPhaseStart];
+        [self release];
+    }
+    else
+	{
+        [self doPhase:ISUploadPhaseResumeUpload];
+	}
+}
+
+- (void)retryOrProcessError:(NSError *)error
+{    
+    // Can retry chucnk session
+    if (self.putUrl == nil && [self canRetryChunkSession])
+    {
+        [self retryChunkSession];
+    }
+    else
+    {
+		if (statusCode == 0)
+		{
+			statusCode = [error code];
+		}
+		
+		if (retryCounter < 5)
+		{
+			[self retryUpload:NO];
+			retryCounter++;
+		}
+		else
+		{
+			[self doPhase:ISUploadPhaseProcessError];
+		}
+    }    
 }
 
 - (NSString *)errorMessage
@@ -508,6 +637,38 @@
         internalDataSize = [uploadData length];
     }
     return internalDataSize;
+}
+
+- (BOOL)openConnection:(NSURLRequest*)request
+{
+#ifdef TRACE
+	NSLog(@"YFrog_DEBUG: Executing openConnection method...");
+	NSLog(@"	YFrog_DEBUG: Creating and running new connection with request %@", [request description]);
+#endif	
+	
+    if (nil != connection)
+	{
+        return NO;
+	}
+    
+    connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+	isOpened = (nil != connection);
+        
+    [connection start];
+    
+    return isOpened;
+}
+
+
+- (void)closeConnection
+{
+    if (nil != connection)
+    {
+        [connection release];
+        connection = nil;
+    }
+	
+    isOpened = NO;
 }
 
 @end
