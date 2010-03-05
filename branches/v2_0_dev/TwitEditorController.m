@@ -52,6 +52,7 @@
 
 #define PROGRESS_ACTION_SHEET_TAG										214
 #define PHOTO_Q_SHEET_TAG												436
+#define LOCATION_SHEET_TAG												493
 #define PROCESSING_PHOTO_SHEET_TAG										3
 
 #define PHOTO_ENABLE_SERVICES_ALERT_TAG									666
@@ -80,6 +81,7 @@
 @synthesize _message;
 @synthesize pickedVideo;
 @synthesize pickedPhoto;
+@synthesize location;
 
 - (void)setCharsCount
 {
@@ -115,6 +117,16 @@
 	messageText.text = newText;
 	[self setCharsCount];
 	[self setNavigatorButtons];
+}
+
+- (NSRange)locationRange
+{
+	if (nil == self.location)
+	{
+		return NSMakeRange(0, 0);
+	}
+	
+	return [messageText.text rangeOfString:self.location];
 }
 
 - (NSRange)urlPlaceHolderRange
@@ -267,6 +279,7 @@
 	[segmentBarItem release];
 	[photoURLPlaceholderMask release];
 	[videoURLPlaceholderMask release];
+	self.location = nil;
 	self.currentMediaYFrogURL = nil;
 	self.connectionDelegate = nil;
 	self._message = nil;
@@ -547,7 +560,11 @@
 		return NO;		
 	
 	if(NSIntersectionRange(urlPlaceHolderRange, range).length > 0)
-		return NO;		
+		return NO;
+	
+	NSRange locationRange = [self locationRange];
+	if ((locationRange.location < range.location) && (locationRange.location + locationRange.length > range.location))
+		return NO;
 	
 	return YES;
 }
@@ -970,53 +987,19 @@
 
 - (IBAction)insertLocationAction
 {
-	if(![[LocationManager locationManager] locationServicesEnabled])
-	{
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Location service is not available on the device", @"") 
-														message:NSLocalizedString(@"You can to enable Location Services on the device", @"")
-													   delegate:nil cancelButtonTitle:nil otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
-		[alert show];
-		[alert release];
-		return;
-	}
+	NSString *buttons[2] = {0};
+	int i = 0;
 	
-	if(![[NSUserDefaults standardUserDefaults] boolForKey:@"UseLocations"])
-	{
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Location service was turn off in settings", @"") 
-														message:NSLocalizedString(@"You can to enable Location Services in the application settings", @"")
-													   delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", @"") otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
-		alert.tag = PHOTO_ENABLE_SERVICES_ALERT_TAG;
-		[alert show];
-		[alert release];
-		return;
-	}
+	buttons[i++] = NSLocalizedString(@"Add location", @"");
+	buttons[i++] = NSLocalizedString(@"Remove location", @"");
 	
-	if([[LocationManager locationManager] locationDenied])
-	{
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Locations for this application was denied", @"") 
-														message:NSLocalizedString(@"You can to enable Location Services by throw down settings", @"")
-													   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
-		[alert show];
-		[alert release];
-		return;
-	}
-	
-	
-	
-	if(![[LocationManager locationManager] locationDefined])
-	{
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Location undefined", @"") 
-														message:NSLocalizedString(@"Location is still undefined", @"")
-													   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
-		[alert show];
-		[alert release];
-		return;
-	}
-	
-	NSString* mapURL = [NSString stringWithFormat:NSLocalizedString(@"LocationLinkFormat", @""), [[LocationManager locationManager] mapURL]];
-	NSRange selectedRange = messageText.selectedRange;
-	[self setMessageTextText:[NSString stringWithFormat:@"%@\n%@", messageText.text, mapURL]];
-	messageText.selectedRange = selectedRange;
+	UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+				delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", @"") destructiveButtonTitle:nil
+				otherButtonTitles:buttons[0], buttons[1], nil];
+	actionSheet.actionSheetStyle = UIActionSheetStyleAutomatic;
+	actionSheet.tag = LOCATION_SHEET_TAG;
+	[actionSheet showInView:self.view];
+	[actionSheet release];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -1061,6 +1044,25 @@
 				[imgPicker performSelector:@selector(setMediaTypes:) withObject:[self availableMediaTypes:UIImagePickerControllerSourceTypePhotoLibrary]];
 			[self presentModalViewController:imgPicker animated:YES];
 			return;
+		}
+	}
+	else if (LOCATION_SHEET_TAG == actionSheet.tag)
+	{
+		if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Add location", @"")])
+		{
+			[self addLocation];
+		}
+		else if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Remove location", @"")])
+		{
+			NSRange selectedRange = messageText.selectedRange;
+			if (nil != self.location)
+			{
+				NSString *newText = [messageText.text stringByReplacingOccurrencesOfString:self.location withString:@""];
+				[self setMessageTextText:newText];
+			}
+			
+			self.location = nil;
+			messageText.selectedRange = selectedRange;
 		}
 	}
 	else
@@ -1355,6 +1357,68 @@
 - (BOOL)mediaIsPicked
 {
 	return pickedPhoto || pickedVideo;
+}
+
+- (void)addLocation
+{
+	if(![[LocationManager locationManager] locationServicesEnabled])
+	{
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Location service is not available on the device", @"") 
+														message:NSLocalizedString(@"You can to enable Location Services on the device", @"")
+													   delegate:nil cancelButtonTitle:nil otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
+		[alert show];
+		[alert release];
+		return;
+	}
+	
+	if(![[NSUserDefaults standardUserDefaults] boolForKey:@"UseLocations"])
+	{
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Location service was turn off in settings", @"") 
+														message:NSLocalizedString(@"You can to enable Location Services in the application settings", @"")
+													   delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", @"") otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
+		alert.tag = PHOTO_ENABLE_SERVICES_ALERT_TAG;
+		[alert show];
+		[alert release];
+		return;
+	}
+	
+	if([[LocationManager locationManager] locationDenied])
+	{
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Locations for this application was denied", @"") 
+														message:NSLocalizedString(@"You can to enable Location Services by throw down settings", @"")
+													   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+		return;
+	}
+	
+	
+	
+	if(![[LocationManager locationManager] locationDefined])
+	{
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Location undefined", @"") 
+														message:NSLocalizedString(@"Location is still undefined", @"")
+													   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+		return;
+	}
+	
+	NSString* mapURL = [NSString stringWithFormat:
+						NSLocalizedString(@"LocationLinkFormat", @""), [[LocationManager locationManager] mapURL]];
+	NSRange selectedRange = messageText.selectedRange;
+	if (nil == self.location)
+	{
+		[self setMessageTextText:[NSString stringWithFormat:@"%@\n%@", messageText.text, mapURL]];
+	}
+	else
+	{
+		NSString *newText = [messageText.text stringByReplacingOccurrencesOfString:self.location withString:mapURL];
+		[self setMessageTextText:newText];
+	}
+	
+	self.location = mapURL;
+	messageText.selectedRange = selectedRange;	
 }
 
 @end
