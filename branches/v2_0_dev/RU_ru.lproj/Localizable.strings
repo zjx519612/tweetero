@@ -158,6 +158,9 @@
 "Location service was turn off in settings"                         = "Location Tracking is disabled";
 "You can to enable Location Services in the application settings"   = "Do you want to enable Location Tracking?";
 "Location undefined"                                                = "Can't retrieve a current location";
+"Add location"														= "Добавить местоположение";
+"Remove location"													= "Удалить местоположение";
+"Loading saved searches..."											= "Загрузка сохраненных поисков...";
 "Location is still undefined"                                       = "Пожалуйста! повторите попытку еще раз!";
 "Locations for this application was denied"                         = "Location Services for this application are disabled";
 "You can to enable Location Services by throw down settings"        = "You can enable the Location Services in the device Settings application (Settings > General > Reset > Reset Location Warnings)";
