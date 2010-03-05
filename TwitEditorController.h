@@ -79,6 +79,9 @@ enum _TwitEditorSuspendedOperations
 
 	NSString*				photoURLPlaceholderMask;
 	NSString*				videoURLPlaceholderMask;
+	
+	NSString*				location;
+	
 	MGTwitterEngine *		_twitter;
 	
 	BOOL					messageTextWillIgnoreNextViewAppearing;
@@ -145,6 +148,7 @@ enum _TwitEditorSuspendedOperations
 - (void)releaseActivityIndicator;
 
 - (BOOL)mediaIsPicked;
+- (void)addLocation;
 
 @property (nonatomic, retain) UIActionSheet *progressSheet;
 
@@ -153,5 +157,6 @@ enum _TwitEditorSuspendedOperations
 @property (nonatomic, retain) NSDictionary *_message;
 @property (nonatomic, retain) NSURL *pickedVideo;
 @property (nonatomic, retain) UIImage *pickedPhoto;
+@property (nonatomic, retain) NSString *location;
 
 @end
