@@ -34,6 +34,7 @@ typedef enum {
 
 @interface ISVideoUploadEngine : NSObject
 {
+@private
     NSURLConnection                 *connection;
     NSString                        *boundary;
     NSData                          *uploadData;
@@ -50,6 +51,11 @@ typedef enum {
     id<ISVideoUploadEngineDelegate>  delegate;
     NSString                        *path;
     unsigned long long               internalDataSize;
+	
+	NSInteger						sessionCount;
+	NSInteger						retryCounter;
+	BOOL							isOpened;
+	NSTimer							*timer;
 }
 
 @property (nonatomic, copy) NSString *username;
@@ -60,6 +66,8 @@ typedef enum {
 @property (nonatomic, copy) NSString *putUrl;
 @property (nonatomic, copy) NSString *getLengthUrl;
 @property (nonatomic, retain) NSString *path;
+
+@property (nonatomic, readonly) BOOL isOpened;
 
 // Init upload ojbect
 - (id)initWithData:(NSData *)theData delegate:(id<ISVideoUploadEngineDelegate>) dlgt;
