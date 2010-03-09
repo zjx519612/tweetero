@@ -71,6 +71,7 @@ enum _TwitEditorSuspendedOperations
 	IBOutlet UISegmentedControl *postImageSegmentedControl;
 	UIBarButtonItem *segmentBarItem;
 	IBOutlet UISegmentedControl *imagesSegmentedControl;
+	IBOutlet UISegmentedControl *locationSegmentedControl;
 	UIColor *defaultTintColor;
 	
 	NSString* currentMediaYFrogURL;
