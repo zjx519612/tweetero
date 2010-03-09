@@ -990,8 +990,10 @@
 	
 	if (nil == self.location)
 	{
-		[self addLocation];
-		theImage = [UIImage imageNamed:@"mapRemove.tiff"];
+		if ([self addLocation])
+		{
+			theImage = [UIImage imageNamed:@"mapRemove.tiff"];
+		}
 	}
 	else
 	{
@@ -1360,7 +1362,7 @@
 	return pickedPhoto || pickedVideo;
 }
 
-- (void)addLocation
+- (BOOL)addLocation
 {
 	if(![[LocationManager locationManager] locationServicesEnabled])
 	{
@@ -1369,7 +1371,7 @@
 													   delegate:nil cancelButtonTitle:nil otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
 		[alert show];
 		[alert release];
-		return;
+		return NO;
 	}
 	
 	if(![[NSUserDefaults standardUserDefaults] boolForKey:@"UseLocations"])
@@ -1380,7 +1382,7 @@
 		alert.tag = PHOTO_ENABLE_SERVICES_ALERT_TAG;
 		[alert show];
 		[alert release];
-		return;
+		return NO;
 	}
 	
 	if([[LocationManager locationManager] locationDenied])
@@ -1390,10 +1392,8 @@
 													   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
 		[alert show];
 		[alert release];
-		return;
+		return NO;
 	}
-	
-	
 	
 	if(![[LocationManager locationManager] locationDefined])
 	{
@@ -1402,7 +1402,7 @@
 													   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
 		[alert show];
 		[alert release];
-		return;
+		return NO;
 	}
 	
 	NSString* mapURL = [NSString stringWithFormat:
@@ -1419,7 +1419,8 @@
 	}
 	
 	self.location = mapURL;
-	messageText.selectedRange = selectedRange;	
+	messageText.selectedRange = selectedRange;
+	return YES;
 }
 
 @end
