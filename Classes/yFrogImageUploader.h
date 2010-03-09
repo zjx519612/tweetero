@@ -47,6 +47,9 @@
 	id userData;
 	
 	NSURLConnection *connection;
+	NSData* mediaData;
+	NSInteger retriesCounter;
+	NSTimer *retryTimer;
 	
 	NSMutableString* contentXMLProperty;
 	NSString*		newURL;
