@@ -52,7 +52,6 @@
 
 #define PROGRESS_ACTION_SHEET_TAG										214
 #define PHOTO_Q_SHEET_TAG												436
-#define LOCATION_SHEET_TAG												493
 #define PROCESSING_PHOTO_SHEET_TAG										3
 
 #define PHOTO_ENABLE_SERVICES_ALERT_TAG									666
@@ -986,20 +985,41 @@
 }
 
 - (IBAction)insertLocationAction
-{
-	NSString *buttons[2] = {0};
-	int i = 0;
+{	
+	UIImage *theImage = nil;
 	
-	buttons[i++] = NSLocalizedString(@"Add location", @"");
-	buttons[i++] = NSLocalizedString(@"Remove location", @"");
+	if (nil == self.location)
+	{
+		[self addLocation];
+		theImage = [UIImage imageNamed:@"mapRemove.tiff"];
+	}
+	else
+	{
+		NSRange selectedRange = messageText.selectedRange;
+		NSString *newLineWithLocation = [NSString stringWithFormat:@"%@%@", @"\n", self.location];
+		
+		NSRange notFoundRange = {NSNotFound, 0};
+		NSRange stringRange = [messageText.text rangeOfString:newLineWithLocation];
+		NSString *newText = nil;
+		if (!NSEqualRanges(stringRange, notFoundRange))
+		{
+			newText = [messageText.text stringByReplacingOccurrencesOfString:newLineWithLocation withString:@""];			
+		}
+		else
+		{
+			newText = [messageText.text stringByReplacingOccurrencesOfString:self.location withString:@""];
+		}
+		
+		[self setMessageTextText:newText];
+		self.location = nil;
+		messageText.selectedRange = selectedRange;
+		theImage = [UIImage imageNamed:@"map.tiff"];
+	}
 	
-	UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
-				delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", @"") destructiveButtonTitle:nil
-				otherButtonTitles:buttons[0], buttons[1], nil];
-	actionSheet.actionSheetStyle = UIActionSheetStyleAutomatic;
-	actionSheet.tag = LOCATION_SHEET_TAG;
-	[actionSheet showInView:self.view];
-	[actionSheet release];
+	if (nil != theImage)
+	{
+		[locationSegmentedControl setImage:theImage forSegmentAtIndex:0];
+	}
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -1044,25 +1064,6 @@
 				[imgPicker performSelector:@selector(setMediaTypes:) withObject:[self availableMediaTypes:UIImagePickerControllerSourceTypePhotoLibrary]];
 			[self presentModalViewController:imgPicker animated:YES];
 			return;
-		}
-	}
-	else if (LOCATION_SHEET_TAG == actionSheet.tag)
-	{
-		if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Add location", @"")])
-		{
-			[self addLocation];
-		}
-		else if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Remove location", @"")])
-		{
-			NSRange selectedRange = messageText.selectedRange;
-			if (nil != self.location)
-			{
-				NSString *newText = [messageText.text stringByReplacingOccurrencesOfString:self.location withString:@""];
-				[self setMessageTextText:newText];
-			}
-			
-			self.location = nil;
-			messageText.selectedRange = selectedRange;
 		}
 	}
 	else
