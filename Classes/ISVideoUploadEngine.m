@@ -418,7 +418,7 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
 #endif	
 	
-    NSRange range = {0, 5 * 1024};
+    NSRange range = {0, 31*1024+512}; // 31.5 Kb
 
     range.location = currentDataLocation;
     //if ([uploadData length] <= range.location)
