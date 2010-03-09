@@ -149,7 +149,7 @@ enum _TwitEditorSuspendedOperations
 - (void)releaseActivityIndicator;
 
 - (BOOL)mediaIsPicked;
-- (void)addLocation;
+- (BOOL)addLocation;
 
 @property (nonatomic, retain) UIActionSheet *progressSheet;
 
