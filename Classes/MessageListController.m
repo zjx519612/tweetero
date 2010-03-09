@@ -38,6 +38,10 @@
 #import "TwMessageCell.h"
 
 #define ROW_HEIGHT          70
+NSString *const kTwitterErrorPrefix = @"Twitter: ";
+NSString *const kTwitterSecureErrorMessage = @"Secure Connection Failed";
+NSString *const kTwitterOperationErrorMessage = @"Operation Could Not Be Completed";
+const NSInteger kRetriesNumber = 3;
 
 @interface MessageListController(TwitterMessageObjectManagament)
 - (void)initTwitterMessageObjectCache;
@@ -305,7 +309,7 @@
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
     ISLog(@"Failed");
-    
+		
 	if(self.navigationItem.leftBarButtonItem)
 			self.navigationItem.leftBarButtonItem.enabled = YES;
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
@@ -323,6 +327,20 @@
 		_messages = nil;
 	}
 	
+	NSString *errorMessage = [[error localizedDescription] capitalizedString];
+	NSRange notFoundRange = {NSNotFound, 0};
+	NSRange secureErrorRange = [errorMessage rangeOfString:kTwitterSecureErrorMessage];
+	NSRange operationErrorRange = [errorMessage rangeOfString:kTwitterOperationErrorMessage];
+	if (retryCounter < kRetriesNumber &&
+				(!NSEqualRanges(secureErrorRange, notFoundRange) || !NSEqualRanges(operationErrorRange, notFoundRange)))
+	{
+		retryCounter++;
+		_errorDesc = [[NSString stringWithFormat:@"%@%@", kTwitterErrorPrefix, [[error localizedDescription] capitalizedString]] retain];
+		[self performSelector:@selector(reloadAll) withObject:nil afterDelay:0.5f];
+		return;
+	}
+    
+	retryCounter = 0;
 	[self.tableView reloadData];
 }
 

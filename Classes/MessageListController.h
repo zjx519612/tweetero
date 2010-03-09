@@ -39,6 +39,7 @@
     NSArray             *_messages;
     NSMutableDictionary *_messageObjects;
 	int                  _pagenum;
+	NSInteger			retryCounter;
 	BOOL                 _lastMessage;
     TwActivityIndicator *_processIndicator;
 	int                  _indicatorCount;
