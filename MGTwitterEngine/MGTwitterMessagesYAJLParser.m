@@ -18,21 +18,21 @@
 	{
 		[_sender setObject:value forKey:key];
 #if DEBUG_PARSING
-		NSLog(@"messages:   sender: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
+		YFLog(@"messages:   sender: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
 #endif
 	}
 	else if (_recipient)
 	{
 		[_recipient setObject:value forKey:key];
 #if DEBUG_PARSING
-		NSLog(@"messages:   recipient: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
+		YFLog(@"messages:   recipient: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
 #endif
 	}
 	else if (_status)
 	{
 		[_status setObject:value forKey:key];
 #if DEBUG_PARSING
-		NSLog(@"messages:   status: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
+		YFLog(@"messages:   status: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
 #endif
 	}
 }
@@ -40,7 +40,7 @@
 - (void)startDictionaryWithKey:(NSString *)key
 {
 #if DEBUG_PARSING
-	NSLog(@"messages: dictionary start = %@", key);
+	YFLog(@"messages: dictionary start = %@", key);
 #endif
 
 	if (! _status)
@@ -86,21 +86,21 @@
 	}
 	
 #if DEBUG_PARSING
-	NSLog(@"messages: dictionary end");
+	YFLog(@"messages: dictionary end");
 #endif
 }
 
 - (void)startArrayWithKey:(NSString *)key
 {
 #if DEBUG_PARSING
-	NSLog(@"messages: array start = %@", key);
+	YFLog(@"messages: array start = %@", key);
 #endif
 }
 
 - (void)endArray
 {
 #if DEBUG_PARSING
-	NSLog(@"messages: array end");
+	YFLog(@"messages: array end");
 #endif
 }
 

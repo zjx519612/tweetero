@@ -59,7 +59,7 @@
 
 - (void)dealloc
 {
-    NSLog(@"DEALLOC WEB VIEW CONTROLLER");
+    YFLog(@"DEALLOC WEB VIEW CONTROLLER");
 	_webView.delegate = nil;
 	if(_webView.loading)
 	{
@@ -119,7 +119,7 @@
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
-    NSLog(@"Load request");
+    YFLog(@"Load request");
 	
 	TweetterAppDelegate *appDel = (TweetterAppDelegate*)[[UIApplication sharedApplication] delegate];
 	UIViewController *googleMapLoadController = [appDel googleMapLoadControllerWithRequest:request];
@@ -148,7 +148,7 @@
 {
     NSURL *url = [request URL];
     
-    NSLog(@"%@", [url host]);
+    YFLog(@"%@", [url host]);
     
 	return YES;
 }

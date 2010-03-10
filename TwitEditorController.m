@@ -217,9 +217,9 @@
 	//_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
     _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
     
-    //NSLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).authorizeURL path]);
-    //NSLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).accessTokenURL path]);
-    //NSLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).requestTokenURL path]);
+    //YFLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).authorizeURL path]);
+    //YFLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).accessTokenURL path]);
+    //YFLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).requestTokenURL path]);
     
 	inTextEditingMode = NO;
 	suspendedOperation = noTEOperations;
@@ -267,7 +267,7 @@
 
 - (void)dealloc 
 {
-    NSLog(@"tweetEditor - DEALLOC");
+    YFLog(@"tweetEditor - DEALLOC");
 	while (_indicatorCount) 
 		[self releaseActivityIndicator];
 	[_twitter closeAllConnections];
@@ -760,7 +760,7 @@
 - (void)startUpload
 {
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Executing startUpload of TwitEditController method...");
+	YFLog(@"YFrog_DEBUG: Executing startUpload of TwitEditController method...");
 #endif	
 	
 	if(![self mediaIsPicked])
@@ -769,7 +769,7 @@
     [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
 	
 #ifdef TRACE
-	NSLog(@"	YFrog_DEBUG: Media is picked");
+	YFLog(@"	YFrog_DEBUG: Media is picked");
 #endif
     
 	// Image uploader will be released after finishing upload process by setting
@@ -782,8 +782,8 @@
 	else
     {
 #ifdef TRACE
-		NSLog(@"	YFrog_DEBUG: Picked video URL description: %@", [pickedVideo description]);
-		NSLog(@"	YFrog_DEBUG: Picked video is file URL %d", (int)[pickedVideo isFileURL]);
+		YFLog(@"	YFrog_DEBUG: Picked video URL description: %@", [pickedVideo description]);
+		YFLog(@"	YFrog_DEBUG: Picked video is file URL %d", (int)[pickedVideo isFileURL]);
 #endif
 		
         NSString *path;
@@ -794,7 +794,7 @@
         }
 		
 #ifdef TRACE
-		NSLog(@"	YFrog_DEBUG: Path of the video file %@", path);
+		YFLog(@"	YFrog_DEBUG: Path of the video file %@", path);
 #endif		
 		
         [uploader postMP4DataWithPath:path delegate:self userData:pickedVideo];

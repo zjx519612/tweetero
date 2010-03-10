@@ -55,14 +55,14 @@
 
 - (void)saveAccount:(UserAccount*)account
 {
-    NSLog(@"Save account method");
+    YFLog(@"Save account method");
     if (account == nil)
         return;
     
     BOOL isNewAccount = ![self hasAccountWithUsername:account.username];
     BOOL isValid = [self validateAccount:account];
     
-    NSLog(@"Account present = %i", isNewAccount);
+    YFLog(@"Account present = %i", isNewAccount);
     if (isNewAccount && isValid)
     {
         // Add and save new account
@@ -84,7 +84,7 @@
             [attrToUpdate release];
         }
         
-        NSLog(@"SecItemAdd result = %i (noErr = %i)", err, noErr);
+        YFLog(@"SecItemAdd result = %i (noErr = %i)", err, noErr);
         if (err == noErr || err == errSecDuplicateItem)
         {
             // Add account to dictionary
@@ -98,14 +98,14 @@
 
 - (void)replaceAccount:(UserAccount*)oldAccount with:(UserAccount*)newAccount
 {
-    NSLog(@"Replace account method");
+    YFLog(@"Replace account method");
     if (oldAccount == nil || newAccount == nil)
         return;
     
     BOOL hasOldAccount = [self hasAccountWithUsername:oldAccount.username];
     BOOL hasNewAccount = [self hasAccountWithUsername:newAccount.username];
     
-    NSLog(@"Has oldAccount = %i, has newAccount = %i", hasOldAccount, hasNewAccount);
+    YFLog(@"Has oldAccount = %i, has newAccount = %i", hasOldAccount, hasNewAccount);
     if (hasOldAccount)
     {
         BOOL isValid = [self validateAccount:newAccount];
@@ -115,7 +115,7 @@
         // Replace user data
         if ([oldAccount.username compare:newAccount.username] == NSOrderedSame)
         {
-            NSLog(@"Replace security data");
+            YFLog(@"Replace security data");
             
             NSString *secString = [newAccount secretData];
             
@@ -128,7 +128,7 @@
             
             OSStatus err = SecItemUpdate((CFDictionaryRef)secItemEntry, (CFDictionaryRef)attrToUpdate);
             
-            NSLog(@"SecItemAdd result = %i (noErr = %i)", err, noErr);
+            YFLog(@"SecItemAdd result = %i (noErr = %i)", err, noErr);
             if (err == noErr)
             {
                 // Update accounts dictionary
@@ -143,7 +143,7 @@
         }
         else if (!hasNewAccount)
         {
-            NSLog(@"Remove old and add new accounts");
+            YFLog(@"Remove old and add new accounts");
             // Delete old account
             [self removeAccount:oldAccount];
             // Add new account
@@ -154,10 +154,10 @@
 
 - (void)removeAccount:(UserAccount*)account
 {
-    NSLog(@"Reemove account method");
+    YFLog(@"Reemove account method");
     BOOL hasAccount = [self hasAccountWithUsername:account.username];
     
-    NSLog(@"Account present = %i", hasAccount);
+    YFLog(@"Account present = %i", hasAccount);
     if (hasAccount)
     {
         NSMutableDictionary *secItemEntry = [self prepareSecItemEntry:SEC_ATTR_SERVER user:account.username];
@@ -165,7 +165,7 @@
         // Remove data from KeyChain
         OSStatus err = SecItemDelete((CFDictionaryRef)secItemEntry);
         
-        NSLog(@"SecItemAdd result = %i (noErr = %i)", err, noErr);
+        YFLog(@"SecItemAdd result = %i (noErr = %i)", err, noErr);
         if (err == noErr)
         {
             // Remove account from dictionary

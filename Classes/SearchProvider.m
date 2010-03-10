@@ -136,7 +136,7 @@ static SearchProvider *sharedProvider = nil;
 // Remove saved search query
 - (void)removeQuery:(NSString *)query
 {
-    NSLog(@"REMOVEW_QUERY: %@", query);
+    YFLog(@"REMOVEW_QUERY: %@", query);
     NSString *queryId = [self queryId:query];
     
     if (queryId != nil && [queryId longLongValue] > 0)
@@ -166,12 +166,12 @@ static SearchProvider *sharedProvider = nil;
 */
 - (void)removeQueryById:(NSString*)queryId
 {
-    NSLog(@"REMOVE_QUERY_BY_ID: %@", queryId);
+    YFLog(@"REMOVE_QUERY_BY_ID: %@", queryId);
     if (queryId)
     {
         NSString *query = [self queryById:queryId];
         
-        NSLog(@"Query: %@", query);
+        YFLog(@"Query: %@", query);
         if (query)
         {
             [_twitter searchDestroyQuery:queryId];
@@ -255,11 +255,11 @@ static SearchProvider *sharedProvider = nil;
 #pragma mark MGTwitterEngineDelegate
 - (void)searchResultsReceived:(NSArray *)searchResults forRequest:(NSString *)connectionIdentifier
 {
-    NSLog(@"SEARCH RESULT FOR ID: %@", connectionIdentifier);
+    YFLog(@"SEARCH RESULT FOR ID: %@", connectionIdentifier);
     
     SPNotificationValue notification = [self notificationForIdentifier:connectionIdentifier];
     
-    //NSLog(@"%@", searchResults);
+    //YFLog(@"%@", searchResults);
     if (notification == SPInvalidValue)
         return;
     
@@ -279,7 +279,7 @@ static SearchProvider *sharedProvider = nil;
                 id itemId = [item objectForKey:@"id"];
                 if (itemId) {
                     NSString *updateConnectionIdent = [_twitter getUpdate:[itemId stringValue]];
-                    NSLog(@"UPDATE_CONNECTION_ID: %@, STATUS_ID: %@", updateConnectionIdent, [itemId stringValue]);
+                    YFLog(@"UPDATE_CONNECTION_ID: %@, STATUS_ID: %@", updateConnectionIdent, [itemId stringValue]);
                     NSString *queryConnectionIdent = [[connectionIdentifier copy] autorelease];
                     [_connections setObject:queryConnectionIdent forKey:updateConnectionIdent];
                 }
@@ -301,7 +301,7 @@ static SearchProvider *sharedProvider = nil;
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error 
 {
-    NSLog(@"FAILED_CONNECTION: %@", connectionIdentifier);
+    YFLog(@"FAILED_CONNECTION: %@", connectionIdentifier);
     NSString *query = [_connections objectForKey:connectionIdentifier];
     if (query) 
     {
@@ -321,15 +321,15 @@ static SearchProvider *sharedProvider = nil;
 #pragma mark Unusable MGTwitterEngineDelegate methods
 - (void)requestSucceeded:(NSString *)connectionIdentifier 
 {
-    NSLog(@"REQUEST SUCCEEDED FOR ID: %@", connectionIdentifier);
+    YFLog(@"REQUEST SUCCEEDED FOR ID: %@", connectionIdentifier);
 }
 
 - (void)receivedObject:(NSDictionary *)dictionary forRequest:(NSString *)connectionIdentifier {}
 
 - (void)statusesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier 
 {
-    NSLog(@"CURRENT CONNECTION ID: %@", connectionIdentifier);
-    NSLog(@"ALL CONNECTIONS: %@", _connections);
+    YFLog(@"CURRENT CONNECTION ID: %@", connectionIdentifier);
+    YFLog(@"ALL CONNECTIONS: %@", _connections);
     NSString *searchIdentifier = [[_connections objectForKey:connectionIdentifier] retain];
     [_connections removeObjectForKey:connectionIdentifier];
     if (statuses && [statuses count] > 0) 

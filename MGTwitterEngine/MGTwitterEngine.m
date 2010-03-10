@@ -697,7 +697,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 
 	NSURL *URL = [connection URL];
 
-//	//NSLog(@"jsonData = %@ from %@", [[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] autorelease], URL);
+//	//YFLog(@"jsonData = %@ from %@", [[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] autorelease], URL);
 
     switch (responseType) {
         case MGTwitterStatuses:
@@ -933,7 +933,7 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
     if (NO) {
         // Display headers for debugging.
         NSHTTPURLResponse *resp = (NSHTTPURLResponse *)response;
-        NSLog(@"(%d) [%@]:\\r%@", 
+        YFLog(@"(%d) [%@]:\\r%@", 
               [resp statusCode], 
               [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], 
               [resp allHeaderFields]);

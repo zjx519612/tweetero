@@ -18,7 +18,7 @@
 	{
 		[_results setObject:value forKey:key];
 #if DEBUG_PARSING
-		NSLog(@"misc:   results: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
+		YFLog(@"misc:   results: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
 #endif
 	}
 }
@@ -26,7 +26,7 @@
 - (void)startDictionaryWithKey:(NSString *)key
 {
 #if DEBUG_PARSING
-	NSLog(@"misc: dictionary start = %@", key);
+	YFLog(@"misc: dictionary start = %@", key);
 #endif
 
 	if (! _results)
@@ -46,21 +46,21 @@
 	_results = nil;
 	
 #if DEBUG_PARSING
-	NSLog(@"misc: dictionary end");
+	YFLog(@"misc: dictionary end");
 #endif
 }
 
 - (void)startArrayWithKey:(NSString *)key
 {
 #if DEBUG_PARSING
-	NSLog(@"misc: array start = %@", key);
+	YFLog(@"misc: array start = %@", key);
 #endif
 }
 
 - (void)endArray
 {
 #if DEBUG_PARSING
-	NSLog(@"misc: array end");
+	YFLog(@"misc: array end");
 #endif
 }
 

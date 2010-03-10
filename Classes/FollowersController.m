@@ -294,7 +294,7 @@
 
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-	//NSLog(@"%@", viewController);
+	//YFLog(@"%@", viewController);
 }
 
 #pragma mark MGTwitterEngineDelegate methods
@@ -302,14 +302,14 @@
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	_loading = NO;
-    //NSLog(@"Request succeeded for connectionIdentifier = %@", connectionIdentifier);
+    //YFLog(@"Request succeeded for connectionIdentifier = %@", connectionIdentifier);
 }
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	_loading = NO;
-    /*NSLog(@"Request failed for connectionIdentifier = %@, error = %@ (%@)", 
+    /*YFLog(@"Request failed for connectionIdentifier = %@, error = %@ (%@)", 
           connectionIdentifier, 
           [error localizedDescription], 
           [error userInfo]);*/

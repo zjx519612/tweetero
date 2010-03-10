@@ -10,6 +10,12 @@
 #define ISLog(msg)                  [[Logger logger] log:(msg) className:NSStringFromClass([self class]) methodName:NSStringFromSelector(_cmd) atLine:__LINE__];
 #define ISLogLine(msg)              [[Logger logger] log:(msg) marker:YES]
 
+#ifdef TRACE
+	#define YFLog(format, ...);				NSLog(format, ## __VA_ARGS__);
+#else
+	#define YFLog(format, ...); 
+#endif
+
 @interface Logger : NSObject {
     NSMutableData *_data;
     NSString *_path;

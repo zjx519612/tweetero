@@ -25,7 +25,7 @@
 		// There are no opened child containers so add value to root container
 		[_root setObject:value forKey:key];
 #if DEBUG_PARSING
-		NSLog(@"status:  status: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
+		YFLog(@"status:  status: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
 #endif
 	}
 	
@@ -39,7 +39,7 @@
 			NSMutableDictionary *theChild = [[theLastChildHolder allValues] objectAtIndex:0];
 			[theChild setObject:value forKey:key];
 #if DEBUG_PARSING
-			NSLog(@"status: added value: %@, for key: %@", [value description], key);
+			YFLog(@"status: added value: %@, for key: %@", [value description], key);
 #endif
 			return;
 		}
@@ -49,7 +49,7 @@
 - (void)startDictionaryWithKey:(NSString *)key
 {
 #if DEBUG_PARSING
-	NSLog(@"status: dictionary start = %@", key);
+	YFLog(@"status: dictionary start = %@", key);
 #endif
 
 	if (! _root)
@@ -78,7 +78,7 @@
 		{
 			[_root setObject:theChild forKey:theKey];
 #if DEBUG_PARSING
-			NSLog(@"status: added dictionary for key: %@ to root container", theKey);
+			YFLog(@"status: added dictionary for key: %@ to root container", theKey);
 #endif
 		}
 		else if ([[self childs] count] > 1)
@@ -89,7 +89,7 @@
 			[theParentContainer setObject:theChild forKey:theKey];
 #if DEBUG_PARSING
 			NSString *theParentKey = [[theParentHolder allKeys] objectAtIndex:0];
-			NSLog(@"status: added dictionary for key: %@ to parent for key: %@", theKey, theParentKey);
+			YFLog(@"status: added dictionary for key: %@ to parent for key: %@", theKey, theParentKey);
 #endif
 		}
 
@@ -108,7 +108,7 @@
 		_root = nil;
 		
 #if DEBUG_PARSING
-		NSLog(@"status: root dictionary is closed");
+		YFLog(@"status: root dictionary is closed");
 #endif
 	}
 }
@@ -116,14 +116,14 @@
 - (void)startArrayWithKey:(NSString *)key
 {
 #if DEBUG_PARSING
-	NSLog(@"status: array start = %@", key);
+	YFLog(@"status: array start = %@", key);
 #endif
 }
 
 - (void)endArray
 {
 #if DEBUG_PARSING
-	NSLog(@"status: array end");
+	YFLog(@"status: array end");
 #endif
 }
 

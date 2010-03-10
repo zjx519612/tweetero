@@ -18,14 +18,14 @@
 	{
 		[_results setObject:value forKey:key];
 #if DEBUG_PARSING
-		NSLog(@"search:   results: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
+		YFLog(@"search:   results: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
 #endif
 	}
 	else if (_status)
 	{
 		[_status setObject:value forKey:key];
 #if DEBUG_PARSING
-		NSLog(@"search:   status: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
+		YFLog(@"search:   status: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
 #endif
 	}
 }
@@ -33,7 +33,7 @@
 - (void)startDictionaryWithKey:(NSString *)key
 {
 #if DEBUG_PARSING
-	NSLog(@"search: dictionary start = %@", key);
+	YFLog(@"search: dictionary start = %@", key);
 #endif
 
 	if (insideArray)
@@ -80,14 +80,14 @@
 	}
 	
 #if DEBUG_PARSING
-	NSLog(@"search: dictionary end");
+	YFLog(@"search: dictionary end");
 #endif
 }
 
 - (void)startArrayWithKey:(NSString *)key
 {
 #if DEBUG_PARSING
-	NSLog(@"search: array start = %@", key);
+	YFLog(@"search: array start = %@", key);
 #endif
 	insideArray = YES;
 }
@@ -95,7 +95,7 @@
 - (void)endArray
 {
 #if DEBUG_PARSING
-	NSLog(@"search: array end");
+	YFLog(@"search: array end");
 #endif
 	insideArray = NO;
 }

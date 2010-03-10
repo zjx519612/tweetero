@@ -76,7 +76,7 @@
 {
     id object = [note object];
     
-    NSLog(@"UPDATE_TWITS");
+    YFLog(@"UPDATE_TWITS");
     if ([object respondsToSelector:@selector(dataSourceClass)])
     {
         Class ds_class = [object dataSourceClass];
@@ -124,7 +124,7 @@
 
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count
 {
-    NSLog(@"LOAD HOME START WITH %d COUNT %d", numPage, count);
+    YFLog(@"LOAD HOME START WITH %d COUNT %d", numPage, count);
 	[super loadMessagesStaringAtPage:numPage count:count];
     
     if ([[AccountManager manager] isValidLoggedUser])

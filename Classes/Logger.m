@@ -50,7 +50,7 @@
     {
         NSString *userDocumentsPath = [paths objectAtIndex:0];
         _path = [[NSString stringWithFormat:@"%@/yfrog.log", userDocumentsPath] retain];
-        NSLog(_path);
+        YFLog(_path);
     }
 #endif
     [self log:[Logger titleBlock]];
@@ -91,10 +91,10 @@
             [file closeFile];
         }
         */
-        NSLog(str);
+        YFLog(str);
     }
     @catch (...) {
-        NSLog(@"Could not write log");
+        YFLog(@"Could not write log");
     }
 }
 

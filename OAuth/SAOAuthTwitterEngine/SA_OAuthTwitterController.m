@@ -142,7 +142,7 @@ static NSString* const kGGTwitterLoadingBackgroundImage = @"twitter_load.png";
     NSString *dataSource = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
     
     if (dataSource == nil) {
-        NSLog(@"An error occured while processing the jQueryInject file");
+        YFLog(@"An error occured while processing the jQueryInject file");
     }
 	
 	[_webView stringByEvaluatingJavaScriptFromString:dataSource]; //This line injects the jQuery to make it look better
