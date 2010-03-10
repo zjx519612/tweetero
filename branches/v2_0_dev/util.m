@@ -47,24 +47,24 @@ void traceDict(NSDictionary *dict)
             valStr = obj;
         else
             valStr = [NSString stringWithCString:NAMEOF(key)];
-        NSLog(@"%@: %@\n", keyStr, valStr);
+        YFLog(@"%@: %@\n", keyStr, valStr);
     }
 }
 
 void LogStringArray(NSArray* ar, NSString* descriptionString)
 {
 #ifdef DEBUG
-	NSLog(@"========================Start=====================");
+	YFLog(@"========================Start=====================");
 	if(descriptionString)
-		NSLog(descriptionString);
+		YFLog(descriptionString);
 	NSEnumerator *enumerator = [ar objectEnumerator];
 	id obj;
 	while (obj = [enumerator nextObject]) 
 		if([obj isKindOfClass:[NSString class]])
-			NSLog((NSString*)obj);
+			YFLog((NSString*)obj);
 		else
-			NSLog(@"------------------Non-string item");
-	NSLog(@"========================End=====================");
+			YFLog(@"------------------Non-string item");
+	YFLog(@"========================End=====================");
 #endif
 }
 
@@ -675,7 +675,7 @@ NSDictionary* GoogleMapsCoordsFromUrl(NSURL *url)
 
     NSMutableDictionary *params = nil;
     
-    NSLog(@"%@, %@", latitude, longtitude);
+    YFLog(@"%@, %@", latitude, longtitude);
     if (longtitude && latitude) {
         params = [NSMutableDictionary dictionary];
         

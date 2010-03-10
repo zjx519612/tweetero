@@ -86,8 +86,8 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
     if (self = [self init])
     {
 #ifdef TRACE
-		NSLog(@"YFrog_DEBUG: Executing initWithPath:delegate: method...");
-		NSLog(@"	YFrog_DEBUG: A path of the video file %@", aPath);
+		YFLog(@"YFrog_DEBUG: Executing initWithPath:delegate: method...");
+		YFLog(@"	YFrog_DEBUG: A path of the video file %@", aPath);
 #endif
 		
         self.path = aPath;
@@ -114,8 +114,8 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (BOOL)upload
 {
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Starting Video Upload...");
-	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
+	YFLog(@"YFrog_DEBUG: Starting Video Upload...");
+	YFLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
 #endif
 	
     BOOL success = NO;
@@ -151,8 +151,8 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Executing connection:didFailWithError: method...");
-	NSLog(@"	YFrog_DEBUG: Error description %@", [error description]);
+	YFLog(@"YFrog_DEBUG: Executing connection:didFailWithError: method...");
+	YFLog(@"	YFrog_DEBUG: Error description %@", [error description]);
 #endif
 	
     [delegate didStopUploading:self];
@@ -164,9 +164,9 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Executing connectionDidFinishLoading: method...");
-	NSLog(@"	YFrog_DEBUG: Status code is %d", statusCode);
-	NSLog(@"	YFrog_DEBUG: Current phase is %d", phase);
+	YFLog(@"YFrog_DEBUG: Executing connectionDidFinishLoading: method...");
+	YFLog(@"	YFrog_DEBUG: Status code is %d", statusCode);
+	YFLog(@"	YFrog_DEBUG: Current phase is %d", phase);
 #endif
 	
     if (IsValidStatusCode(statusCode))
@@ -209,8 +209,8 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Executing connection:didReceiveResponse: method...");
-	NSLog(@"	YFrog_DEBUG: Received responce %@", [response description]);
+	YFLog(@"YFrog_DEBUG: Executing connection:didReceiveResponse: method...");
+	YFLog(@"	YFrog_DEBUG: Received responce %@", [response description]);
 #endif			
 
     if ([response isKindOfClass:[NSHTTPURLResponse class]])
@@ -219,7 +219,7 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
         statusCode = [httpResp statusCode];
         
 #ifdef TRACE
-		NSLog(@"	YFrog_DEBUG: Responce status code is: %d", statusCode);
+		YFLog(@"	YFrog_DEBUG: Responce status code is: %d", statusCode);
 #endif
 		
 //        if (phase == ISUploadPhaseResumeUpload)
@@ -237,9 +237,9 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Executing connection:didReceiveData: method...");
-	NSLog(@"	YFrog_DEBUG: Received data is %@", [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease]);
-	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
+	YFLog(@"YFrog_DEBUG: Executing connection:didReceiveData: method...");
+	YFLog(@"	YFrog_DEBUG: Received data is %@", [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease]);
+	YFLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
 #endif	
 	
     if (phase == ISUploadPhaseResumeUpload)
@@ -307,8 +307,8 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 	phase = phaseCode;
 	
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Executing doPhase method...");
-	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
+	YFLog(@"YFrog_DEBUG: Executing doPhase method...");
+	YFLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
 #endif
 
     switch (phase)
@@ -344,8 +344,8 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (void)sendInitData
 {
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Executing sendInitData method...");
-	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
+	YFLog(@"YFrog_DEBUG: Executing sendInitData method...");
+	YFLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
 #endif	
 	
     NSMutableData *body = [NSMutableData data];
@@ -400,8 +400,8 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
     currentDataLocation = 0;
 	
 #ifdef TRACE
-	NSLog(@"	YFrog_DEBUG: From sendInitData: Created HTTP request with body:");
-	NSLog(@"	YFrog_DEBUG: %@", [[[NSString alloc] initWithData:body encoding:NSUTF8StringEncoding] autorelease]);
+	YFLog(@"	YFrog_DEBUG: From sendInitData: Created HTTP request with body:");
+	YFLog(@"	YFrog_DEBUG: %@", [[[NSString alloc] initWithData:body encoding:NSUTF8StringEncoding] autorelease]);
 #endif	
     
     BOOL validConnection = [self openConnection:request];
@@ -414,8 +414,8 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (void)uploadNextChunk
 {
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Executing uploadNextChunk method...");
-	NSLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
+	YFLog(@"YFrog_DEBUG: Executing uploadNextChunk method...");
+	YFLog(@"	YFrog_DEBUG: Current Phase is %d", phase);
 #endif	
 	
     NSRange range = {0, 31*1024+512}; // 31.5 Kb
@@ -445,7 +445,7 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
     [request setValue:contentRange forHTTPHeaderField:@"Content-Range"];
 
 #ifdef TRACE
-	NSLog(@"	YFrog_DEBUG: Chank to upload %@", NSStringFromRange(range));
+	YFLog(@"	YFrog_DEBUG: Chank to upload %@", NSStringFromRange(range));
 #endif
 	
 	[self closeConnection];
@@ -460,7 +460,7 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (void)resumeUpload
 {
 #ifdef TRACE
-    NSLog(@"resumeUpload");
+    YFLog(@"resumeUpload");
 #endif	
 	
     if (self.isOpened)
@@ -471,7 +471,7 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
     if (self.getLengthUrl)
     {
 #ifdef TRACE
-		NSLog(@"Run get length connection");
+		YFLog(@"Run get length connection");
 #endif		
 
         NSMutableURLRequest *request = [[[NSMutableURLRequest alloc] init] autorelease];
@@ -494,7 +494,7 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (BOOL)canRetryChunkSession
 {
 #ifdef TRACE
-    NSLog(@"Can Retry chunk session = %i", sessionCount);
+    YFLog(@"Can Retry chunk session = %i", sessionCount);
 #endif
     
     if (sessionCount++ < 3 && timer == nil)
@@ -508,7 +508,7 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (void)retryChunkSession
 {
 #ifdef TRACE
-    NSLog(@"Retry session");
+    YFLog(@"Retry session");
 #endif
 	
     [self retryUpload:YES];
@@ -517,7 +517,7 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (void)retryUpload:(BOOL)isSession
 {
 #ifdef TRACE
-    NSLog(@"retry Upload");
+    YFLog(@"retry Upload");
 #endif
 	
     [self destroyRetryTimer];
@@ -540,7 +540,7 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (void)retryTimerFired:(NSTimer *)aTimer
 {
 #ifdef TRACE
-    NSLog(@"retryTimerFired");
+    YFLog(@"retryTimerFired");
 #endif
     
 	NSNumber *isSession = [timer userInfo];
@@ -642,8 +642,8 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
 - (BOOL)openConnection:(NSURLRequest*)request
 {
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Executing openConnection method...");
-	NSLog(@"	YFrog_DEBUG: Creating and running new connection with request %@", [request description]);
+	YFLog(@"YFrog_DEBUG: Executing openConnection method...");
+	YFLog(@"	YFrog_DEBUG: Creating and running new connection with request %@", [request description]);
 #endif	
 	
     if (nil != connection)

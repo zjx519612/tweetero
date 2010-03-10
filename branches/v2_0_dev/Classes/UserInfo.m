@@ -218,8 +218,8 @@ static NSString* kActionCell = @"UserInfoActionCell";
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	
-    NSLog(@"NETWORK_FAILED: %@", connectionIdentifier);
-    NSLog(@"%@", error);
+    YFLog(@"NETWORK_FAILED: %@", connectionIdentifier);
+    YFLog(@"%@", error);
     
 	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Network Failure", @"")
                                                     message: [error localizedDescription]
@@ -232,7 +232,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 
 - (void)miscInfoReceived:(NSArray *)miscInfo forRequest:(NSString *)connectionIdentifier
 {
-    NSLog(@"MISC INFO RECEIVE");
+    YFLog(@"MISC INFO RECEIVE");
 	if(![self.isUserReceivingUpdatesForConnectionID isEqualToString:connectionIdentifier])
 		return;
 
@@ -250,7 +250,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 
 - (void)userInfoReceived:(NSArray *)userInfo forRequest:(NSString *)connectionIdentifier;
 {
-    NSLog(@"USER INFO RECEIVE");
+    YFLog(@"USER INFO RECEIVE");
     if (![self.userInfoConnectionID isEqualToString:connectionIdentifier])
         return;
     
@@ -273,7 +273,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
         _following = [following boolValue];
     
     
-    NSLog(@"FOLLOWING: %i", _following);
+    YFLog(@"FOLLOWING: %i", _following);
     _userInfoView.follow = _following;
 
     [_userInfoView disableFollowingButton:NO];
@@ -362,7 +362,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
 				[info appendFormat:@"<a href=http://maps.google.com/maps?q=%f,%f>%@</a>", x, y, @"Current Location"];
 				
 				[info appendString:[item substringFromIndex:[scanner scanLocation]]];
-				NSLog(@"INFO: %@", info);
+				YFLog(@"INFO: %@", info);
 			}
 		}
 		[info appendString:@"<br>"];

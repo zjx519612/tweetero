@@ -18,14 +18,14 @@
 	{
 		[_status setObject:value forKey:key];
 #if DEBUG_PARSING
-		NSLog(@"user:   status: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
+		YFLog(@"user:   status: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
 #endif
 	}
 	else if (_user)
 	{
 		[_user setObject:value forKey:key];
 #if DEBUG_PARSING
-		NSLog(@"user:   user: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
+		YFLog(@"user:   user: %@ = %@ (%@)", key, value, NSStringFromClass([value class]));
 #endif
 	}
 }
@@ -33,7 +33,7 @@
 - (void)startDictionaryWithKey:(NSString *)key
 {
 #if DEBUG_PARSING
-	NSLog(@"user: dictionary start = %@", key);
+	YFLog(@"user: dictionary start = %@", key);
 #endif
 
 	if (! _user)
@@ -69,21 +69,21 @@
 	}
 	
 #if DEBUG_PARSING
-	NSLog(@"user: dictionary end");
+	YFLog(@"user: dictionary end");
 #endif
 }
 
 - (void)startArrayWithKey:(NSString *)key
 {
 #if DEBUG_PARSING
-	NSLog(@"user: array start = %@", key);
+	YFLog(@"user: array start = %@", key);
 #endif
 }
 
 - (void)endArray
 {
 #if DEBUG_PARSING
-	NSLog(@"user: array end");
+	YFLog(@"user: array end");
 #endif
 }
 

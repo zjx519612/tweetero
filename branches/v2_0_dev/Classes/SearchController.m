@@ -72,7 +72,7 @@
 
 - (void)dealloc
 {
-    NSLog(@"DEALLOC SEARCH CONTROLLER");
+    YFLog(@"DEALLOC SEARCH CONTROLLER");
     self.query = nil;
     if (self.searchProvider) {
         [self.searchProvider closeSearch];

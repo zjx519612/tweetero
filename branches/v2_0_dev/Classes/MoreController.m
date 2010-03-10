@@ -70,10 +70,10 @@
 
 - (id)initWithStyle:(UITableViewStyle)style 
 {
-    NSLog(@"MORE_CONTOLLER");
+    YFLog(@"MORE_CONTOLLER");
     if (self = [super initWithStyle:style]) 
     {
-        NSLog(@"INIT MORE CONTROLLER");
+        YFLog(@"INIT MORE CONTROLLER");
         
         self.tableView.dataSource = self;
         self.tableView.delegate = self;

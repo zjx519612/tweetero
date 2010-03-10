@@ -114,7 +114,7 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 		
 	if(!self.contentType)
 	{
-		NSLog(@"Content-Type header was not setted\n");
+		YFLog(@"Content-Type header was not setted\n");
 		return;
 	}
 	
@@ -257,8 +257,8 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	}
 	
 #ifdef TRACE
-	NSLog(@"YFrog_DEBUG: Executing postMP4DataWithPath:delegate: method...");
-	NSLog(@"	YFrog_DEBUG: Creating Video upload engine");
+	YFLog(@"YFrog_DEBUG: Executing postMP4DataWithPath:delegate: method...");
+	YFLog(@"	YFrog_DEBUG: Creating Video upload engine");
 #endif
 	
     ISVideoUploadEngine *engine = [[ISVideoUploadEngine alloc] initWithPath:path delegate:self];

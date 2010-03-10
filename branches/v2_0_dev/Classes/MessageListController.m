@@ -347,7 +347,7 @@ const NSInteger kRetriesNumber = 3;
 - (void)statusesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier
 {
     ISLog(@"Receive status");
-    NSLog(@"%@", statuses);
+    YFLog(@"%@", statuses);
     /*
 	if([statuses count] < MESSAGES_PER_PAGE)
 	{
@@ -382,7 +382,7 @@ const NSInteger kRetriesNumber = 3;
 		}
 		@catch (NSException * e) 
 		{
-			NSLog(@"Tweet List Error!!!\nNumber of rows: %d\n_messages: %@\nstatuses: %@\nIndices: %@\n",
+			YFLog(@"Tweet List Error!!!\nNumber of rows: %d\n_messages: %@\nstatuses: %@\nIndices: %@\n",
 				[self tableView:self.tableView numberOfRowsInSection:0],
 				_messages, statuses, indices);
 		}
@@ -443,7 +443,7 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 		}
 		@catch (NSException * e) 
 		{
-			NSLog(@"Direct Messages Error!!!\nNumber of rows: %d\n_messages: %@\nstatuses: %@\nIndices: %@\n",
+			YFLog(@"Direct Messages Error!!!\nNumber of rows: %d\n_messages: %@\nstatuses: %@\nIndices: %@\n",
 				[self tableView:self.tableView numberOfRowsInSection:0],
 				_messages, statuses, indices);
 		}

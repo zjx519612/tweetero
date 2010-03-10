@@ -162,12 +162,12 @@ static int NetworkActivityIndicatorCounter = 0;
 
 - (void)mapViewWillStartLoadingMap:(MKMapView *)mapView
 {
-	NSLog(@"mapViewWillStartLoadingMap");
+	YFLog(@"mapViewWillStartLoadingMap");
 }
 
 - (void)mapViewDidFinishLoadingMap:(MKMapView *)mapView
 {
-	NSLog(@"mapViewDidFinishLoadingMap");
+	YFLog(@"mapViewDidFinishLoadingMap");
 }
 
 - (UIViewController *)googleMapLoadControllerWithRequest:(NSURLRequest *)request
@@ -194,7 +194,7 @@ static int NetworkActivityIndicatorCounter = 0;
 				
 				CLLocationCoordinate2D location;
 				
-				NSLog(@"Map: %@, %@", latitude, longtitude);
+				YFLog(@"Map: %@, %@", latitude, longtitude);
 				
 				location.latitude = [latitude doubleValue];
 				location.longitude = [longtitude doubleValue];

@@ -95,8 +95,8 @@
         
         _message = [[_store messageData:_currentMessageIndex] retain];
         
-        NSLog(@"CURRENT INDEX: %i", _currentMessageIndex);
-        NSLog(@"%@", _message);
+        YFLog(@"CURRENT INDEX: %i", _currentMessageIndex);
+        YFLog(@"%@", _message);
         
         if (_imagesLinks)
             [_imagesLinks release];
@@ -486,7 +486,7 @@
 
 - (void)dealloc
 {
-    NSLog(@"DEALLOC TweetViewController");
+    YFLog(@"DEALLOC TweetViewController");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     self.connectionIdentifier = nil;
@@ -541,8 +541,8 @@
     [super viewDidAppear:animated];
     [self.navigationController.view setNeedsLayout];
     TweetterAppDelegate *app = (TweetterAppDelegate*)[UIApplication sharedApplication].delegate;
-    NSLog(@"TweetViewController: app.window.frame: %@", NSStringFromCGRect(app.window.frame));
-    NSLog(@"TweetViewController: self.view.frame: %@", NSStringFromCGRect(self.view.frame));
+    YFLog(@"TweetViewController: app.window.frame: %@", NSStringFromCGRect(app.window.frame));
+    YFLog(@"TweetViewController: self.view.frame: %@", NSStringFromCGRect(self.view.frame));
     [self.view.superview setFrame:CGRectMake(0, 64, 320, 416)];
     [self.view.superview setNeedsLayout];
     [self.navigationController.view setNeedsLayout];
@@ -803,7 +803,7 @@
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-    NSLog(@"WebViewDidFinishLoad: Orientation is %d",[UIDevice currentDevice].orientation);
+    YFLog(@"WebViewDidFinishLoad: Orientation is %d",[UIDevice currentDevice].orientation);
 }
 
 #pragma mark UIActionSheet Delegate
@@ -825,7 +825,7 @@
         
         NSString *messageId = [[_message objectForKey:@"id"] stringValue];
         
-        NSLog(@"Delete twit: Message ID = %@", messageId);
+        YFLog(@"Delete twit: Message ID = %@", messageId);
         if (_isDirectMessage)
             [_twitter deleteDirectMessage:messageId];
         else
@@ -887,7 +887,7 @@
 #pragma mark MGTweeterEngine Delegate
 - (void)requestSucceeded:(NSString *)connectionIdentifier
 {
-    NSLog(@"MGTwitterEngine Request SUCCEEDED");
+    YFLog(@"MGTwitterEngine Request SUCCEEDED");
     
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"TwittsUpdated" object:self];
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
@@ -901,8 +901,8 @@
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
-    NSLog(@"MGTwitterEngine Request FAILED");
-    NSLog(@"%@", error);
+    YFLog(@"MGTwitterEngine Request FAILED");
+    YFLog(@"%@", error);
 
     [self enableFavoriteButton:YES];//DEBUG
     
@@ -930,7 +930,7 @@
 
 - (void)statusesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier
 {
-    NSLog(@"STATUS RECEIVED");
+    YFLog(@"STATUS RECEIVED");
     isFavorited = !isFavorited;
     [self updateFavoriteIcon];
     [self enableFavoriteButton:YES];
@@ -938,17 +938,17 @@
 
 - (void)directMessagesReceived:(NSArray *)messages forRequest:(NSString *)connectionIdentifier
 {
-    NSLog(@"DIRECT MESSAGES RECEIVED");
+    YFLog(@"DIRECT MESSAGES RECEIVED");
 }
 
 - (void)userInfoReceived:(NSArray *)userInfo forRequest:(NSString *)connectionIdentifier
 {
-    NSLog(@"USER INFO RECEIVED");
+    YFLog(@"USER INFO RECEIVED");
 }
 
 - (void)miscInfoReceived:(NSArray *)miscInfo forRequest:(NSString *)connectionIdentifier
 {
-    NSLog(@"MISC INFO RECEIVED");
+    YFLog(@"MISC INFO RECEIVED");
 }
 
 @end

@@ -260,7 +260,7 @@ static yajl_callbacks callbacks = {
 			if (status != yajl_status_insufficient_data && status != yajl_status_ok)
 			{
 				unsigned char *errorMessage = yajl_get_error(_handle, 0, [json bytes], [json length]);
-				NSLog(@"MGTwitterYAJLParser: error = %s", errorMessage);
+				YFLog(@"MGTwitterYAJLParser: error = %s", errorMessage);
 				[self _parsingErrorOccurred:[NSError errorWithDomain:@"YAJL" code:status userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithUTF8String:(char *)errorMessage] forKey:@"errorMessage"]]];
 				yajl_free_error(_handle, errorMessage);
 			}
@@ -299,35 +299,35 @@ static yajl_callbacks callbacks = {
 {
 	// default implementation -- override in subclasses
 	
-	NSLog(@"%@ = %@ (%@)", key, value, NSStringFromClass([value class]));
+	YFLog(@"%@ = %@ (%@)", key, value, NSStringFromClass([value class]));
 }
 
 - (void)startDictionaryWithKey:(NSString *)key
 {
 	// default implementation -- override in subclasses
 	
-	NSLog(@"dictionary start = %@", key);
+	YFLog(@"dictionary start = %@", key);
 }
 
 - (void)endDictionary
 {
 	// default implementation -- override in subclasses
 	
-	NSLog(@"dictionary end");
+	YFLog(@"dictionary end");
 }
 
 - (void)startArrayWithKey:(NSString *)key
 {
 	// default implementation -- override in subclasses
 	
-	NSLog(@"array start = %@", key);
+	YFLog(@"array start = %@", key);
 }
 
 - (void)endArray
 {
 	// default implementation -- override in subclasses
 	
-	NSLog(@"array end");
+	YFLog(@"array end");
 }
 
 
