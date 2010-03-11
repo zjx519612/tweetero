@@ -37,6 +37,12 @@
 #define		RETRIES_NUMBER_LIMIT		5
 const NSTimeInterval kTimerRetryInterval = 5.0;
 
+@interface ImageUploader()
+
+- (NSString *)getApiURL;
+
+@end
+
 @implementation ImageUploader
 
 @synthesize connection;
@@ -130,8 +136,9 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
         return;
     }
 	
-	[mediaData autorelease];
-	mediaData = [data retain];
+	[data retain];
+	[mediaData release];
+	mediaData = data;
 	
 	NSString *boundary = [NSString stringWithFormat:@"%ld__%ld__%ld", random(), random(), random()];
 	
@@ -169,7 +176,7 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 	NSString* fileHeader = [NSString stringWithFormat:
 				@"--%@\r\n"
-				"Content-Disposition: form-data; name=\"media\"; filename=\"iPhoneMedia\"\r\n"
+				"Content-Disposition: form-data; name=\"fileupload\"; filename=\"iPhoneMedia\"\r\n"
 				"Content-Type: %@\r\n"
 				"Content-Transfer-Encoding: binary; \r\n\r\n",
 				boundary, self.contentType];
@@ -177,7 +184,7 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	[postBody appendData:data];
 	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 	
-	NSURL *url = [NSURL URLWithString:@"http://yfrog.com/api/upload"];
+	NSURL *url = [NSURL URLWithString:[self getApiURL]];
 	NSMutableURLRequest *request = tweeteroMutableURLRequest(url);
 	[request setCachePolicy:NSURLRequestReloadIgnoringCacheData];
 	[request setTimeoutInterval:HTTPUploadTimeout];
@@ -351,7 +358,7 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
     if (qName) 
         elementName = qName;
 
-    if ([elementName isEqualToString:@"mediaurl"])
+    if ([elementName isEqualToString:@"yfrog_link"])
 		self.contentXMLProperty = [NSMutableString string];
 	else
 		self.contentXMLProperty = nil;
@@ -362,7 +369,7 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
     if (qName)
         elementName = qName;
     
-    if ([elementName isEqualToString:@"mediaurl"])
+    if ([elementName isEqualToString:@"yfrog_link"])
 	{
         self.newURL = [self.contentXMLProperty stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		[parser abortParsing];
@@ -421,6 +428,21 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	[self postData:mediaData];
 }
 
+- (NSString *)getApiURL
+{
+	const NSInteger theServerCount = 9;
+    static NSInteger theCurrentServerImage = 1;
+    
+    NSInteger theServerIndex = (random() % theServerCount) + 1;
+    if (theServerIndex == theCurrentServerImage)
+	{
+        theServerIndex = (random() % theServerCount) + 1;
+	}
+
+    theCurrentServerImage = theServerIndex;
+		
+    return [NSString stringWithFormat:@"http://load%d.imageshack.us/upload_api.php", theServerIndex];
+}
 
 #pragma mark ISVideoUploadEngine Delegate
 - (void)didStartUploading:(ISVideoUploadEngine *)engine totalSize:(NSUInteger)size
