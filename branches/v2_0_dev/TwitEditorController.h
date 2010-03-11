@@ -61,13 +61,13 @@ enum _TwitEditorSuspendedOperations
     IBOutlet UINavigationItem *navItem;
     IBOutlet ImagePreview *image;
     IBOutlet UITextView *messageText;
-    IBOutlet ImagePickerController *imgPicker;
     IBOutlet UILabel *charsCount;
     IBOutlet UIProgressView *progress;
     IBOutlet UILabel *progressStatus;
 	BOOL			inTextEditingMode;
 
 	UIActionSheet *progressSheet;
+	ImagePickerController *imgPicker;
 	IBOutlet UISegmentedControl *postImageSegmentedControl;
 	UIBarButtonItem *segmentBarItem;
 	IBOutlet UISegmentedControl *imagesSegmentedControl;

@@ -229,21 +229,6 @@
 					<bool key="IBUIPrompted">NO</bool>
 				</object>
 			</object>
-			<object class="IBUIImagePickerController" id="780139201">
-				<object class="IBUISimulatedTabBarMetrics" key="IBUISimulatedBottomBarMetrics"/>
-				<object class="IBUISimulatedStatusBarMetrics" key="IBUISimulatedStatusBarMetrics"/>
-				<object class="IBUINavigationBar" key="IBUINavigationBar" id="904662552">
-					<nil key="NSNextResponder"/>
-					<int key="NSvFlags">256</int>
-					<string key="NSFrameSize">{320, 44}</string>
-					<bool key="IBUIOpaque">NO</bool>
-					<bool key="IBUIClipsSubviews">YES</bool>
-					<bool key="IBUIMultipleTouchEnabled">YES</bool>
-				</object>
-				<object class="NSMutableArray" key="IBUIViewControllers">
-					<bool key="EncodedWithXMLCoder">YES</bool>
-				</object>
-			</object>
 			<object class="IBUIBarButtonItem" id="39701725">
 				<string key="IBUITitle">Pick Image</string>
 				<int key="IBUIStyle">1</int>
@@ -316,14 +301,6 @@
 						<reference key="destination" ref="510192053"/>
 					</object>
 					<int key="connectionID">28</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">imgPicker</string>
-						<reference key="source" ref="372490531"/>
-						<reference key="destination" ref="780139201"/>
-					</object>
-					<int key="connectionID">32</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
@@ -491,20 +468,6 @@
 						<reference key="parent" ref="191373211"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">13</int>
-						<reference key="object" ref="780139201"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="904662552"/>
-						</object>
-						<reference key="parent" ref="451420043"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">14</int>
-						<reference key="object" ref="904662552"/>
-						<reference key="parent" ref="780139201"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">34</int>
 						<reference key="object" ref="39701725"/>
 						<reference key="parent" ref="451420043"/>
@@ -575,10 +538,6 @@
 					<string>1.IBPluginDependency</string>
 					<string>11.CustomClassName</string>
 					<string>11.IBPluginDependency</string>
-					<string>13.CustomClassName</string>
-					<string>13.IBEditorWindowLastContentRect</string>
-					<string>13.IBPluginDependency</string>
-					<string>14.IBPluginDependency</string>
 					<string>34.IBPluginDependency</string>
 					<string>35.IBPluginDependency</string>
 					<string>36.IBPluginDependency</string>
@@ -599,10 +558,6 @@
 					<string>{{580, 352}, {320, 480}}</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>ImagePreview</string>
-					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-					<string>ImagePickerController</string>
-					<string>{{88, 156}, {320, 480}}</string>
-					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
