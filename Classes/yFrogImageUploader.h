@@ -35,6 +35,7 @@
 - (void)uploadedImage:(NSString*)yFrogURL sender:(ImageUploader*)sender;
 - (void)uploadedDataSize:(NSInteger)size;
 - (void)uploadedProccess:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten;
+- (void)imageUploadDidFailedBySender:(ImageUploader *)sender;
 
 @end
 
@@ -47,7 +48,6 @@
 	id userData;
 	
 	NSURLConnection *connection;
-	NSData* mediaData;
 	NSInteger retriesCounter;
 	NSTimer *retryTimer;
 	

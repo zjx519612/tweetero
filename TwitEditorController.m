@@ -44,6 +44,13 @@
 #   define DEBUG_VIDEO_FILE_EXT         @"mov"
 #endif
 
+#define DEBUG_IMAGE_UPLOAD				0
+#if DEBUG_IMAGE_UPLOAD
+#   define DEBUG_IMAGE_FILE_NAME        @"test"
+#   define DEBUG_IMAGE_FILE_EXT         @"jpg"
+#endif
+
+
 #define SEND_SEGMENT_CNTRL_WIDTH			130
 #define FIRST_SEND_SEGMENT_WIDTH			 66
 
@@ -413,6 +420,10 @@
     NSString *debugVideoFilePath = [[NSBundle mainBundle] pathForResource:DEBUG_VIDEO_FILE_NAME ofType:DEBUG_VIDEO_FILE_EXT];
     NSURL *theMovieURL = [NSURL fileURLWithPath:debugVideoFilePath];
     [self imagePickerController:picker didFinishWithPickingPhoto:nil pickingMovie:theMovieURL];
+#elif DEBUG_IMAGE_UPLOAD
+    NSString *debugImageFilePath = [[NSBundle mainBundle] pathForResource:DEBUG_IMAGE_FILE_NAME ofType:DEBUG_IMAGE_FILE_EXT];
+    UIImage *theImage = [UIImage imageWithContentsOfFile:debugImageFilePath];
+    [self imagePickerController:picker didFinishWithPickingPhoto:theImage pickingMovie:nil];
 #else
 	if([[info objectForKey:@"UIImagePickerControllerMediaType"] isEqualToString:K_UI_TYPE_IMAGE])
 		[self imagePickerController:picker didFinishWithPickingPhoto:[info objectForKey:@"UIImagePickerControllerOriginalImage"] pickingMovie:nil];
@@ -512,9 +523,6 @@
 	[temporaryBarButtonItem release];
 	
 	self.navigationItem.title = NSLocalizedString(@"New Tweet", @"");
-
-    imgPicker.twitEditor = self;
-	imgPicker.delegate = self;	
 	messageText.delegate = self;
 	
 	postImageSegmentedControl.frame = CGRectMake(0, 0, SEND_SEGMENT_CNTRL_WIDTH, 30);
@@ -762,6 +770,11 @@
 #ifdef TRACE
 	YFLog(@"YFrog_DEBUG: Executing startUpload of TwitEditController method...");
 #endif	
+	
+	if (self.connectionDelegate)
+	{
+		self.connectionDelegate = nil;
+	}
 	
 	if(![self mediaIsPicked])
 		return;
@@ -1045,6 +1058,9 @@
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use photo camera", @"")])
 		{
+			imgPicker = [[ImagePickerController alloc] init];
+			imgPicker.twitEditor = self;
+			imgPicker.delegate = self;	
 			imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
 			if([imgPicker respondsToSelector:@selector(setMediaTypes:)])
 				[imgPicker performSelector:@selector(setMediaTypes:) withObject:[NSArray arrayWithObject:K_UI_TYPE_IMAGE]];
@@ -1053,6 +1069,9 @@
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use video camera", @"")])
 		{
+			imgPicker = [[ImagePickerController alloc] init];
+			imgPicker.twitEditor = self;
+			imgPicker.delegate = self;			
 			imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
 			if([imgPicker respondsToSelector:@selector(setMediaTypes:)])
 				[imgPicker performSelector:@selector(setMediaTypes:) withObject:[NSArray arrayWithObject:K_UI_TYPE_MOVIE]];
@@ -1061,6 +1080,9 @@
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use library", @"")])
 		{
+			imgPicker = [[ImagePickerController alloc] init];
+			imgPicker.twitEditor = self;
+			imgPicker.delegate = self;				
 			imgPicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
 			if([imgPicker respondsToSelector:@selector(setMediaTypes:)])
 				[imgPicker performSelector:@selector(setMediaTypes:) withObject:[self availableMediaTypes:UIImagePickerControllerSourceTypePhotoLibrary]];
@@ -1110,6 +1132,12 @@
 	messageTextWillIgnoreNextViewAppearing = NO;
 	[self setCharsCount];
 	[self setNavigatorButtons];
+	
+	if (imgPicker)
+	{
+		[imgPicker release];
+		imgPicker = nil;
+	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -1120,6 +1148,9 @@
         _canShowCamera = NO;
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
         {
+			imgPicker = [[ImagePickerController alloc] init];
+			imgPicker.twitEditor = self;
+			imgPicker.delegate = self;				
             imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
             if([imgPicker respondsToSelector:@selector(setMediaTypes:)])
                 [imgPicker performSelector:@selector(setMediaTypes:) withObject:[NSArray arrayWithObjects:K_UI_TYPE_MOVIE, K_UI_TYPE_IMAGE, nil]];
@@ -1220,6 +1251,12 @@
     //float delta = (float)(totalBytesWritten) / (float)_dataSize;
     //[progress setProgress:delta];
     [self progressUpdate:totalBytesWritten];
+}
+
+- (void)imageUploadDidFailedBySender:(ImageUploader *)sender
+{
+	if(pickedPhoto)
+		[sender postImage:pickedPhoto delegate:self userData:pickedPhoto];
 }
 
 #pragma mark MGTwitterEngineDelegate methods

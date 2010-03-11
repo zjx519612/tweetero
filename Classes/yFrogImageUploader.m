@@ -106,14 +106,15 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	self.userData = nil;
 	self.contentType = nil;
 	[result  release];
-	[mediaData release];
 	[retryTimer release];
 	[super dealloc];
 }
 
-- (void) postData:(NSData*)data
+- (void)postImage:(UIImage *)anImage
 {
-	if (nil == data || canceled)
+	NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	
+	if (nil == anImage || canceled)
 	{
 		return;
 	}
@@ -135,11 +136,7 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 		[delegate uploadedImage:nil sender:self];
         return;
     }
-	
-	[data retain];
-	[mediaData release];
-	mediaData = data;
-	
+		
 	NSString *boundary = [NSString stringWithFormat:@"%ld__%ld__%ld", random(), random(), random()];
 	
 	//adding the body:
@@ -181,7 +178,7 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 				"Content-Transfer-Encoding: binary; \r\n\r\n",
 				boundary, self.contentType];
 	[postBody appendData:[fileHeader dataUsingEncoding:NSUTF8StringEncoding]];
-	[postBody appendData:data];
+	[postBody appendData:UIImageJPEGRepresentation(anImage, 1.0f)];
 	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 	
 	NSURL *url = [NSURL URLWithString:[self getApiURL]];
@@ -204,12 +201,16 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	}
 	
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
+	
+	[thePool release];
 }
 
-- (void) postData:(NSData*)data contentType:(NSString*)mediaContentType
+- (void)postData:(NSData*)data contentType:(NSString*)mediaContentType
 {
 	self.contentType = mediaContentType;
-	[self postData:data];
+	// Convert data to image if needed
+	UIImage *theImage = nil;
+	[self postImage:theImage];
 }
 
 
@@ -224,7 +225,10 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 		return;
 	}
 
-	[self postData:imageJPEGData contentType:JPEG_CONTENT_TYPE];
+	// Convert data to image if needed
+	UIImage *theImage = nil;
+	self.contentType = JPEG_CONTENT_TYPE;
+	[self postImage:theImage];
 }
 
 - (void)postMP4DataWithUploadEngine:(ISVideoUploadEngine*)engine delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
@@ -285,19 +289,10 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
     [engine release];
 }
 
-- (void)convertImageThreadAndStartUpload:(UIImage*)image
+- (void)postImage:(UIImage*)anImage delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
 	
-	NSData* imData = UIImageJPEGRepresentation(image, 1.0f);
-	self.contentType = JPEG_CONTENT_TYPE;
-	[self performSelectorOnMainThread:@selector(postData:) withObject:imData waitUntilDone:NO];
-
-	[pool release];
-}
-
-- (void)postImage:(UIImage*)image delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
-{
 	self.delegate = dlgt;
 	self.userData = data;
 
@@ -305,11 +300,14 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	
 	BOOL needToResize;
 	BOOL needToRotate;
-	int newDimension = isImageNeedToConvert(image, &needToResize, &needToRotate);
+	int newDimension = isImageNeedToConvert(anImage, &needToResize, &needToRotate);
 	if(needToResize || needToRotate)		
-		modifiedImage = imageScaledToSize(image, newDimension);
-
-	[NSThread detachNewThreadSelector:@selector(convertImageThreadAndStartUpload:) toTarget:self withObject:modifiedImage ? modifiedImage : image];
+		modifiedImage = imageScaledToSize(anImage, newDimension);
+	
+	self.contentType = JPEG_CONTENT_TYPE;
+	[self postImage:modifiedImage ? modifiedImage : anImage];
+	
+	[thePool release];
 }
 
 #pragma mark NSURLConnection delegate methods
@@ -425,7 +423,7 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
         retryTimer = nil;
     }
 	
-	[self postData:mediaData];
+	[delegate imageUploadDidFailedBySender:self];
 }
 
 - (NSString *)getApiURL
