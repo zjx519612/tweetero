@@ -66,8 +66,8 @@
     
     if (account.authType == TwitterAuthCommon)
     {
-        [params setObject:[account username] forKey:@"username"];
-        [params setObject:[account secretData] forKey:@"password"];
+        [params setObject:[account username] forKey:@"a_username"];
+        [params setObject:[account secretData] forKey:@"a_password"];
     }
     else if (account.authType == TwitterAuthOAuth)
     {
@@ -78,7 +78,7 @@
         [oaEngine authorizeWithAccessTokenString:account.secretData];
         
         [params setObject:@"oauth" forKey:@"auth"];
-        [params setObject:[account username] forKey:@"username"];
+        [params setObject:[account username] forKey:@"a_username"];
         
         NSDictionary *oauthFields = [oaEngine authRequestFields];
         
@@ -91,7 +91,7 @@
         }
         NSString *verify_url_value = [credential substringToIndex:[credential length] - 1];
         
-        [params setObject:verify_url_value forKey:@"verify_url"];
+        [params setObject:verify_url_value forKey:@"a_verify_url"];
         [oaEngine release];
     }
     

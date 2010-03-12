@@ -359,12 +359,12 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
     [body appendData:[kTweeteroDevKey dataUsingEncoding:NSUTF8StringEncoding]];
     
 	[body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-	[body appendData:[@"Content-Disposition: form-data; name=\"username\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+	[body appendData:[@"Content-Disposition: form-data; name=\"t_username\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
 	[body appendData:[self.username dataUsingEncoding:NSUTF8StringEncoding]];
 	
     if (self.password != nil) {
         [body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-        [body appendData:[@"Content-Disposition: form-data; name=\"password\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[@"Content-Disposition: form-data; name=\"t_password\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
         [body appendData:[self.password dataUsingEncoding:NSUTF8StringEncoding]];
     } else if (self.verifyUrl) {
         [body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -372,7 +372,7 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
         [body appendData:[@"oauth" dataUsingEncoding:NSUTF8StringEncoding]];
         
         [body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-        [body appendData:[@"Content-Disposition: form-data; name=\"verify_url\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[@"Content-Disposition: form-data; name=\"t_verify_url\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
         [body appendData:[self.verifyUrl dataUsingEncoding:NSUTF8StringEncoding]];
     }
 
@@ -393,6 +393,7 @@ const NSTimeInterval kDefaultRetryInterval = 5.0;
     
     [request setHTTPMethod:@"POST"];
 	[request setTimeoutInterval:HTTPUploadTimeout];
+	[request setCachePolicy:NSURLRequestReloadIgnoringCacheData];
     [request setValue:multipartContentType forHTTPHeaderField:@"Content-type"];
     [request setHTTPBody:body];
     
