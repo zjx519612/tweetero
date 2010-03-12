@@ -690,8 +690,8 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 #if YAJL_AVAILABLE
 - (void)_parseDataForConnection:(MGTwitterHTTPURLConnection *)connection
 {
-    NSString *identifier = [[[connection identifier] copy] autorelease];
-    NSData *jsonData = [[[connection data] copy] autorelease];
+    NSString *identifier = [[connection identifier] copy];
+    NSData *jsonData = [[connection data] copy];
     MGTwitterRequestType requestType = [connection requestType];
     MGTwitterResponseType responseType = [connection responseType];
 
@@ -702,37 +702,53 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
     switch (responseType) {
         case MGTwitterStatuses:
         case MGTwitterStatus:
-            [MGTwitterStatusesYAJLParser parserWithJSON:jsonData delegate:self 
-                              connectionIdentifier:identifier requestType:requestType 
-                                      responseType:responseType URL:URL deliveryOptions:_deliveryOptions];
+		{
+			id parser = [[MGTwitterStatusesYAJLParser alloc] initWithJSON:jsonData delegate:self 
+						connectionIdentifier:identifier requestType:requestType responseType:responseType
+						URL:URL deliveryOptions:_deliveryOptions];
+			[parser release];
             break;
+		}
         case MGTwitterUsers:
         case MGTwitterUser:
-            [MGTwitterUsersYAJLParser parserWithJSON:jsonData delegate:self 
-                           connectionIdentifier:identifier requestType:requestType 
-                                   responseType:responseType URL:URL deliveryOptions:_deliveryOptions];
+		{
+			id parser = [[MGTwitterUsersYAJLParser alloc] initWithJSON:jsonData delegate:self 
+						connectionIdentifier:identifier requestType:requestType responseType:responseType
+						URL:URL deliveryOptions:_deliveryOptions];
+			[parser release];
             break;
+		}
         case MGTwitterDirectMessages:
         case MGTwitterDirectMessage:
-            [MGTwitterMessagesYAJLParser parserWithJSON:jsonData delegate:self 
-                              connectionIdentifier:identifier requestType:requestType 
-                                      responseType:responseType URL:URL deliveryOptions:_deliveryOptions];
+		{
+			id parser = [[MGTwitterMessagesYAJLParser alloc] initWithJSON:jsonData delegate:self 
+						connectionIdentifier:identifier requestType:requestType responseType:responseType
+						URL:URL deliveryOptions:_deliveryOptions];
+			[parser release];
             break;
+		}
 		case MGTwitterMiscellaneous:
-			[MGTwitterMiscYAJLParser parserWithJSON:jsonData delegate:self 
-						  connectionIdentifier:identifier requestType:requestType 
-								  responseType:responseType URL:URL deliveryOptions:_deliveryOptions];
+		{
+			id parser = [[MGTwitterMiscYAJLParser alloc] initWithJSON:jsonData delegate:self 
+						connectionIdentifier:identifier requestType:requestType responseType:responseType
+						URL:URL deliveryOptions:_deliveryOptions];
+			[parser release];
 			break;
+		}
         case MGTwitterSearchResults:
         {
- 			[MGTwitterSearchYAJLParser parserWithJSON:jsonData delegate:self 
-						  connectionIdentifier:identifier requestType:requestType 
-								  responseType:responseType URL:URL deliveryOptions:_deliveryOptions];
+			id parser = [[MGTwitterSearchYAJLParser alloc] initWithJSON:jsonData delegate:self 
+						connectionIdentifier:identifier requestType:requestType responseType:responseType
+						URL:URL deliveryOptions:_deliveryOptions];
+			[parser release];
 			break;
         }
        default:
             break;
     }
+	
+    [identifier release];
+    [jsonData release];
 }
 #else
 - (void)_parseDataForConnection:(MGTwitterHTTPURLConnection *)connection
