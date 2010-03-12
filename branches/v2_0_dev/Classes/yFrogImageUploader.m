@@ -156,10 +156,6 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[@"Content-Disposition: form-data; name=\"key\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [postBody appendData:[kTweeteroDevKey dataUsingEncoding:NSUTF8StringEncoding]];
-
-	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];	
-	[postBody appendData:[@"Content-Disposition: form-data; name=\"username\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-	[postBody appendData:[[MGTwitterEngine username] dataUsingEncoding:NSUTF8StringEncoding]];
 	
 	if([[LocationManager locationManager] locationDefined])
 	{
@@ -241,14 +237,14 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
     MGTwitterEngineFactory *factory = [MGTwitterEngineFactory factory];
     NSDictionary *authFields = [factory createTwitterAuthorizationFields:account];
     if (authFields) {
-        NSString *val = [authFields objectForKey:@"username"];
+        NSString *val = [authFields objectForKey:@"a_username"];
         if (val)
             engine.username = val;
-        val = [authFields objectForKey:@"password"];
+        val = [authFields objectForKey:@"a_password"];
         if (val)
             engine.password = val;
         else {
-            val = [authFields objectForKey:@"verify_url"];
+            val = [authFields objectForKey:@"a_verify_url"];
             if (val)
                 engine.verifyUrl = val;
         }
