@@ -67,7 +67,7 @@ int process_yajl_string(void *ctx, const unsigned char * stringVal, unsigned int
 	
 	if (currentKey)
 	{
-		NSMutableString *value = [[[NSMutableString alloc] initWithBytes:stringVal length:stringLen encoding:NSUTF8StringEncoding] autorelease];
+		NSMutableString *value = [[NSMutableString alloc] initWithBytes:stringVal length:stringLen encoding:NSUTF8StringEncoding];
 		
 		[value replaceOccurrencesOfString:@"&gt;" withString:@">" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [value length])];
 		[value replaceOccurrencesOfString:@"&lt;" withString:@"<" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [value length])];
@@ -91,9 +91,9 @@ int process_yajl_string(void *ctx, const unsigned char * stringVal, unsigned int
 			//time_t epochTime = timegm(&theTime);
 			// save the date as a long with the number of seconds since the epoch in 1970
             
-            NSDate *createdDate = [NSDate dateWithNaturalLanguageString:value];
+            id createdDate = [NSDate dateWithNaturalLanguageString:value];
             [self addValue:createdDate forKey:currentKey];
-            
+			            
 			//[self addValue:[NSNumber numberWithLong:epochTime] forKey:currentKey];
 			// this value can be converted to a date with [NSDate dateWithTimeIntervalSince1970:epochTime]
 		}
@@ -102,6 +102,7 @@ int process_yajl_string(void *ctx, const unsigned char * stringVal, unsigned int
 			[self addValue:value forKey:currentKey];
 		}
 		
+		[value release];
 		[currentKey release];
 		currentKey = nil;
 	}

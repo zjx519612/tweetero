@@ -1264,6 +1264,12 @@
 		[sender postImage:pickedPhoto delegate:self userData:pickedPhoto];
 }
 
+- (BOOL)shouldChangeImage:(UIImage *)anImage withNewImage:(UIImage *)newImage
+{
+	[self setImage:newImage movie:nil];
+	return YES;
+}
+
 #pragma mark MGTwitterEngineDelegate methods
 - (void)requestSucceeded:(NSString *)connectionIdentifier
 {

@@ -36,6 +36,7 @@
 - (void)uploadedDataSize:(NSInteger)size;
 - (void)uploadedProccess:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten;
 - (void)imageUploadDidFailedBySender:(ImageUploader *)sender;
+- (BOOL)shouldChangeImage:(UIImage *)anImage withNewImage:(UIImage *)newImage;
 
 @end
 
@@ -55,7 +56,8 @@
 	NSString*		newURL;
 	BOOL			canceled;
 	BOOL			scaleIfNeed;
-	
+	BOOL			isHeaderTag;
+	BOOL			isPresentGatewayError;
 	NSString*		contentType;
     ISVideoUploadEngine *videoUploadEngine;
 }

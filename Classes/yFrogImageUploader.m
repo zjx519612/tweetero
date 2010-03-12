@@ -36,10 +36,13 @@
 #define		MP4_CONTENT_TYPE			@"video/mp4"
 #define		RETRIES_NUMBER_LIMIT		5
 const NSTimeInterval kTimerRetryInterval = 5.0;
+NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 
 @interface ImageUploader()
 
 - (NSString *)getApiURL;
+- (void)closeConnection;
+- (BOOL)openConnection:(NSURLRequest*)request;
 
 @end
 
@@ -60,6 +63,8 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 		result = [[NSMutableData alloc] initWithCapacity:128];
 		canceled = NO;
 		scaleIfNeed = NO;
+		isHeaderTag = NO;
+		isPresentGatewayError = NO;
 		retriesCounter = 0;
 	}
 	return self;
@@ -100,12 +105,13 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
     //[self setVideoUploadEngine:nil];
     [videoUploadEngine release];
 	self.delegate = nil;
+	[self closeConnection];
 	self.connection = nil;
 	self.contentXMLProperty = nil;
 	self.newURL = nil;
 	self.userData = nil;
 	self.contentType = nil;
-	[result  release];
+	[result release];
 	[retryTimer release];
 	[super dealloc];
 }
@@ -140,7 +146,7 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	NSString *boundary = [NSString stringWithFormat:@"%ld__%ld__%ld", random(), random(), random()];
 	
 	//adding the body:
-	NSMutableData *postBody = [NSMutableData data];
+	NSMutableData *postBody = [[NSMutableData alloc] init];;
 	
     for (NSString *key in [authFields allKeys])
 	{
@@ -174,7 +180,8 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 				"Content-Transfer-Encoding: binary; \r\n\r\n",
 				boundary, self.contentType];
 	[postBody appendData:[fileHeader dataUsingEncoding:NSUTF8StringEncoding]];
-	[postBody appendData:UIImageJPEGRepresentation(anImage, 1.0f)];
+	NSData *imageData = UIImageJPEGRepresentation(anImage, 1.0f);
+	[postBody appendData:imageData];
 	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 	
 	NSURL *url = [NSURL URLWithString:[self getApiURL]];
@@ -185,13 +192,16 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	[request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", boundary] forHTTPHeaderField:@"Content-type"];
     [request setValue:[NSString stringWithFormat:@"%d", [postBody length]] forHTTPHeaderField:@"Content-length"];
 	
-	NSInputStream *stream = [[[NSInputStream alloc] initWithData:postBody] autorelease];
+	
+	NSInputStream *stream = [[NSInputStream alloc] initWithData:postBody];
 	[request setHTTPBodyStream:stream];
+	[stream release];
 
     [delegate uploadedDataSize:[postBody length]];
+	[postBody release];
 	
-	self.connection = [[[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES] autorelease];
-	if (!self.connection) 
+	[self closeConnection];	
+	if (![self openConnection:request]) 
 	{
 		[delegate uploadedImage:nil sender:self];
 	}
@@ -231,6 +241,7 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 {
 	self.delegate = dlgt;
 	self.userData = data;
+
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
     
     UserAccount *account = [[AccountManager manager] loggedUserAccount];
@@ -291,17 +302,25 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	
 	self.delegate = dlgt;
 	self.userData = data;
-
-	UIImage* modifiedImage = nil;
+	
+	UIImage* imageToUpload = anImage;
 	
 	BOOL needToResize;
 	BOOL needToRotate;
 	int newDimension = isImageNeedToConvert(anImage, &needToResize, &needToRotate);
-	if(needToResize || needToRotate)		
-		modifiedImage = imageScaledToSize(anImage, newDimension);
+	if(needToResize || needToRotate)
+	{
+		UIImage *modifiedImage = imageScaledToSize(anImage, newDimension);
+		if (nil != modifiedImage && [self.delegate shouldChangeImage:anImage withNewImage:modifiedImage])
+		{
+			imageToUpload = modifiedImage;
+			self.userData = imageToUpload;
+		}
+	}
 	
 	self.contentType = JPEG_CONTENT_TYPE;
-	[self postImage:modifiedImage ? modifiedImage : anImage];
+	
+	[self postImage:imageToUpload];
 	
 	[thePool release];
 }
@@ -326,6 +345,8 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	if (retriesCounter < RETRIES_NUMBER_LIMIT)
 	{
 		retriesCounter++;
+		isHeaderTag = NO;
+		isPresentGatewayError = NO;
 		retryTimer = [[NSTimer scheduledTimerWithTimeInterval:kTimerRetryInterval target:self
 					selector:@selector(retryTimerFired:) userInfo:nil repeats:NO] retain];
 		return;
@@ -351,6 +372,9 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 {
     if (qName) 
         elementName = qName;
+	
+	if ([elementName isEqualToString:@"h1"])
+		isHeaderTag = YES;
 
     if ([elementName isEqualToString:@"yfrog_link"])
 		self.contentXMLProperty = [NSMutableString string];
@@ -368,14 +392,28 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
         self.newURL = [self.contentXMLProperty stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 		[parser abortParsing];
 	}
+	else if ([elementName isEqualToString:@"h1"])
+	{
+		isHeaderTag = NO;
+		if (isPresentGatewayError)
+		{
+			[parser abortParsing];
+		}
+	}
 }
 
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
 {
     if (self.contentXMLProperty)
 		[self.contentXMLProperty appendString:string];
+	else if (isHeaderTag)
+	{
+		if([string rangeOfString:kGatewayTimeOutError options:NSCaseInsensitiveSearch].location != NSNotFound)
+		{
+			isPresentGatewayError = YES;
+		}
+	}	
 }
-
 
 - (void) connectionDidFinishLoading:(NSURLConnection *)connection
 {
@@ -390,6 +428,17 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
 	[parser release];
     
 	[result setLength:0];
+	
+	if (isPresentGatewayError && retriesCounter < RETRIES_NUMBER_LIMIT)
+	{
+		retriesCounter++;
+		isHeaderTag = NO;
+		isPresentGatewayError = NO;
+		retryTimer = [[NSTimer scheduledTimerWithTimeInterval:kTimerRetryInterval target:self
+					selector:@selector(retryTimerFired:) userInfo:nil repeats:NO] retain];
+		return;
+	}
+	
 	[delegate uploadedImage:self.newURL sender:self];
 }
 
@@ -436,6 +485,29 @@ const NSTimeInterval kTimerRetryInterval = 5.0;
     theCurrentServerImage = theServerIndex;
 		
     return [NSString stringWithFormat:@"http://load%d.imageshack.us/upload_api.php", theServerIndex];
+}
+
+- (void)closeConnection
+{
+    if (nil != connection)
+    {
+		[connection cancel];
+        [connection release];
+        connection = nil;
+    }
+}
+
+- (BOOL)openConnection:(NSURLRequest*)request
+{
+    if (nil != connection)
+	{
+        return NO;
+	}
+    
+    connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    [connection start];
+    
+    return nil != connection;
 }
 
 #pragma mark ISVideoUploadEngine Delegate
