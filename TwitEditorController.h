@@ -67,7 +67,7 @@ enum _TwitEditorSuspendedOperations
 	BOOL			inTextEditingMode;
 
 	UIActionSheet *progressSheet;
-	ImagePickerController *imgPicker;
+	//ImagePickerController *imgPicker;
 	IBOutlet UISegmentedControl *postImageSegmentedControl;
 	UIBarButtonItem *segmentBarItem;
 	IBOutlet UISegmentedControl *imagesSegmentedControl;
