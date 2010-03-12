@@ -291,7 +291,7 @@
 	self._message = nil;
 	self.pickedPhoto = nil;
 	self.pickedVideo = nil;
-    [imgPicker release];
+    //[imgPicker release];
 	[self dismissProgressSheetIfExist];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
@@ -342,6 +342,9 @@
     //url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"TestYfrog" ofType:@"mov"]];
     
     // PROGRESS
+    
+    [picker retain];
+    
     [self progressClear];
     
 	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
@@ -379,6 +382,8 @@
 			self.progressSheet.tag = PROCESSING_PHOTO_SHEET_TAG;
 		}
 	}
+    
+    [picker release];
 }
 /*
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishWithPickingPhoto:(UIImage *)img pickingMovie:(NSURL*)url
@@ -1058,7 +1063,7 @@
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use photo camera", @"")])
 		{
-			imgPicker = [[ImagePickerController alloc] init];
+			ImagePickerController *imgPicker = [[[ImagePickerController alloc] init] autorelease];
 			imgPicker.twitEditor = self;
 			imgPicker.delegate = self;	
 			imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
@@ -1069,7 +1074,7 @@
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use video camera", @"")])
 		{
-			imgPicker = [[ImagePickerController alloc] init];
+			ImagePickerController *imgPicker = [[[ImagePickerController alloc] init] autorelease];
 			imgPicker.twitEditor = self;
 			imgPicker.delegate = self;			
 			imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
@@ -1080,7 +1085,7 @@
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use library", @"")])
 		{
-			imgPicker = [[ImagePickerController alloc] init];
+			ImagePickerController *imgPicker = [[[ImagePickerController alloc] init] autorelease];
 			imgPicker.twitEditor = self;
 			imgPicker.delegate = self;				
 			imgPicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
@@ -1133,11 +1138,11 @@
 	[self setCharsCount];
 	[self setNavigatorButtons];
 	
-	if (imgPicker)
-	{
-		[imgPicker release];
-		imgPicker = nil;
-	}
+//	if (imgPicker)
+//	{
+//		[imgPicker release];
+//		imgPicker = nil;
+//	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -1148,7 +1153,7 @@
         _canShowCamera = NO;
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
         {
-			imgPicker = [[ImagePickerController alloc] init];
+			ImagePickerController *imgPicker = [[[ImagePickerController alloc] init] autorelease];
 			imgPicker.twitEditor = self;
 			imgPicker.delegate = self;				
             imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
