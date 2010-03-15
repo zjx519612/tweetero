@@ -560,9 +560,9 @@ static NSString* kActionCell = @"UserInfoActionCell";
     [_userTableImages setObject:@"directmsg.png" forKey:[NSNumber numberWithInt:UActionDirectMessageIndex]];
 }
 
-- (UITableViewCell*)createCellForIdentifier:(UITableView*)tableView reuseIdentifier:(NSString*)identifier
+- (UITableViewCell*)createCellForIdentifier:(UITableView*)aTableView reuseIdentifier:(NSString*)identifier
 {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    UITableViewCell *cell = [aTableView dequeueReusableCellWithIdentifier:identifier];
     if (cell == nil)
     {
         cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:identifier] autorelease];
