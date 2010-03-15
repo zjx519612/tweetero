@@ -29,13 +29,11 @@
 #import "util.h"
 #import "AboutController.h"
 
-const NSTimeInterval kWebViewRetryInterval = 5.0;
+const NSTimeInterval kWebViewRetryInterval = 15.0;
 
 @interface WebViewController()
 
-- (void)destroyRetryTimer;
 - (void)retry;
-- (void)retryTimerFired:(NSTimer *)aTimer;
 
 @end
 
@@ -78,7 +76,6 @@ const NSTimeInterval kWebViewRetryInterval = 5.0;
 	}
     [_webView release];
 	[_request release];
-	[timer release];
 	[super dealloc];
 }
 
@@ -125,8 +122,8 @@ const NSTimeInterval kWebViewRetryInterval = 5.0;
 		if (retryCounter < retryNumber)
 		{
 			retryCounter++;
-			[self retry];
-		}
+			[self performSelector:@selector(retry) withObject:nil afterDelay:kWebViewRetryInterval];
+		}	
 		else
 		{
 			retryCounter = 0;
@@ -165,24 +162,6 @@ const NSTimeInterval kWebViewRetryInterval = 5.0;
 
 - (void)retry
 {
-	[self destroyRetryTimer];
-	timer = [[NSTimer scheduledTimerWithTimeInterval:kWebViewRetryInterval target:self
-				selector:@selector(retryTimerFired:) userInfo:nil repeats:NO] retain];
-}
-
-- (void)destroyRetryTimer
-{
-	if (nil != timer)
-	{
-		[timer invalidate];
-		[timer autorelease];
-		timer = nil;
-	}
-}
-
-- (void)retryTimerFired:(NSTimer *)aTimer
-{
-	[self destroyRetryTimer];
 	if (!isLoaded)
 	{
 		[_webView reload];
@@ -198,10 +177,8 @@ const NSTimeInterval kWebViewRetryInterval = 5.0;
 @implementation OAuthWebController
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
-{
-    NSURL *url = [request URL];
-    
-    YFLog(@"%@", [url host]);
+{    
+    YFLog(@"%@", [[request URL] host]);
     
 	return YES;
 }
