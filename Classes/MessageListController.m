@@ -328,18 +328,19 @@ const NSInteger kRetriesNumber = 3;
 	}
 	
 	NSString *errorMessage = [[error localizedDescription] capitalizedString];
-	NSRange notFoundRange = {NSNotFound, 0};
-	NSRange secureErrorRange = [errorMessage rangeOfString:kTwitterSecureErrorMessage];
-	NSRange operationErrorRange = [errorMessage rangeOfString:kTwitterOperationErrorMessage];
-	if (retryCounter < kRetriesNumber &&
-				(!NSEqualRanges(secureErrorRange, notFoundRange) || !NSEqualRanges(operationErrorRange, notFoundRange)))
+	if ([errorMessage rangeOfString:kTwitterSecureErrorMessage options:NSCaseInsensitiveSearch].location != NSNotFound ||
+				[errorMessage rangeOfString:kTwitterOperationErrorMessage options:NSCaseInsensitiveSearch].location != NSNotFound)
 	{
-		retryCounter++;
 		_errorDesc = [[NSString stringWithFormat:@"%@%@", kTwitterErrorPrefix, [[error localizedDescription] capitalizedString]] retain];
-		[self performSelector:@selector(reloadAll) withObject:nil afterDelay:0.5f];
-		return;
+		
+		if (retryCounter < kRetriesNumber)
+		{
+			retryCounter++;
+			[self performSelector:@selector(reloadAll) withObject:nil afterDelay:0.5f];
+			return;
+		}
 	}
-    
+	    
 	retryCounter = 0;
 	[self.tableView reloadData];
 }
