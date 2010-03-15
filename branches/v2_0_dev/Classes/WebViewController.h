@@ -33,6 +33,10 @@
 	
 	NSURLRequest* _request;
     NSString* _content;
+	NSInteger retryCounter;
+	NSInteger retryNumber;
+	BOOL isLoaded;
+	NSTimer *timer;
 }
 
 - (id)initWithRequest:(NSURLRequest*)request;
