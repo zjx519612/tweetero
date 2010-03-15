@@ -36,7 +36,6 @@
 	NSInteger retryCounter;
 	NSInteger retryNumber;
 	BOOL isLoaded;
-	NSTimer *timer;
 }
 
 - (id)initWithRequest:(NSURLRequest*)request;
