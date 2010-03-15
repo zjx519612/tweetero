@@ -7,7 +7,7 @@
 //
 
 #import "UserAccount.h"
-
+#import "MGTwitterEngineFactory.h"
 
 @implementation UserAccount
 
@@ -20,7 +20,7 @@
     //NSAssert(NO, @"Object could not created");
     if (self = [super init])
     {
-        self.authType = TwitterAuthCommon;
+        self.authType = TwitterAuthCommon;		
     }
     return self;
 }
@@ -29,14 +29,57 @@
 {
     self.username = nil;
     self.secretData = nil;
+	[_twitter release];
+	[_userInfoConnectionID release];
+	[_userData release];
     [super dealloc];
 }
-/*
-- (TwitterAuthType)authType
+
+- (void)updateUserInfo
 {
-    return 0;
+	if (nil == _twitter)
+	{
+		MGTwitterEngineFactory *factory = [[MGTwitterEngineFactory alloc] init];
+		_twitter = [[factory createTwitterEngineForUserAccount:self delegate:self] retain];
+		[factory release];
+	}
+	
+	[_userInfoConnectionID release];
+	_userInfoConnectionID = [[_twitter getUserInformationFor:_username] retain];
 }
-*/
+
+- (id)valueForUndefinedKey:(NSString *)key
+{
+	return [_userData valueForKey:key];
+}
+
+#pragma mark MGTwitterEngine Delegate
+- (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
+{	
+    YFLog(@"NETWORK_FAILED: %@", connectionIdentifier);
+    YFLog(@"%@", error);    
+}
+
+- (void)miscInfoReceived:(NSArray *)miscInfo forRequest:(NSString *)connectionIdentifier
+{
+}
+
+- (void)userInfoReceived:(NSArray *)userInfo forRequest:(NSString *)connectionIdentifier;
+{
+    YFLog(@"USER INFO RECEIVE");
+	
+    if (![_userInfoConnectionID isEqualToString:connectionIdentifier])
+	{
+		return;
+	}
+    
+	[_userData release];
+	_userData = [[userInfo objectAtIndex:0] retain];
+	
+	[_userInfoConnectionID release];
+	_userInfoConnectionID = nil;
+}
+
 @end
 
 // TwitterCommonUserAccount

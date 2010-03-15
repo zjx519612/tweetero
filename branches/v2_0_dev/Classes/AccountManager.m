@@ -271,6 +271,7 @@
     [self clearLoggedObject];
     
     _loggedUserAccount = [account retain];
+	[_loggedUserAccount updateUserInfo];
     
     [[NSUserDefaults standardUserDefaults] setObject:account.username forKey:ACCOUNT_MANAGER_LAST_USER_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
@@ -301,7 +302,8 @@
         NSString *secData = nil;
         if (err == noErr && result)
         {
-            secData = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
+			NSData *theData = (NSData *)result;
+            secData = [[NSString alloc] initWithData:theData encoding:NSUTF8StringEncoding];
             
             UserAccount *account = [[UserAccount alloc] init];
             account.username = username;

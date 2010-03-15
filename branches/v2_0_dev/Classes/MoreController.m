@@ -13,6 +13,7 @@
 #import "FollowersController.h"
 #import "SettingsController.h"
 #import "AboutController.h"
+#import "AccountManager.h"
 
 @interface MoreItem : NSObject
 {
@@ -118,6 +119,28 @@
     self.parentViewController.navigationItem.rightBarButtonItem = nil;
     
 	[self updateSavedSearches];
+	
+	NSEnumerator *moreItemsEnumerator = [_moreItems objectEnumerator];
+	id moreItem = nil;
+	while (nil != (moreItem = [moreItemsEnumerator nextObject]))
+	{
+		MoreItem *theItem = (MoreItem *)moreItem;
+		if ([[theItem title] isEqualToString:@"Followers"])
+		{
+			NSString *theTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", NSLocalizedString([theItem title], @""),
+						[[[AccountManager manager] loggedUserAccount] valueForKey:@"followers_count"]];
+			theItem.title = theTitle;
+			[theTitle release];
+		}
+		else if ([[theItem title] isEqualToString:@"Following"])
+		{
+			NSString *theTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", NSLocalizedString([theItem title], @""),
+						[[[AccountManager manager] loggedUserAccount] valueForKey:@"friends_count"]];
+			theItem.title = theTitle;
+			[theTitle release];
+		}
+	}
+	
     [self.tableView reloadData];
 }
 
@@ -161,7 +184,6 @@
     if (indexPath.section == 0)
     {
         MoreItem *item = [_moreItems objectAtIndex:indexPath.row];
-        
         if (item)
         {
             cell.textLabel.text =  item.title;
@@ -264,7 +286,7 @@
     item.icon = [UIImage imageNamed:@"my-tweets.png"];
     item.controllerClass = [MyTweetViewController class];
     [_moreItems addObject:item];
-    
+    	
     item = [MoreItem item];
     item.title = @"Followers";
     item.nibName = @"UserMessageList";

@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "MGTwitterEngine.h"
 
 @class OAToken;
 
@@ -21,12 +22,17 @@ typedef enum {
     NSString        *_username;
     NSString        *_secretData;
     TwitterAuthType  _authType;
+	
+	MGTwitterEngine *_twitter;
+	NSString *_userInfoConnectionID;
+	NSDictionary *_userData;
 }
 
 @property (nonatomic, copy) NSString *username;
 @property (nonatomic, copy) NSString *secretData;
 @property (nonatomic) TwitterAuthType authType;
 
+- (void)updateUserInfo;
 //- (TwitterAuthType)authType;
 
 @end
