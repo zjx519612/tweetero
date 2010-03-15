@@ -29,6 +29,16 @@
 #import "util.h"
 #import "AboutController.h"
 
+const NSTimeInterval kWebViewRetryInterval = 5.0;
+
+@interface WebViewController()
+
+- (void)destroyRetryTimer;
+- (void)retry;
+- (void)retryTimerFired:(NSTimer *)aTimer;
+
+@end
+
 @implementation WebViewController
 
 - (id)initWithRequest:(NSURLRequest*)request
@@ -68,12 +78,15 @@
 	}
     [_webView release];
 	[_request release];
+	[timer release];
 	[super dealloc];
 }
 
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
+	
+	retryNumber = 5;
     
     _webView.delegate = self;
     if (_request)
@@ -101,13 +114,25 @@
 {
 	// starting the load, show the activity indicator in the status bar
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
+	isLoaded = NO;
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	if (!_webView.hidden)
-		self.navigationItem.title = NSLocalizedString(@"Failed!", @"");
+	{
+		if (retryCounter < retryNumber)
+		{
+			retryCounter++;
+			[self retry];
+		}
+		else
+		{
+			retryCounter = 0;
+			self.navigationItem.title = NSLocalizedString(@"Failed!", @"");
+		}
+	}
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
@@ -115,6 +140,8 @@
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	if (!_webView.hidden)
 		self.navigationItem.title = [webView stringByEvaluatingJavaScriptFromString:@"document.title"];
+	
+	isLoaded = YES;
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
@@ -134,6 +161,32 @@
 	}
 
 	return YES;
+}
+
+- (void)retry
+{
+	[self destroyRetryTimer];
+	timer = [[NSTimer scheduledTimerWithTimeInterval:kWebViewRetryInterval target:self
+				selector:@selector(retryTimerFired:) userInfo:nil repeats:NO] retain];
+}
+
+- (void)destroyRetryTimer
+{
+	if (nil != timer)
+	{
+		[timer invalidate];
+		[timer autorelease];
+		timer = nil;
+	}
+}
+
+- (void)retryTimerFired:(NSTimer *)aTimer
+{
+	[self destroyRetryTimer];
+	if (!isLoaded)
+	{
+		[_webView reload];
+	}
 }
 
 @end
