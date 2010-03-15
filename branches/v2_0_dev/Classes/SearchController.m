@@ -27,6 +27,38 @@
 #define MAX_SEARCH_COUNT        20
 #define START_AT_PAGE           1
 
+static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2, void *context)
+{
+	if (![searchItem1 isKindOfClass:[NSDictionary class]] || ![searchItem2 isKindOfClass:[NSDictionary class]])
+	{
+		return NSOrderedSame;
+	}
+	
+	NSDictionary *dictionary1 = (NSDictionary *)searchItem1;
+	NSDictionary *dictionary2 = (NSDictionary *)searchItem2;
+	
+	NSDate *date1 = [dictionary1 valueForKey:@"created_at"];
+	NSDate *date2 = [dictionary2 valueForKey:@"created_at"];
+	
+	if (nil == date1 || nil == date2)
+	{
+		return NSOrderedSame;
+	}
+	
+	NSComparisonResult comparisionResult = [date1 compare:date2];
+	if (NSOrderedAscending == comparisionResult)
+	{
+		return NSOrderedDescending;
+	}
+	
+	if (NSOrderedDescending == comparisionResult)
+	{
+		return NSOrderedAscending;
+	}
+		
+	return NSOrderedSame;
+}
+
 @interface SearchController (Private)
 
 - (UITableViewCell *)createSearchResultCell:(UITableView*)tableView more:(BOOL)isMore;
@@ -167,16 +199,27 @@
 - (void)searchDidEnd:(NSArray *)recievedData forQuery:(NSString *)query
 {
     _emptyString = @"";
-    if (recievedData && [recievedData count] > 0) {
+    if (recievedData && [recievedData count] > 0)
+	{
         if (!_result)
-            _result = [NSMutableArray new];
+		{
+			_result = [NSMutableArray new];
+		}
+		
         [_result addObjectsFromArray:recievedData];
     }
-    [self reloadData];
-    if ([self.searchProvider isEndOfSearch]) {
-        [TweetterAppDelegate decreaseNetworkActivityIndicator];
-        [self activateIndicator:NO];
+	
+    if ([self.searchProvider isEndOfSearch])
+	{
+		[TweetterAppDelegate decreaseNetworkActivityIndicator];
+		[self activateIndicator:NO];
+		
+		NSArray *theSortedArray = [_result sortedArrayUsingFunction:searchResultsComparator context:NULL];
+		[_result release];
+		_result = [[NSMutableArray alloc] initWithArray:theSortedArray];
     }
+	
+    [self reloadData];
 }
 
 - (void)searchDidEndWithError:(NSString *)query
