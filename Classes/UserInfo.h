@@ -50,6 +50,7 @@ enum {
     
     IBOutlet UISegmentedControl *followButton;
     IBOutlet UIButton *followBtn;
+	IBOutlet UITableView *tableView;
     
 	BOOL _gotInfo;
 	BOOL _shouldUpdateUserInfo;
@@ -58,6 +59,7 @@ enum {
     BOOL _following;
 	NSString *isUserReceivingUpdatesForConnectionID;
     NSString *userInfoConnectionID;
+	NSString *followersCount;
     BOOL _isDirectMessage;
     UserInfoView *_userInfoView;
     NSMutableArray *_userTableSection;

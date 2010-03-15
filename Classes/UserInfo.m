@@ -87,6 +87,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
     [_userTableImages release];
     [_userInfoView release];
     [_userTableSection release];
+	[followersCount release];
     
 	infoView.delegate = nil;
 	if(infoView.loading)
@@ -277,6 +278,9 @@ static NSString* kActionCell = @"UserInfoActionCell";
     _userInfoView.follow = _following;
 
     [_userInfoView disableFollowingButton:NO];
+	
+	[followersCount release];
+	followersCount = [[userData objectForKey:@"followers_count"] retain];
     
 	// Create description html
 	BOOL infoEmpty = YES;
@@ -401,6 +405,8 @@ static NSString* kActionCell = @"UserInfoActionCell";
 		_shouldUpdateUserInfo = NO;
 		self.userInfoConnectionID = [_twitter getUserInformationFor:_username];
 	}
+	
+	[tableView reloadData];
 }
 
 #pragma mark UIAlertView Delegate
@@ -454,7 +460,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
     return [[_userTableSection objectAtIndex:section] count];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCell *)tableView:(UITableView *)aTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *cellIdent = nil;
     
@@ -465,40 +471,47 @@ static NSString* kActionCell = @"UserInfoActionCell";
     else if (indexPath.section == USAction)
         cellIdent = kActionCell;
     
-    UITableViewCell *cell = [self createCellForIdentifier:tableView reuseIdentifier:cellIdent];
+    UITableViewCell *cell = [self createCellForIdentifier:aTableView reuseIdentifier:cellIdent];
     
-    cell.textLabel.text = [[_userTableSection objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
+	NSString *cellTitle = [[_userTableSection objectAtIndex:indexPath.section] objectAtIndex:indexPath.row];
+	if ([cellTitle isEqualToString:NSLocalizedString(@"Followers", @"")] && nil != followersCount)
+	{
+		cellTitle = [NSString stringWithFormat:@"%@ (%@)",
+					[[_userTableSection objectAtIndex:indexPath.section] objectAtIndex:indexPath.row], followersCount];
+	}
+	
+    cell.textLabel.text = cellTitle;
     if (indexPath.section == USAction)
         cell.imageView.image = [UIImage imageNamed:[_userTableImages objectForKey:[NSNumber numberWithInt:indexPath.row]]];
     return cell;
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)aTableView
 {
-    return [_userTableSection count];;
+    return [_userTableSection count];
 }
 
 #pragma mark UITableView Delegate
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+- (CGFloat)tableView:(UITableView *)aTableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return ((indexPath.section == USDescription) ? (infoView.frame.size.height + 1) : 40);
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+- (CGFloat)tableView:(UITableView *)aTableView heightForHeaderInSection:(NSInteger)section
 {
     return ((section == 0) ? 60 : 0);
 }
 
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+- (UIView *)tableView:(UITableView *)aTableView viewForHeaderInSection:(NSInteger)section
 {
     return ((section == USDescription) ? _userInfoView : nil);
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)tableView:(UITableView *)aTableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.section == USAction)
     {
-        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        UITableViewCell *cell = [aTableView cellForRowAtIndexPath:indexPath];
         if (cell.selectionStyle == UITableViewCellSelectionStyleNone)
             return;
         
@@ -524,7 +537,7 @@ static NSString* kActionCell = @"UserInfoActionCell";
                 break;
         }
     }
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [aTableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 @end
 
