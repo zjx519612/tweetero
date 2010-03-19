@@ -31,8 +31,8 @@
 #include "config.h"
 #include "util.h"
 
-#define AccountSegmentIndex     0
-#define OAuthSegmentIndex       1
+//#define AccountSegmentIndex     0
+//#define OAuthSegmentIndex       1
 
 const NSString *kNewAccountLoginDataKey = @"newAccount";
 const NSString *kOldAccountLoginDataKey = @"oldAccount";
@@ -43,10 +43,13 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
 
 - (id)init
 {
-    if (self = [super initWithNibName:@"Login" bundle:nil])
+//    if (self = [super initWithNibName:@"Login" bundle:nil])
+	self = [super init];
+	if (nil != self)
     {
         _currentAccount = nil;
-        oAuthAuthorization = NO;
+//        oAuthAuthorization = NO;
+		oAuthAuthorization = YES;
     }
     return self;
 }
@@ -68,15 +71,15 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
 
 - (IBAction)cancel:(id)sender 
 {
-    [self.navigationController popViewControllerAnimated:YES];
+//    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)processAccountInfo
 {
     // Create new UserAccount object and send it as parameter of notification
     UserAccount *newAccount = [[UserAccount alloc] init];
-    newAccount.username = [loginField text];
-    newAccount.secretData = [passwordField text];
+//    newAccount.username = [loginField text];
+//    newAccount.secretData = [passwordField text];
     // Notification parameters
     NSDictionary *loginData = [NSDictionary dictionaryWithObjectsAndKeys: newAccount, kNewAccountLoginDataKey, _currentAccount, kOldAccountLoginDataKey, nil];
     [newAccount release];
@@ -90,100 +93,119 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
 
 - (IBAction)login:(id)sender
 {
-    twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
-    [MGTwitterEngine setUsername:[loginField text] password:[passwordField text]];
-    twitterUserCredentialID = [twitter checkUserCredentials];
-    [loginField resignFirstResponder];
-    [passwordField resignFirstResponder];
+//    twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
+//    [MGTwitterEngine setUsername:[loginField text] password:[passwordField text]];
+//    twitterUserCredentialID = [twitter checkUserCredentials];
+//    [loginField resignFirstResponder];
+//    [passwordField resignFirstResponder];
     // Show progress indicator
-    progress = [[TwActivityIndicator alloc] init];
-    [progress.messageLabel setText:NSLocalizedString(@"Account_Verification", @"")];
-    [progress show];
-    self.navigationItem.rightBarButtonItem.enabled = NO;
-    self.navigationItem.leftBarButtonItem.enabled = NO;
-    [authTypeSegment setEnabled:NO forSegmentAtIndex:0];
-    [authTypeSegment setEnabled:NO forSegmentAtIndex:1];
+//    progress = [[TwActivityIndicator alloc] init];
+//    [progress.messageLabel setText:NSLocalizedString(@"Account_Verification", @"")];
+//    [progress show];
+//    self.navigationItem.rightBarButtonItem.enabled = NO;
+//    self.navigationItem.leftBarButtonItem.enabled = NO;
+//    [authTypeSegment setEnabled:NO forSegmentAtIndex:0];
+//    [authTypeSegment setEnabled:NO forSegmentAtIndex:1];
 }
 
-- (IBAction)changeAuthTypeClick:(id)sender
-{
-    UISegmentedControl *segmentSender = (UISegmentedControl*)sender;
-    
-    if (segmentSender)
-    {
-        // Select authentification via login/password.
-        if (segmentSender.selectedSegmentIndex == AccountSegmentIndex)
-        {
-            self.view = accountView;
-            self.navigationItem.rightBarButtonItem.enabled = YES;
-        }
-        // Selecte authentification via OAuth. Load twitter.com in inapp web browser.
-        else if (segmentSender.selectedSegmentIndex == OAuthSegmentIndex)
-        {
-            self.view = oAuthView;
-            self.navigationItem.rightBarButtonItem.enabled = NO;			
-        }
-    }
-}
+//- (IBAction)changeAuthTypeClick:(id)sender
+//{
+//    UISegmentedControl *segmentSender = (UISegmentedControl*)sender;
+//    
+//    if (segmentSender)
+//    {
+//        // Select authentification via login/password.
+//        if (segmentSender.selectedSegmentIndex == AccountSegmentIndex)
+//        {
+//            self.view = accountView;
+//            self.navigationItem.rightBarButtonItem.enabled = YES;
+//        }
+//        // Selecte authentification via OAuth. Load twitter.com in inapp web browser.
+//        else if (segmentSender.selectedSegmentIndex == OAuthSegmentIndex)
+//        {
+//            self.view = oAuthView;
+//            self.navigationItem.rightBarButtonItem.enabled = NO;			
+//        }
+//    }
+//}
 
-- (IBAction)oAuthOKClick
+//- (IBAction)oAuthOKClick
+//{
+//    SA_OAuthTwitterEngine *engine = [[SA_OAuthTwitterEngine alloc] initOAuthWithDelegate: self];
+//    
+//    engine.consumerKey = kTweeteroConsumerKey;
+//    engine.consumerSecret = kTweeteroConsumerSecret;
+//    
+//    [engine requestRequestToken];
+//    
+//    SA_OAuthTwitterController *oAuthController = [SA_OAuthTwitterController controllerToEnterCredentialsWithTwitterEngine:engine delegate:self];
+//    
+//    if (oAuthController)
+//        [self.navigationController pushViewController:oAuthController animated:YES];
+//    else
+//		[engine sendUpdate: [NSString stringWithFormat: @"Already Updated. %@", [NSDate date]]];
+//}
+
+- (void)showOAuthViewInController:(UINavigationController *)aNavigationController
 {
-    SA_OAuthTwitterEngine *engine = [[SA_OAuthTwitterEngine alloc] initOAuthWithDelegate: self];
-    
+    SA_OAuthTwitterEngine *engine = [[SA_OAuthTwitterEngine alloc] initOAuthWithDelegate:self];
     engine.consumerKey = kTweeteroConsumerKey;
     engine.consumerSecret = kTweeteroConsumerSecret;
-    
     [engine requestRequestToken];
     
-    SA_OAuthTwitterController *oAuthController = [SA_OAuthTwitterController controllerToEnterCredentialsWithTwitterEngine:engine delegate:self];
-    
+    SA_OAuthTwitterController *oAuthController =
+	[SA_OAuthTwitterController controllerToEnterCredentialsWithTwitterEngine:engine delegate:self];
     if (oAuthController)
-        [self.navigationController pushViewController:oAuthController animated:YES];
+	{
+		[aNavigationController pushViewController:oAuthController animated:YES];
+	}
     else
+	{
 		[engine sendUpdate: [NSString stringWithFormat: @"Already Updated. %@", [NSDate date]]];
+	}
+	[engine release];
 }
 
-//- (void)viewDidLoad 
 - (void)loadView
 {
     //[super viewDidLoad];
     [super loadView];
-    accountView = self.view;
+//    accountView = self.view;
     
- 	self.navigationItem.rightBarButtonItem = loginButton;
-    self.navigationItem.leftBarButtonItem = cancelButton;
-    self.navigationItem.titleView = authTypeSegment;
+// 	self.navigationItem.rightBarButtonItem = loginButton;
+//  self.navigationItem.leftBarButtonItem = cancelButton;
+//  self.navigationItem.titleView = authTypeSegment;
     
-    if (_currentAccount)
-    {
-        [loginField setText:_currentAccount.username];
-        [passwordField setText:@""];
-        [rememberSwitch setOn: NO];
-    }
+//    if (_currentAccount)
+//    {
+//        [loginField setText:_currentAccount.username];
+//        [passwordField setText:@""];
+//        [rememberSwitch setOn: NO];
+//    }
     
     //self.navigationItem.leftBarButtonItem = nil;
     
-	UIImage *icon = [UIImage imageNamed:@"Frog.tiff"];
-	if(icon)
-		[iconView setImage:icon];
-		
-	[oAuthOKButton setBackgroundImage:[UIImage imageNamed:@"oAuthButton.png"] forState:UIControlStateNormal];
-    oAuthOKButton.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-	oAuthOKButton.frame = CGRectInset(oAuthOKButton.frame, -10, -15);
-	oAuthOKButton.titleLabel.textColor = [UIColor whiteColor];
+//	UIImage *icon = [UIImage imageNamed:@"Frog.tiff"];
+//	if(icon)
+//		[iconView setImage:icon];
+//		
+//	[oAuthOKButton setBackgroundImage:[UIImage imageNamed:@"oAuthButton.png"] forState:UIControlStateNormal];
+//    oAuthOKButton.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+//	oAuthOKButton.frame = CGRectInset(oAuthOKButton.frame, -10, -15);
+//	oAuthOKButton.titleLabel.textColor = [UIColor whiteColor];	
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
-    if (_currentAccount)
-    {
-        UISegmentedControl *seg = authTypeSegment;
-        
-        [seg setSelectedSegmentIndex:_currentAccount.authType];
-        [self changeAuthTypeClick:seg];
-    }
+//    if (_currentAccount)
+//    {
+//        UISegmentedControl *seg = authTypeSegment;
+//        
+//        [seg setSelectedSegmentIndex:_currentAccount.authType];
+//        [self changeAuthTypeClick:seg];
+//    }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -237,18 +259,18 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
     twitterUserCredentialID = nil;
     [twitter autorelease];
     twitter = nil;
-    [progress hide];
-    [progress release];
-    self.navigationItem.rightBarButtonItem.enabled = YES;
-    self.navigationItem.leftBarButtonItem.enabled = YES;
-    [authTypeSegment setEnabled:YES forSegmentAtIndex:0];
-    [authTypeSegment setEnabled:YES forSegmentAtIndex:1];
+//    [progress hide];
+//    [progress release];
+//    self.navigationItem.rightBarButtonItem.enabled = YES;
+//    self.navigationItem.leftBarButtonItem.enabled = YES;
+//    [authTypeSegment setEnabled:YES forSegmentAtIndex:0];
+//    [authTypeSegment setEnabled:YES forSegmentAtIndex:1];
 }
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
-    [progress hide];
-    [progress release];
+//    [progress hide];
+//    [progress release];
 	
 	UIAlertView *theAlert = CreateAlertWithError(error);
     [theAlert show];
@@ -256,10 +278,10 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
     twitterUserCredentialID = nil;
     [twitter autorelease];
     twitter = nil;
-    self.navigationItem.rightBarButtonItem.enabled = YES;
-    self.navigationItem.leftBarButtonItem.enabled = YES;
-    [authTypeSegment setEnabled:YES forSegmentAtIndex:0];
-    [authTypeSegment setEnabled:YES forSegmentAtIndex:1];
+//    self.navigationItem.rightBarButtonItem.enabled = YES;
+//    self.navigationItem.leftBarButtonItem.enabled = YES;
+//    [authTypeSegment setEnabled:YES forSegmentAtIndex:0];
+//    [authTypeSegment setEnabled:YES forSegmentAtIndex:1];
 }
 
 @end

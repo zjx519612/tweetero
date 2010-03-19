@@ -40,22 +40,22 @@ extern const NSString *LoginControllerAccountDidChange;
 @interface LoginController : UIViewController <UITextFieldDelegate, SA_OAuthTwitterControllerDelegate>
 {
 @private
-	IBOutlet UIButton *oAuthOKButton;
+//	IBOutlet UIButton *oAuthOKButton;
 	
-    IBOutlet id cancelButton;
-    IBOutlet id loginButton;
-    IBOutlet id loginField;
-    IBOutlet id passwordField;
-	IBOutlet id rememberSwitch;
-	IBOutlet id iconView;
-    IBOutlet id authTypeSegment;
-    IBOutlet UIView *accountView;
-    IBOutlet UIView *oAuthView;    
+//    IBOutlet id cancelButton;
+//    IBOutlet id loginButton;
+//    IBOutlet id loginField;
+//    IBOutlet id passwordField;
+//	IBOutlet id rememberSwitch;
+//	IBOutlet id iconView;
+//    IBOutlet id authTypeSegment;
+//    IBOutlet UIView *accountView;
+//    IBOutlet UIView *oAuthView;    
     UserAccount *_currentAccount;
     BOOL oAuthAuthorization;
     MGTwitterEngine *twitter;
     NSString *twitterUserCredentialID;
-    TwActivityIndicator *progress;
+//    TwActivityIndicator *progress;
 }
 
 - (id)initWithUserAccount:(UserAccount*)account;
@@ -64,8 +64,10 @@ extern const NSString *LoginControllerAccountDidChange;
 
 - (IBAction)login:(id)sender;
 
-- (IBAction)changeAuthTypeClick:(id)sender;
+- (void)showOAuthViewInController:(UINavigationController *)aNavigationController;
 
-- (IBAction)oAuthOKClick;
+//- (IBAction)changeAuthTypeClick:(id)sender;
+
+//- (IBAction)oAuthOKClick;
 
 @end
