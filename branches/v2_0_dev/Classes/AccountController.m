@@ -69,6 +69,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_tableAccounts release];
     [_manager release];
+	[loginController release];
     [self closeAndReleaserTwitter];
     [super dealloc];
 }
@@ -101,10 +102,16 @@
 // Create LoginController and push it to navigation controller.
 - (IBAction)clickAdd
 {
-    LoginController *controller = [[LoginController alloc] initWithNibName:@"Login" bundle:nil];
-    
-    [self.navigationController pushViewController:controller animated:YES];
-    [controller release];
+//	LoginController *controller = [[LoginController alloc] initWithNibName:@"Login" bundle:nil];
+//	[self.navigationController pushViewController:controller animated:YES];
+//	[controller release];
+	
+	if (nil == loginController)
+	{
+		loginController = [[LoginController alloc] init];
+	}
+	
+	[loginController showOAuthViewInController:self.navigationController];
 }
 
 - (IBAction)clickEdit

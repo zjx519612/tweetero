@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-@class AccountManager, MGTwitterEngine;
+@class AccountManager, MGTwitterEngine, LoginController;
 
 @interface AccountController : UIViewController <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate>
 {
@@ -10,6 +10,7 @@
     AccountManager       *_manager;
     MGTwitterEngine      *_twitter;
     NSString             *_credentialIdentifier;
+	LoginController	 *loginController;
 }
 
 @property (nonatomic) BOOL canAnimate;
