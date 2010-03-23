@@ -171,6 +171,8 @@
 
 	OAMutableURLRequest			*request = [[[OAMutableURLRequest alloc] initWithURL: self.authorizeURL consumer: nil token: _requestToken realm: nil signatureProvider: nil] autorelease];	
 
+	[request setHTTPShouldHandleCookies:NO];
+	[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
 	[request setParameters: [NSArray arrayWithObject: [[[OARequestParameter alloc] initWithName: @"oauth_token" value: _requestToken.key] autorelease]]];	
 	return request;
 }

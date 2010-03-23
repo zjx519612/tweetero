@@ -181,7 +181,22 @@ static NSString* const kGGTwitterLoadingBackgroundImage = @"twitter_load.png";
 		[self denied];
 		return NO;
 	}
+
 	[_webView setHidden:YES];
+	
+	if ([request HTTPShouldHandleCookies])
+	{
+		NSMutableURLRequest *noCookiesRequest = [[NSMutableURLRequest alloc] initWithURL:[request URL]];
+		[noCookiesRequest setHTTPBody:[request HTTPBody]];
+		[noCookiesRequest setHTTPMethod:[request HTTPMethod]];
+		[noCookiesRequest setAllHTTPHeaderFields:[request allHTTPHeaderFields]];
+		[noCookiesRequest setHTTPShouldHandleCookies:NO];
+		[noCookiesRequest setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
+		[_webView loadRequest:noCookiesRequest];
+		[noCookiesRequest release];
+		return NO;
+	}	
+	
 	return YES;
 }
 
