@@ -106,11 +106,13 @@
 //	[self.navigationController pushViewController:controller animated:YES];
 //	[controller release];
 	
-	if (nil == loginController)
+	if (nil != loginController)
 	{
-		loginController = [[LoginController alloc] init];
+		[loginController release];
+		loginController = nil;
 	}
-	
+
+	loginController = [[LoginController alloc] init];
 	[loginController showOAuthViewInController:self.navigationController];
 }
 
@@ -136,9 +138,16 @@
     else if (buttonIndex == 1)
     {
         // Edit selected account. Navigate LoginController with account data.
-        LoginController *login = [[LoginController alloc] initWithUserAccount:account];
-        [self.navigationController pushViewController:login animated:YES];
-        [login release];
+		if (nil != loginController)
+		{
+			[loginController release];
+			loginController = nil;
+		}
+		
+		loginController = [[LoginController alloc] initWithUserAccount:account];
+		[loginController showOAuthViewInController:self.navigationController];
+//      [self.navigationController pushViewController:login animated:YES];
+//      [login release];
     }
     
     [_tableAccounts setEditing:NO];
