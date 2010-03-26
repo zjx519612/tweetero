@@ -103,6 +103,7 @@
 		498D96D40F62EFA9004E1B20 /* Login.xib in Resources */ = {isa = PBXBuildFile; fileRef = 498D96CE0F62EFA9004E1B20 /* Login.xib */; };
 		49B3F5B50F66A78000DFFE04 /* yFrogImageDownoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 49B3F5B30F66A78000DFFE04 /* yFrogImageDownoader.m */; };
 		A7BB56C611464FDF00940E86 /* mapRemove.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A7BB56C511464FDF00940E86 /* mapRemove.tiff */; };
+		A7C5E1B4115CE6FC00D6999D /* YFDataInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = A7C5E1B3115CE6FC00D6999D /* YFDataInputStream.m */; };
 		A7C6CAFF113FCD9600A02E17 /* oAuthButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A7C6CAFE113FCD9600A02E17 /* oAuthButton.png */; };
 		AA47D5BC0F7B3BAA005E0EEC /* MessageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = AA47D5BB0F7B3BAA005E0EEC /* MessageUploader.m */; };
 		AA6492C90F75BBCC00E40348 /* MGConnectionWrap.m in Sources */ = {isa = PBXBuildFile; fileRef = AA6492C80F75BBCC00E40348 /* MGConnectionWrap.m */; };
@@ -325,6 +326,8 @@
 		49B3F5B40F66A78000DFFE04 /* yFrogImageDownoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yFrogImageDownoader.h; path = Classes/yFrogImageDownoader.h; sourceTree = SOURCE_ROOT; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A7BB56C511464FDF00940E86 /* mapRemove.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = mapRemove.tiff; path = Resource/Images/mapRemove.tiff; sourceTree = "<group>"; };
+		A7C5E1B2115CE6FC00D6999D /* YFDataInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YFDataInputStream.h; sourceTree = "<group>"; };
+		A7C5E1B3115CE6FC00D6999D /* YFDataInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YFDataInputStream.m; sourceTree = "<group>"; };
 		A7C6CAFE113FCD9600A02E17 /* oAuthButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = oAuthButton.png; path = Resource/Images/oAuthButton.png; sourceTree = "<group>"; };
 		AA47D5BA0F7B3BAA005E0EEC /* MessageUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageUploader.h; sourceTree = "<group>"; };
 		AA47D5BB0F7B3BAA005E0EEC /* MessageUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MessageUploader.m; sourceTree = "<group>"; };
@@ -678,6 +681,8 @@
 				49B3F5B30F66A78000DFFE04 /* yFrogImageDownoader.m */,
 				AA87F6840F71E7EA00D7A2C0 /* yFrogImageUploader.h */,
 				AA87F6850F71E7EA00D7A2C0 /* yFrogImageUploader.m */,
+				A7C5E1B2115CE6FC00D6999D /* YFDataInputStream.h */,
+				A7C5E1B3115CE6FC00D6999D /* YFDataInputStream.m */,
 				AA6492C70F75BBCC00E40348 /* MGConnectionWrap.h */,
 				AA6492C80F75BBCC00E40348 /* MGConnectionWrap.m */,
 				AA47D5BA0F7B3BAA005E0EEC /* MessageUploader.h */,
@@ -1051,6 +1056,7 @@
 				006B67A310E12B600043B992 /* TwMessageCell.m in Sources */,
 				006B67C110E131740043B992 /* TwImageGridView.m in Sources */,
 				00851F8510F3578A00F178F7 /* TwLabel.m in Sources */,
+				A7C5E1B4115CE6FC00D6999D /* YFDataInputStream.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1217,7 +1223,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = yfrog;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
-				SDKROOT = iphoneos2.2.1;
+				SDKROOT = iphoneos3.0;
 			};
 			name = Distribution;
 		};
@@ -1292,7 +1298,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = yfrog;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
-				SDKROOT = iphoneos2.2.1;
+				SDKROOT = iphoneos3.0;
 				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
@@ -1309,7 +1315,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = yfrog;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
-				SDKROOT = iphoneos2.2.1;
+				SDKROOT = iphoneos3.0;
 			};
 			name = Release;
 		};
