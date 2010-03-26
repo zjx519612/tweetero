@@ -201,6 +201,7 @@ static int NetworkActivityIndicatorCounter = 0;
 				
 				MKPlacemark *place = [[MKPlacemark alloc] initWithCoordinate:location addressDictionary:[NSDictionary dictionary]];
 				[mapView addAnnotation:place];
+				[place release];
 				
 				return [container autorelease];
 			}
