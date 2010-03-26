@@ -77,25 +77,34 @@ int process_yajl_string(void *ctx, const unsigned char * stringVal, unsigned int
 		if ([currentKey isEqualToString:@"created_at"])
 		{
 			// we have a priori knowledge that the value for created_at is a date, not a string
-			struct tm theTime;
+			//struct tm theTime;
+			NSString *dateFormat = nil;
 			if ([value hasSuffix:@"+0000"])
 			{
 				// format for Search API: "Fri, 06 Feb 2009 07:28:06 +0000"
-				strptime([value UTF8String], "%a, %d %b %Y %H:%M:%S +0000", &theTime);
+				// strptime([value UTF8String], "%a, %d %b %Y %H:%M:%S +0000", &theTime);
+				dateFormat = @"EEE, dd MMM yyyy HH:mm:ss ZZZ";
 			}
 			else
 			{
 				// format for REST API: "Thu Jan 15 02:04:38 +0000 2009"
-				strptime([value UTF8String], "%a %b %d %H:%M:%S +0000 %Y", &theTime);
+				// strptime([value UTF8String], "%a %b %d %H:%M:%S +0000 %Y", &theTime);
+				dateFormat = @"EEE MMM dd HH:mm:ss ZZZ yyyy";
 			}
 			//time_t epochTime = timegm(&theTime);
 			// save the date as a long with the number of seconds since the epoch in 1970
             
-            id createdDate = [NSDate dateWithNaturalLanguageString:value];
-            [self addValue:createdDate forKey:currentKey];
+            // id createdDate = [NSDate dateWithNaturalLanguageString:value];
+            // [self addValue:createdDate forKey:currentKey];
 			            
 			//[self addValue:[NSNumber numberWithLong:epochTime] forKey:currentKey];
 			// this value can be converted to a date with [NSDate dateWithTimeIntervalSince1970:epochTime]
+			[NSDateFormatter setDefaultFormatterBehavior:NSDateFormatterBehavior10_4];
+			NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+			[dateFormatter setDateFormat:dateFormat];
+			NSDate *creationDate = [dateFormatter dateFromString:value];
+			[self addValue:creationDate forKey:currentKey];
+			[dateFormatter release];
 		}
 		else
 		{
