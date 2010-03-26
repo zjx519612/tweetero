@@ -35,11 +35,14 @@
     TwActivityIndicator *_activity;
 	int _indicatorCount;
 	BOOL _loading;
+	
+	UIBarButtonItem *_topBarItem;
 }
 
 - (void)reloadAll;
 - (void)retainActivityIndicator;
 - (void)releaseActivityIndicator;
+- (void)changeActionSegment:(id)sender;
 
 @end
 

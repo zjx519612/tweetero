@@ -9,6 +9,7 @@
 #import "MyTweetViewController.h"
 #import "MGTwitterEngine.h"
 #import "TweetterAppDelegate.h"
+#import "TwitEditorController.h"
 
 @implementation MyTweetViewController
 
@@ -16,12 +17,50 @@
 {
     [super viewDidLoad];
     
+    UISegmentedControl *userActionButton = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"New", @"Refresh", nil]] autorelease];
+    
+    CGRect frame = CGRectMake(235, 7, 80, 30);
+    
+    [userActionButton setFrame:frame];
+    [userActionButton setSegmentedControlStyle:UISegmentedControlStyleBar];
+    [userActionButton setImage:[UIImage imageNamed:@"edit.tif"] forSegmentAtIndex:0];
+    [userActionButton setImage:[UIImage imageNamed:@"refresh.tif"] forSegmentAtIndex:1];
+    [userActionButton addTarget:self action:@selector(changeActionSegment:) forControlEvents:UIControlEventValueChanged];
+    [userActionButton setMomentary:YES];
+    
+    _topBarItem = [[UIBarButtonItem alloc] initWithCustomView:userActionButton];	
+	
 	self.navigationItem.title = @"MyTweets";
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(twittsUpdatedNotificationHandler:) name:@"TwittsUpdated" object:nil];
 }
 
+- (void)viewWillAppear:(BOOL)animated 
+{
+    [super viewWillAppear:animated];
+	self.navigationItem.rightBarButtonItem = _topBarItem;		
+	[self reloadAll];
+}
+
+- (void)changeActionSegment:(id)sender
+{
+    UISegmentedControl *seg = (UISegmentedControl*)sender;
+    
+    if (seg.selectedSegmentIndex == 0)
+	{
+		TwitEditorController *newMessageView = [[TwitEditorController alloc] init];
+		[self.navigationController pushViewController:newMessageView animated:YES];
+		[newMessageView release];
+	}
+    else
+	{
+		[self reloadAll];
+	}
+}
+
 - (void)dealloc 
 {
+	[_topBarItem release];
+	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }

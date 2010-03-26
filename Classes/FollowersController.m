@@ -31,6 +31,7 @@
 #import "ImageLoader.h"
 #import "UserInfo.h"
 #import "TweetterAppDelegate.h"
+#import "TwitEditorController.h"
 #import "CustomImageView.h"
 #include "util.h"
 
@@ -77,6 +78,19 @@
 	_loading = [[AccountManager manager] isValidLoggedUser];
 	_indicatorCount = 0;
 	
+	UISegmentedControl *userActionButton = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"New", @"Refresh", nil]] autorelease];
+    
+    CGRect frame = CGRectMake(235, 7, 80, 30);
+    
+    [userActionButton setFrame:frame];
+    [userActionButton setSegmentedControlStyle:UISegmentedControlStyleBar];
+    [userActionButton setImage:[UIImage imageNamed:@"edit.tif"] forSegmentAtIndex:0];
+    [userActionButton setImage:[UIImage imageNamed:@"refresh.tif"] forSegmentAtIndex:1];
+    [userActionButton addTarget:self action:@selector(changeActionSegment:) forControlEvents:UIControlEventValueChanged];
+    [userActionButton setMomentary:YES];
+    
+    _topBarItem = [[UIBarButtonItem alloc] initWithCustomView:userActionButton];	
+	
     _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(accountChanged:) name:@"AccountChanged" object:nil];
 	
@@ -87,6 +101,8 @@
 {
     [super viewWillAppear:animated];
 	
+	self.navigationItem.rightBarButtonItem = _topBarItem;
+	
 	if(!_users)
 		[self.tableView reloadData];
 }
@@ -95,6 +111,22 @@
 {
     [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
     // Release anything that's not essential, such as cached data
+}
+
+- (void)changeActionSegment:(id)sender
+{
+    UISegmentedControl *seg = (UISegmentedControl*)sender;
+    
+    if (seg.selectedSegmentIndex == 0)
+	{
+		TwitEditorController *newMessageView = [[TwitEditorController alloc] init];
+		[self.navigationController pushViewController:newMessageView animated:YES];
+		[newMessageView release];		
+	}
+    else
+	{
+		[self reloadAll];
+	}
 }
 
 #pragma mark Table view methods
@@ -401,6 +433,8 @@
 
 - (void)dealloc
 {
+	[_topBarItem release];
+	
     if (_username)
         [_username autorelease];
     [super dealloc];
@@ -418,6 +452,11 @@
 
 - (void)loadFollowers
 {
+	[_users release];
+	_users = nil;
+	
+	[self.tableView reloadData];
+	
 	[super loadFollowers];
 	
     if ([[AccountManager manager] isValidLoggedUser])
@@ -462,6 +501,11 @@
 
 - (void)loadFollowers
 {
+	[_users release];
+	_users = nil;
+	
+	[self.tableView reloadData];
+	
 	[super loadFollowers];
 	
     if ([[AccountManager manager] isValidLoggedUser])
