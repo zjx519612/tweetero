@@ -28,6 +28,7 @@
 #import "TweetterAppDelegate.h"
 #import "MGTwitterEngineFactory.h"
 #import "LocationManager.h"
+#import "YFDataInputStream.h"
 #include "util.h"
 #include "config.h"
 #import "MGTwitterEngine.h"
@@ -102,6 +103,8 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 
 -(void)dealloc
 {
+	YFLog(@"Image Uploader - DEALLOC");
+	
     //[self setVideoUploadEngine:nil];
     [videoUploadEngine release];
 	self.delegate = nil;
@@ -145,60 +148,59 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 		
 	NSString *boundary = [NSString stringWithFormat:@"%ld__%ld__%ld", random(), random(), random()];
 	
-	//adding the body:
-	NSMutableData *postBody = [[NSMutableData alloc] init];;
+	NSMutableData *headerData = [NSMutableData data];
 	
     for (NSString *key in [authFields allKeys])
 	{
         NSString *value = [authFields objectForKey:key];
 		if (nil != value)
 		{
-			[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-			[postBody appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
-			[postBody appendData:[value dataUsingEncoding:NSUTF8StringEncoding]];
+			[headerData appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+			[headerData appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
+			[headerData appendData:[value dataUsingEncoding:NSUTF8StringEncoding]];
 		}
     }
 	
-	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    [postBody appendData:[@"Content-Disposition: form-data; name=\"key\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-    [postBody appendData:[kTweeteroDevKey dataUsingEncoding:NSUTF8StringEncoding]];
+	[headerData appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    [headerData appendData:[@"Content-Disposition: form-data; name=\"key\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    [headerData appendData:[kTweeteroDevKey dataUsingEncoding:NSUTF8StringEncoding]];
 	
 	if([[LocationManager locationManager] locationDefined])
 	{
-        [postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-		[postBody appendData:[@"Content-Disposition: form-data; name=\"tags\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-		[postBody appendData:[[NSString stringWithFormat:@"geotagged, geo:lat=%+.6f, geo:lon=%+.6f",
+        [headerData appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+		[headerData appendData:[@"Content-Disposition: form-data; name=\"tags\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+		[headerData appendData:[[NSString stringWithFormat:@"geotagged, geo:lat=%+.6f, geo:lon=%+.6f",
 					[[LocationManager locationManager] latitude],
 					[[LocationManager locationManager] longitude]] dataUsingEncoding:NSUTF8StringEncoding]];
 	}	
 	
-	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+	[headerData appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 	NSString* fileHeader = [NSString stringWithFormat:
 				@"--%@\r\n"
 				"Content-Disposition: form-data; name=\"fileupload\"; filename=\"iPhoneMedia\"\r\n"
 				"Content-Type: %@\r\n"
 				"Content-Transfer-Encoding: binary; \r\n\r\n",
 				boundary, self.contentType];
-	[postBody appendData:[fileHeader dataUsingEncoding:NSUTF8StringEncoding]];
-	NSData *imageData = UIImageJPEGRepresentation(anImage, 1.0f);
-	[postBody appendData:imageData];
-	[postBody appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+	[headerData appendData:[fileHeader dataUsingEncoding:NSUTF8StringEncoding]];
+	
+	NSData *bodyData = UIImageJPEGRepresentation(anImage, 1.0f);
+	NSData *endData = [[NSString stringWithFormat:@"\r\n--%@--\r\n\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding];
+	NSArray *datasArray = [NSArray arrayWithObjects:headerData, bodyData, endData, nil];
+	YFDataInputStream *stream = [[YFDataInputStream alloc] initWithDataContainer:datasArray];
 	
 	NSURL *url = [NSURL URLWithString:[self getApiURL]];
 	NSMutableURLRequest *request = tweeteroMutableURLRequest(url);
 	[request setCachePolicy:NSURLRequestReloadIgnoringCacheData];
+	[request setHTTPShouldHandleCookies:NO];
 	[request setTimeoutInterval:HTTPUploadTimeout];
 	[request setHTTPMethod:@"POST"];
 	[request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", boundary] forHTTPHeaderField:@"Content-type"];
-    [request setValue:[NSString stringWithFormat:@"%d", [postBody length]] forHTTPHeaderField:@"Content-length"];
+    [request setValue:[NSString stringWithFormat:@"%d", [stream length]] forHTTPHeaderField:@"Content-length"];
 	
-	
-	NSInputStream *stream = [[NSInputStream alloc] initWithData:postBody];
 	[request setHTTPBodyStream:stream];
 	[stream release];
 
-    [delegate uploadedDataSize:[postBody length]];
-	[postBody release];
+    [delegate uploadedDataSize:[stream length]];
 	
 	[self closeConnection];	
 	if (![self openConnection:request]) 
@@ -326,19 +328,15 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 }
 
 #pragma mark NSURLConnection delegate methods
-
-
 - (void) connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
     [result setLength:0];
 }
 
-
 - (void) connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
     [result appendData:data];
 }
-
 
 - (void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
