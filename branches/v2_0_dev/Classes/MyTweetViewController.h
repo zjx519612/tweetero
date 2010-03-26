@@ -14,6 +14,9 @@
 
 @interface MyTweetViewController : MessageListController
 {
+	UIBarButtonItem *_topBarItem;
 }
+
+- (void)changeActionSegment:(id)sender;
 
 @end
