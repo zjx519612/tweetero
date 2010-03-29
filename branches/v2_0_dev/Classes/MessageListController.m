@@ -44,6 +44,7 @@ NSString *const kTwitterOperationErrorMessage = @"Operation Could Not Be Complet
 const NSInteger kRetriesNumber = 3;
 
 @interface MessageListController(TwitterMessageObjectManagament)
+- (void)clearMessagesCache;
 - (void)initTwitterMessageObjectCache;
 - (void)releaseTwitterMessageObjectCache;
 - (TwitterMessageObject*)mapTwitterMessageObject:(NSDictionary*)message;
@@ -135,7 +136,12 @@ const NSInteger kRetriesNumber = 3;
 
 - (void)didReceiveMemoryWarning 
 {
-    ISLog(@"MEMORY WARNING");
+	ISLog(@"MEMORY WARNING");
+	
+	[self releaseTwitterMessageObjectCache];
+	[self initTwitterMessageObjectCache];
+	[self clearMessagesCache];
+	
     [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
     // Release anything that's not essential, such as cached data
 }
@@ -489,12 +495,8 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
     
 	_lastMessage = NO;
 	_pagenum = 1;
-    
-	if(_messages)
-	{
-		[_messages release];
-		_messages = nil;
-	}
+
+    [self clearMessagesCache];
 	
 	[self loadMessagesStaringAtPage:_pagenum count:MESSAGES_PER_PAGE];
 }
@@ -538,6 +540,15 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 
 @implementation MessageListController(TwitterMessageObjectManagament)
 
+- (void)clearMessagesCache
+{
+	if(_messages)
+	{
+		[_messages release];
+		_messages = nil;
+	}	
+}
+
 - (void)initTwitterMessageObjectCache
 {
     if (_messageObjects == nil)
@@ -547,6 +558,7 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 - (void)releaseTwitterMessageObjectCache
 {
     [_messageObjects release];
+	_messageObjects = nil;
 }
 
 - (TwitterMessageObject*)mapTwitterMessageObject:(NSDictionary*)message
