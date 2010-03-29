@@ -119,11 +119,11 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 	[super dealloc];
 }
 
-- (void)postImage:(UIImage *)anImage
+- (void)postData:(NSData *)anImageData
 {
 	NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
 	
-	if (nil == anImage || canceled)
+	if (nil == anImageData || canceled)
 	{
 		return;
 	}
@@ -183,7 +183,7 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 				boundary, self.contentType];
 	[headerData appendData:[fileHeader dataUsingEncoding:NSUTF8StringEncoding]];
 	
-	NSData *bodyData = UIImageJPEGRepresentation(anImage, 1.0f);
+	NSData *bodyData = anImageData;
 	NSData *endData = [[NSString stringWithFormat:@"\r\n--%@--\r\n\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding];
 	NSArray *datasArray = [NSArray arrayWithObjects:headerData, bodyData, endData, nil];
 	YFDataInputStream *stream = [[YFDataInputStream alloc] initWithDataContainer:datasArray];
@@ -233,10 +233,8 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 		return;
 	}
 
-	// Convert data to image if needed
-	UIImage *theImage = nil;
 	self.contentType = JPEG_CONTENT_TYPE;
-	[self postImage:theImage];
+	[self postData:imageJPEGData];
 }
 
 - (void)postMP4DataWithUploadEngine:(ISVideoUploadEngine*)engine delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
@@ -298,33 +296,13 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
     [engine release];
 }
 
-- (void)postImage:(UIImage*)anImage delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
+- (void)postData:(NSData*)anImageData delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data
 {
-	NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
-	
 	self.delegate = dlgt;
 	self.userData = data;
-	
-	UIImage* imageToUpload = anImage;
-	
-	BOOL needToResize;
-	BOOL needToRotate;
-	int newDimension = isImageNeedToConvert(anImage, &needToResize, &needToRotate);
-	if(needToResize || needToRotate)
-	{
-		UIImage *modifiedImage = imageScaledToSize(anImage, newDimension);
-		if (nil != modifiedImage && [self.delegate shouldChangeImage:anImage withNewImage:modifiedImage])
-		{
-			imageToUpload = modifiedImage;
-			self.userData = imageToUpload;
-		}
-	}
-	
 	self.contentType = JPEG_CONTENT_TYPE;
 	
-	[self postImage:imageToUpload];
-	
-	[thePool release];
+	[self postData:anImageData];
 }
 
 #pragma mark NSURLConnection delegate methods
@@ -417,6 +395,7 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
     
+	YFLog(@"Image Uploader Result: %@", [[[NSString alloc] initWithData:result encoding:4] autorelease]);
 	NSXMLParser *parser = [[NSXMLParser alloc] initWithData:result];
 	[parser setDelegate:self];
 	[parser setShouldProcessNamespaces:NO];

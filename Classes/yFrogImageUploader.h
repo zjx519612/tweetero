@@ -66,7 +66,7 @@
 - (void)postMP4DataWithUploadEngine:(ISVideoUploadEngine*)engine delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data;
 - (void)postMP4DataWithPath:(NSString*)path delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data;
 - (void)postMP4Data:(NSData*)movieData delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data;
-- (void)postImage:(UIImage*)image delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data; // call postJPEGData:delegate:userData:
+- (void)postData:(NSData*)image delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data; // call postJPEGData:delegate:userData:
 - (void)cancel;
 - (BOOL)canceled;
 
