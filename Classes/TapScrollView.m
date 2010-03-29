@@ -29,6 +29,8 @@
 
 @implementation TapScrollView
 
+@synthesize tapDelegate = _tapDelegate;
+
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event 
 { 
 	[super touchesEnded:touches withEvent:event];

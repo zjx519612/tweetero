@@ -52,6 +52,8 @@
         self._yFrogURL = yFrogURL;
 		self._image = nil;
 		self.hidesBottomBarWhenPushed = YES;
+		scrollView.delegate = self;
+		scrollView.tapDelegate = self;
     }
     return self;
 }
@@ -64,6 +66,8 @@
         self._yFrogURL = nil;
 		self._image = image;
 		self.hidesBottomBarWhenPushed = YES;
+		scrollView.delegate = self;
+		scrollView.tapDelegate = self;
     }
     return self;
 }

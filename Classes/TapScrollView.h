@@ -32,4 +32,6 @@
 	IBOutlet id _tapDelegate;
 }
 
+@property (nonatomic, assign) id tapDelegate;
+
 @end
