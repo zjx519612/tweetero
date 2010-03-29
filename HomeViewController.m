@@ -72,6 +72,15 @@
     self.parentViewController.navigationItem.rightBarButtonItem = _topBarItem;
 }
 
+- (void)didReceiveMemoryWarning 
+{
+	[super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+	
+	// Refresh a table since base implementation should remove cached data
+	[self.tableView reloadData];
+}
+
 - (void)twittsUpdatedNotificationHandler:(NSNotification*)note
 {
     id object = [note object];
