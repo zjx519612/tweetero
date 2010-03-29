@@ -136,22 +136,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="115995125"/>
-						<reference key="destination" ref="372490531"/>
-					</object>
-					<int key="connectionID">17</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">_tapDelegate</string>
-						<reference key="source" ref="115995125"/>
-						<reference key="destination" ref="372490531"/>
-					</object>
-					<int key="connectionID">18</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
 						<string key="label">imageActionsSegmentedControl</string>
 						<reference key="source" ref="372490531"/>
 						<reference key="destination" ref="394278897"/>
@@ -182,6 +166,14 @@
 						<int key="IBEventType">13</int>
 					</object>
 					<int key="connectionID">32</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">scrollView</string>
+						<reference key="source" ref="372490531"/>
+						<reference key="destination" ref="115995125"/>
+					</object>
+					<int key="connectionID">33</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -293,7 +285,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">32</int>
+			<int key="maxID">33</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -330,6 +322,7 @@
 							<string>imageActionsSegmentedControl</string>
 							<string>imageView</string>
 							<string>saveButton</string>
+							<string>scrollView</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -337,6 +330,7 @@
 							<string>UISegmentedControl</string>
 							<string>UIImageView</string>
 							<string>UIBarButtonItem</string>
+							<string>TapScrollView</string>
 						</object>
 					</object>
 					<reference key="sourceIdentifier" ref="519650916"/>
@@ -364,7 +358,7 @@
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
-		<string key="IBDocument.LastKnownRelativeProjectPath">../Tweetter.xcodeproj</string>
+		<string key="IBDocument.LastKnownRelativeProjectPath">../Tweetero.xcodeproj</string>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<string key="IBCocoaTouchPluginVersion">3.1</string>
 	</data>

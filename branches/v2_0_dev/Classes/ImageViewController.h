@@ -25,6 +25,7 @@
 // 
 
 #import <UIKit/UIKit.h>
+#import "TapScrollView.h"
 #import "yFrogImageDownoader.h"
 #import "TwitterConnectionProtocol.h"
 
@@ -35,9 +36,11 @@
 
 @end
 
-@interface ImageViewController : UIViewController <ImageDownoaderDelegate, UIAlertViewDelegate>
+@interface ImageViewController : UIViewController <ImageDownoaderDelegate, UIScrollViewDelegate, UIAlertViewDelegate>
 {
     IBOutlet UIImageView* imageView;
+	IBOutlet TapScrollView *scrollView;
+	
 	NSString *_yFrogURL;
 	UIImage *_image;
 	CGAffineTransform _tabBarTransform;
