@@ -99,6 +99,8 @@ enum _TwitEditorSuspendedOperations
 	
 	NSURL*					pickedVideo;
 	UIImage*				pickedPhoto;
+	UIImage*				previewImage;
+	NSData*					pickedPhotoData;
     
     int                     _dataSize;
     BOOL                    _canShowCamera;
@@ -158,6 +160,8 @@ enum _TwitEditorSuspendedOperations
 @property (nonatomic, retain) NSDictionary *_message;
 @property (nonatomic, retain) NSURL *pickedVideo;
 @property (nonatomic, retain) UIImage *pickedPhoto;
+@property (nonatomic, retain) UIImage *previewImage;
+@property (nonatomic, retain) NSData *pickedPhotoData;
 @property (nonatomic, retain) NSString *location;
 
 @end

@@ -87,6 +87,8 @@
 @synthesize _message;
 @synthesize pickedVideo;
 @synthesize pickedPhoto;
+@synthesize previewImage;
+@synthesize pickedPhotoData;
 @synthesize location;
 
 - (void)setCharsCount
@@ -291,6 +293,8 @@
 	self._message = nil;
 	self.pickedPhoto = nil;
 	self.pickedVideo = nil;
+	self.previewImage = nil;
+	self.pickedPhotoData = nil;
     //[imgPicker release];
 	[self dismissProgressSheetIfExist];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -318,14 +322,43 @@
 
 - (void)setImage:(UIImage*)img movie:(NSURL*)url
 {
-	self.pickedPhoto = img;
-	self.pickedVideo = url;
-	UIImage* prevImage = nil;
-	if(img)
-		prevImage = img;
+	NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	
+	UIImage *thePrevImage = nil;
+	if (img)
+	{
+		UIImage *imageToUpload = img;
+		
+		BOOL needToResize = NO;
+		BOOL needToRotate = NO;
+		int newDimension = isImageNeedToConvert(img, &needToResize, &needToRotate);
+		if(needToResize || needToRotate)
+		{
+			UIImage *modifiedImage = imageScaledToSize(img, newDimension);
+			if (nil != modifiedImage)
+			{
+				imageToUpload = modifiedImage;
+			}
+		}
+		
+		self.pickedPhotoData = UIImageJPEGRepresentation(imageToUpload, 1.0f);
+		
+		NSInteger maxDimension = 480;// A largest size of the iPhone screen side
+		UIImage *modifiedImage = imageScaledToSize(img, maxDimension);
+
+		self.previewImage = modifiedImage;
+		thePrevImage = modifiedImage;
+		self.pickedPhoto = modifiedImage;
+	}
 	else if(url)
-		prevImage = [UIImage imageNamed:@"MovieIcon.tif"];
-	[self setImageImage:prevImage];
+	{
+		self.pickedVideo = url;
+		thePrevImage = [UIImage imageNamed:@"MovieIcon.tif"];
+	}
+	
+	[self setImageImage:thePrevImage];
+	
+	[thePool release];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
@@ -338,11 +371,6 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishWithPickingPhoto:(UIImage *)img pickingMovie:(NSURL*)url
 {
-    //img = nil;
-    //url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"TestYfrog" ofType:@"mov"]];
-    
-    // PROGRESS
-    
     [picker retain];
     
     [self progressClear];
@@ -352,13 +380,33 @@
 	messageTextWillIgnoreNextViewAppearing = YES;
 
 	BOOL startNewUpload = NO;
-
+	
 	if(pickedPhoto != img || pickedVideo != url)
 	{
 		startNewUpload = YES;
+		
+		if(img)
+		{
+			BOOL needToResize = NO;
+			BOOL needToRotate = NO;
+			
+			isImageNeedToConvert(img, &needToResize, &needToRotate);
+			
+			if (img.size.width > 500 || img.size.height > 500)
+			{
+				needToResize = YES;
+			}
+			
+			if(needToResize || needToRotate)
+			{
+				self.progressSheet = ShowActionSheet(NSLocalizedString(@"Processing image...", @""), self, nil, self.view);
+				self.progressSheet.tag = PROCESSING_PHOTO_SHEET_TAG;
+			}
+		}
+		
 		[self setImage:img movie:url];
 	}
-			
+	
 	[self setNavigatorButtons];
 
 	if(startNewUpload)
@@ -370,19 +418,7 @@
 	}
 
 	[messageText becomeFirstResponder];
-	
-	if(img)
-	{
-		BOOL needToResize;
-		BOOL needToRotate;
-		isImageNeedToConvert(img, &needToResize, &needToRotate);
-		if(needToResize || needToRotate)
-		{
-			self.progressSheet = ShowActionSheet(NSLocalizedString(@"Processing image...", @""), self, nil, self.view);
-			self.progressSheet.tag = PROCESSING_PHOTO_SHEET_TAG;
-		}
-	}
-    
+	    
     [picker release];
 }
 /*
@@ -434,7 +470,7 @@
 		[self imagePickerController:picker didFinishWithPickingPhoto:[info objectForKey:@"UIImagePickerControllerOriginalImage"] pickingMovie:nil];
 	else if([[info objectForKey:@"UIImagePickerControllerMediaType"] isEqualToString:K_UI_TYPE_MOVIE])
 		[self imagePickerController:picker didFinishWithPickingPhoto:nil pickingMovie:[info objectForKey:@"UIImagePickerControllerMediaURL"]];
-#endif
+#endif	
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)img editingInfo:(NSDictionary *)editInfo 
@@ -458,7 +494,7 @@
 {
 	if(pickedPhoto)
 	{
-		UIViewController *imgViewCtrl = [[ImageViewController alloc] initWithImage:pickedPhoto];
+		UIViewController *imgViewCtrl = [[ImageViewController alloc] initWithImage:previewImage];
 		[self.navigationController pushViewController:imgViewCtrl animated:YES];
 		[imgViewCtrl release];
 	}
@@ -796,7 +832,9 @@
 	self.connectionDelegate = uploader;
 	[self retainActivityIndicator];
 	if(pickedPhoto)
-		[uploader postImage:pickedPhoto delegate:self userData:pickedPhoto];
+	{
+		[uploader postData:self.pickedPhotoData delegate:self userData:pickedPhoto];
+	}
 	else
     {
 #ifdef TRACE
@@ -1223,6 +1261,7 @@
 		self.currentMediaYFrogURL = nil;
 		self.pickedPhoto = nil;
 		self.pickedVideo = nil;
+		self.pickedPhotoData = nil;
 	}
 	else // another media was picked
 		return;
@@ -1261,7 +1300,9 @@
 - (void)imageUploadDidFailedBySender:(ImageUploader *)sender
 {
 	if(pickedPhoto)
-		[sender postImage:pickedPhoto delegate:self userData:pickedPhoto];
+	{
+		[sender postData:self.pickedPhotoData delegate:self userData:pickedPhoto];
+	}
 }
 
 - (BOOL)shouldChangeImage:(UIImage *)anImage withNewImage:(UIImage *)newImage
@@ -1281,6 +1322,7 @@
 	image.image = nil;
 	self.pickedPhoto = nil;
 	self.pickedVideo = nil;
+	self.pickedPhotoData = nil;
 	[self setMessageTextText:@""];
 	[messageText becomeFirstResponder];
 	inTextEditingMode = YES;
