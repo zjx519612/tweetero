@@ -17,6 +17,7 @@
 
 @synthesize canAnimate = _canAnimate;
 @synthesize accountManager = _manager;
+@synthesize _tableAccounts;
 
 + (void)showAccountController:(UINavigationController*)navigationController
 {
@@ -71,6 +72,10 @@
     [_manager release];
 	[loginController release];
     [self closeAndReleaserTwitter];
+	
+	[_tableAccounts release];
+	_tableAccounts = nil;
+	
     [super dealloc];
 }
 

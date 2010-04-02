@@ -38,17 +38,17 @@
 
 @interface ImageViewController : UIViewController <ImageDownoaderDelegate, UIScrollViewDelegate, UIAlertViewDelegate>
 {
-    IBOutlet UIImageView* imageView;
-	IBOutlet TapScrollView *scrollView;
+	UIImageView* imageView;
+	TapScrollView *scrollView;
 	
 	NSString *_yFrogURL;
 	UIImage *_image;
 	CGAffineTransform _tabBarTransform;
 	CGRect _tabBarFrame;
 
-	IBOutlet UISegmentedControl *imageActionsSegmentedControl;
+	UISegmentedControl *imageActionsSegmentedControl;
 	UIColor *defaultTintColor;
-	IBOutlet UIBarButtonItem *saveButton;
+	UIBarButtonItem *saveButton;
 
 	id <TwitterConnectionProtocol>  connectionDelegate;
 	NSDictionary *originalMessage;
@@ -63,6 +63,10 @@
 - (IBAction)imageSegmentedActions:(id)sender;
 - (IBAction)saveActions:(id)sender;
 
+@property (nonatomic, retain) IBOutlet UIImageView *imageView;
+@property (nonatomic, retain) IBOutlet TapScrollView *scrollView;
+@property (nonatomic, retain) IBOutlet UISegmentedControl *imageActionsSegmentedControl;
+@property (nonatomic, retain) IBOutlet UIBarButtonItem *saveButton;
 
 @property (nonatomic, retain) UIImage *_image;
 @property (nonatomic, retain) NSDictionary *originalMessage;

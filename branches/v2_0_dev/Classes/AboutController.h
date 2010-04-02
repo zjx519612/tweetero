@@ -29,10 +29,13 @@
 
 @interface AboutController : UIViewController 
 {
-	IBOutlet UILabel *productName;
-	IBOutlet UILabel *version;
+	UILabel *productName;
+	UILabel *version;
 }
 
 - (IBAction)browseSourceCode;
+
+@property (nonatomic, retain) IBOutlet UILabel *productName;
+@property (nonatomic, retain) IBOutlet UILabel *version;
 
 @end

@@ -56,6 +56,7 @@
 
 @synthesize progressSheet;
 @synthesize _connection;
+@synthesize queueSegmentedControl;
 
 + (NSString*)queueTitle
 {
@@ -110,6 +111,9 @@
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	_connection = nil;
 	[defaultTintColor release];
+	[queueSegmentedControl release];
+	queueSegmentedControl = nil;
+	
     [super dealloc];
 }
 

@@ -6,7 +6,7 @@
 {
 @private
     BOOL                  _canAnimate;
-    IBOutlet UITableView *_tableAccounts;
+	UITableView *_tableAccounts;
     AccountManager       *_manager;
     MGTwitterEngine      *_twitter;
     NSString             *_credentialIdentifier;
@@ -15,6 +15,7 @@
 
 @property (nonatomic) BOOL canAnimate;
 @property (nonatomic, readonly) AccountManager* accountManager;
+@property (nonatomic, retain) IBOutlet UITableView *_tableAccounts;
 
 - (id)init;
 

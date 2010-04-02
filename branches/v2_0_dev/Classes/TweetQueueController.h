@@ -29,7 +29,7 @@
 
 @interface TweetQueueController : UITableViewController <MessageUploaderDelegate, UIActionSheetDelegate> 
 {
-	IBOutlet UISegmentedControl *queueSegmentedControl;
+	UISegmentedControl *queueSegmentedControl;
 	UIColor *defaultTintColor;
 	UIActionSheet *progressSheet;
     UIViewController *_navigatedController;
@@ -46,5 +46,6 @@
 
 @property (nonatomic, retain) UIActionSheet *progressSheet;
 @property (nonatomic, retain) id <TwitterConnectionProtocol> _connection;
+@property (nonatomic, retain) IBOutlet UISegmentedControl *queueSegmentedControl;
 
 @end

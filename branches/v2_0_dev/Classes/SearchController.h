@@ -14,7 +14,7 @@
 @interface SearchController : UITableViewController <UISearchBarDelegate, SearchProviderDelegate, TweetViewDelegate>
 {
   @private
-    IBOutlet UISearchBar        *_searchBar;
+	UISearchBar        *_searchBar;
     TwActivityIndicator         *_indicator;
     UISearchDisplayController   *_searchController;
     SearchProvider              *_searchProvider;
@@ -29,6 +29,7 @@
 
 @property (nonatomic, retain) SearchProvider *searchProvider;
 @property (nonatomic, copy) NSString *query;
+@property (nonatomic, retain) IBOutlet UISearchBar *_searchBar;
 
 - (id)initWithQuery:(NSString *)query;
 
