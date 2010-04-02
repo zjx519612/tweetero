@@ -31,7 +31,6 @@
 #import "LocationManager.h"
 #include "util.h"
 #import "TweetQueue.h"
-//#import <MediaPlayer/MediaPlayer.h>
 #import "TweetPlayer.h"
 #import "ImageViewController.h"
 #import "MGTwitterEngineFactory.h"
@@ -74,7 +73,13 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
 	[super viewDidDisappear:NO];
-	[twitEditor startUploadingOfPickedMediaIfNeed];
+	//[twitEditor startUploadingOfPickedMediaIfNeed];
+}
+
+- (void)dealloc
+{
+	YFLog(@"Image picker - DEALLOC");
+	[super dealloc];
 }
 
 @end
@@ -90,6 +95,18 @@
 @synthesize previewImage;
 @synthesize pickedPhotoData;
 @synthesize location;
+
+@synthesize pickImage;
+@synthesize cancelButton;
+@synthesize navItem;
+@synthesize image;
+@synthesize messageText;
+@synthesize charsCount;
+@synthesize progress;
+@synthesize progressStatus;
+@synthesize postImageSegmentedControl;
+@synthesize imagesSegmentedControl;
+@synthesize locationSegmentedControl;
 
 - (void)setCharsCount
 {
@@ -295,8 +312,31 @@
 	self.pickedVideo = nil;
 	self.previewImage = nil;
 	self.pickedPhotoData = nil;
-    //[imgPicker release];
 	[self dismissProgressSheetIfExist];
+	
+	[image release];
+	image = nil;
+    [pickImage release];
+	pickImage = nil;
+    [cancelButton release];
+	cancelButton = nil;	
+	[navItem release];
+	navItem = nil;
+	[messageText release];
+	messageText = nil;
+	[charsCount release];
+	charsCount = nil;
+    [progress release];
+	progress = nil;
+	[progressStatus release];
+	progressStatus = nil;
+	[postImageSegmentedControl release];
+	postImageSegmentedControl = nil;
+	[imagesSegmentedControl release];
+	imagesSegmentedControl = nil;
+	[locationSegmentedControl release];
+	locationSegmentedControl = nil;
+	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
@@ -322,43 +362,24 @@
 
 - (void)setImage:(UIImage*)img movie:(NSURL*)url
 {
-	NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
+	self.pickedPhoto = img;
+	self.pickedVideo = url;
 	
-	UIImage *thePrevImage = nil;
-	if (img)
+	if (!img)
 	{
-		UIImage *imageToUpload = img;
-		
-		BOOL needToResize = NO;
-		BOOL needToRotate = NO;
-		int newDimension = isImageNeedToConvert(img, &needToResize, &needToRotate);
-		if(needToResize || needToRotate)
-		{
-			UIImage *modifiedImage = imageScaledToSize(img, newDimension);
-			if (nil != modifiedImage)
-			{
-				imageToUpload = modifiedImage;
-			}
-		}
-		
-		self.pickedPhotoData = UIImageJPEGRepresentation(imageToUpload, 1.0f);
-		
-		NSInteger maxDimension = 480;// A largest size of the iPhone screen side
-		UIImage *modifiedImage = imageScaledToSize(img, maxDimension);
-
-		self.previewImage = modifiedImage;
-		thePrevImage = modifiedImage;
-		self.pickedPhoto = modifiedImage;
-	}
-	else if(url)
-	{
-		self.pickedVideo = url;
-		thePrevImage = [UIImage imageNamed:@"MovieIcon.tif"];
+		self.previewImage = nil;
+		self.pickedPhotoData = nil;		
 	}
 	
-	[self setImageImage:thePrevImage];
+	if(url)
+	{
+		self.previewImage = [UIImage imageNamed:@"MovieIcon.tif"];
+	}
 	
-	[thePool release];
+	if (self.previewImage)
+	{
+		[self setImageImage:self.previewImage];
+	}
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
@@ -370,9 +391,7 @@
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishWithPickingPhoto:(UIImage *)img pickingMovie:(NSURL*)url
-{
-    [picker retain];
-    
+{    
     [self progressClear];
     
 	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
@@ -389,9 +408,7 @@
 		{
 			BOOL needToResize = NO;
 			BOOL needToRotate = NO;
-			
 			isImageNeedToConvert(img, &needToResize, &needToRotate);
-			
 			if (img.size.width > 500 || img.size.height > 500)
 			{
 				needToResize = YES;
@@ -402,37 +419,17 @@
 				self.progressSheet = ShowActionSheet(NSLocalizedString(@"Processing image...", @""), self, nil, self.view);
 				self.progressSheet.tag = PROCESSING_PHOTO_SHEET_TAG;
 			}
-		}
-		
-		[self setImage:img movie:url];
-	}
-	
-	[self setNavigatorButtons];
-
-	if(startNewUpload)
-	{
-		if(self.connectionDelegate)
-			[self.connectionDelegate cancel];
-		self.connectionDelegate = nil;
-		self.currentMediaYFrogURL = nil;
-	}
-
-	[messageText becomeFirstResponder];
-	    
-    [picker release];
-}
-/*
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishWithPickingPhoto:(UIImage *)img pickingMovie:(NSURL*)url
-{
-	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
-	twitWasChangedManually = YES;
-	messageTextWillIgnoreNextViewAppearing = YES;
-
-	BOOL startNewUpload = img != image.image;
-
-	if(!img && url)
-		[self setImageImage:img];
 			
+			[self setImage:img movie:nil];
+			[self performSelector:@selector(convertPickedImageAndStartUpload) withObject:nil afterDelay:0.25];
+		}
+		else
+		{
+			[self setImage:nil movie:url];
+			[self performSelectorOnMainThread:@selector(startUploadingOfPickedMediaIfNeed) withObject:nil waitUntilDone:NO];
+		}
+	}
+	
 	[self setNavigatorButtons];
 
 	if(startNewUpload)
@@ -444,17 +441,8 @@
 	}
 
 	[messageText becomeFirstResponder];
-	
-	BOOL needToResize;
-	BOOL needToRotate;
-	isImageNeedToConvert(img, &needToResize, &needToRotate);
-	if(needToResize || needToRotate)
-	{
-		self.progressSheet = ShowActionSheet(NSLocalizedString(@"Processing image...", @""), self, nil, self.view);
-		self.progressSheet.tag = PROCESSING_PHOTO_SHEET_TAG;
-	}
 }
-*/
+
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
 #if DEBUG_VIDEO_UPLOAD
@@ -494,7 +482,7 @@
 {
 	if(pickedPhoto)
 	{
-		UIViewController *imgViewCtrl = [[ImageViewController alloc] initWithImage:previewImage];
+		UIViewController *imgViewCtrl = [[ImageViewController alloc] initWithImage:pickedPhoto];
 		[self.navigationController pushViewController:imgViewCtrl animated:YES];
 		[imgViewCtrl release];
 	}
@@ -536,7 +524,7 @@
 	if(_queueIndex >= 0)
 	{
 		[[TweetQueue sharedQueue] replaceMessage: messageBody 
-                                       withImage: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhoto : nil  
+                                       withImageData: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhotoData : nil  
                                        withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
                                        inReplyTo: _queuedReplyId
                                          forUser: username
@@ -545,7 +533,7 @@
 	else
 	{
 		[[TweetQueue sharedQueue] addMessage: messageBody 
-                                   withImage: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhoto : nil  
+                                   withImageData: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhotoData : nil  
                                    withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
                                    inReplyTo: _message ? [[_message objectForKey:@"id"] intValue] : 0
                                      forUser: username];
@@ -728,45 +716,7 @@
 	[actionSheet release];
 	
 }
-/*
-- (void)grabImage 
-{
-	BOOL cameraEnabled = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera];
-	BOOL libraryEnabled = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary];
-	BOOL imageAlreadyExists = image.image != nil;
-	NSString* firstButton = nil;
-	NSString* secondButton = nil;
-	NSString* thirdButton = nil;
-	if(cameraEnabled && libraryEnabled)
-	{
-		firstButton = NSLocalizedString(@"Use camera", @"");
-		secondButton = NSLocalizedString(@"Use library", @"");
-		if(imageAlreadyExists)
-			thirdButton = NSLocalizedString(@"RemoveImageTitle" , @"");
-	}
-	else if(cameraEnabled)
-	{
-		firstButton = NSLocalizedString(@"Use camera", @"");
-		if(imageAlreadyExists)
-			secondButton = NSLocalizedString(@"RemoveImageTitle" , @"");
-	}
-	else
-	{
-		firstButton = NSLocalizedString(@"Use library", @"");
-		if(imageAlreadyExists)
-			secondButton = NSLocalizedString(@"RemoveImageTitle" , @"");
-	}
-	
-	UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
-															 delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", @"") destructiveButtonTitle:nil
-													otherButtonTitles:firstButton, secondButton, thirdButton, nil];
-	actionSheet.actionSheetStyle = UIActionSheetStyleAutomatic;
-	actionSheet.tag = PHOTO_Q_SHEET_TAG;
-	[actionSheet showInView:self.view];
-	[actionSheet release];
-	
-}
-*/
+
 - (void)progressClear
 {
     _dataSize = 0;
@@ -831,7 +781,7 @@
 	ImageUploader * uploader = [[ImageUploader alloc] init];
 	self.connectionDelegate = uploader;
 	[self retainActivityIndicator];
-	if(pickedPhoto)
+	if(pickedPhoto && pickedPhotoData)
 	{
 		[uploader postData:self.pickedPhotoData delegate:self userData:pickedPhoto];
 	}
@@ -857,6 +807,55 @@
     }
 	
 	[uploader release];
+}
+
+- (void)convertPickedImageAndStartUpload
+{	
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	//[[NSNotificationCenter defaultCenter] postNotificationName: @"ClearCaches" object: nil];
+	
+	BOOL needToResize = NO;
+	BOOL needToRotate = NO;
+	int newDimension = isImageNeedToConvert(self.pickedPhoto, &needToResize, &needToRotate);
+	if(needToResize || needToRotate)
+	{
+		UIImage *modifiedImage = imageScaledToSize(self.pickedPhoto, newDimension);
+		if (nil != modifiedImage)
+		{
+			self.pickedPhoto = modifiedImage;
+		}
+	}
+	
+	[pool release];
+	
+	[self performSelector:@selector(updatePickedPhotoDataAndStartUpload) withObject:nil afterDelay:0.5];
+}
+
+- (void)updatePickedPhotoDataAndStartUpload
+{
+	self.pickedPhotoData = UIImageJPEGRepresentation(self.pickedPhoto, 1.0f);
+
+	[self performSelector:@selector(reducePickedPhotoSizeAndStartUpload) withObject:nil afterDelay:0.1];
+}
+
+- (void)reducePickedPhotoSizeAndStartUpload
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	
+	UIImage *modifiedImage = imageScaledToSize(self.pickedPhoto, 480);
+	if (nil != modifiedImage)
+	{
+		self.pickedPhoto = modifiedImage;
+	}
+	
+	UIImage *thePreviewImage = imageScaledToSize(self.pickedPhoto, image.frame.size.width);
+	self.previewImage = thePreviewImage;
+	[self setImageImage:self.previewImage];	
+	
+	[pool release];
+	
+	[self performSelector:@selector(startUploadingOfPickedMediaIfNeed) withObject:nil afterDelay:0.1];
 }
 
 - (void)startUploadingOfPickedMediaIfNeed
@@ -1101,35 +1100,38 @@
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use photo camera", @"")])
 		{
-			ImagePickerController *imgPicker = [[[ImagePickerController alloc] init] autorelease];
+			ImagePickerController *imgPicker = [[ImagePickerController alloc] init];
 			imgPicker.twitEditor = self;
 			imgPicker.delegate = self;	
 			imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
 			if([imgPicker respondsToSelector:@selector(setMediaTypes:)])
 				[imgPicker performSelector:@selector(setMediaTypes:) withObject:[NSArray arrayWithObject:K_UI_TYPE_IMAGE]];
 			[self presentModalViewController:imgPicker animated:YES];
+			[imgPicker release];
 			return;
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use video camera", @"")])
 		{
-			ImagePickerController *imgPicker = [[[ImagePickerController alloc] init] autorelease];
+			ImagePickerController *imgPicker = [[ImagePickerController alloc] init];
 			imgPicker.twitEditor = self;
 			imgPicker.delegate = self;			
 			imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
 			if([imgPicker respondsToSelector:@selector(setMediaTypes:)])
 				[imgPicker performSelector:@selector(setMediaTypes:) withObject:[NSArray arrayWithObject:K_UI_TYPE_MOVIE]];
 			[self presentModalViewController:imgPicker animated:YES];
+			[imgPicker release];
 			return;
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use library", @"")])
 		{
-			ImagePickerController *imgPicker = [[[ImagePickerController alloc] init] autorelease];
+			ImagePickerController *imgPicker = [[ImagePickerController alloc] init];
 			imgPicker.twitEditor = self;
 			imgPicker.delegate = self;				
 			imgPicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
 			if([imgPicker respondsToSelector:@selector(setMediaTypes:)])
 				[imgPicker performSelector:@selector(setMediaTypes:) withObject:[self availableMediaTypes:UIImagePickerControllerSourceTypePhotoLibrary]];
 			[self presentModalViewController:imgPicker animated:YES];
+			[imgPicker release];
 			return;
 		}
 	}
@@ -1175,12 +1177,6 @@
 	messageTextWillIgnoreNextViewAppearing = NO;
 	[self setCharsCount];
 	[self setNavigatorButtons];
-	
-//	if (imgPicker)
-//	{
-//		[imgPicker release];
-//		imgPicker = nil;
-//	}
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -1191,13 +1187,14 @@
         _canShowCamera = NO;
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera])
         {
-			ImagePickerController *imgPicker = [[[ImagePickerController alloc] init] autorelease];
+			ImagePickerController *imgPicker = [[ImagePickerController alloc] init];
 			imgPicker.twitEditor = self;
 			imgPicker.delegate = self;				
             imgPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
             if([imgPicker respondsToSelector:@selector(setMediaTypes:)])
                 [imgPicker performSelector:@selector(setMediaTypes:) withObject:[NSArray arrayWithObjects:K_UI_TYPE_MOVIE, K_UI_TYPE_IMAGE, nil]];
             [self presentModalViewController:imgPicker animated:YES];
+			[imgPicker release];
         }
     }
 }
@@ -1262,6 +1259,7 @@
 		self.pickedPhoto = nil;
 		self.pickedVideo = nil;
 		self.pickedPhotoData = nil;
+		self.previewImage = nil;
 	}
 	else // another media was picked
 		return;
@@ -1323,6 +1321,7 @@
 	self.pickedPhoto = nil;
 	self.pickedVideo = nil;
 	self.pickedPhotoData = nil;
+	self.previewImage = nil;
 	[self setMessageTextText:@""];
 	[messageText becomeFirstResponder];
 	inTextEditingMode = YES;
