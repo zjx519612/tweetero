@@ -28,40 +28,28 @@
 
 @implementation YFDataInputStream
 
-- (id)initWithDataContainer:(NSArray *)aDataContainer
+@synthesize dataSource;
+
+- (id)init
 {
 	self = [super init];
 	if (nil != self)
 	{
-		dataContainer = [aDataContainer retain];
 		totalLength = 0;
 		dataChunkLocation = 0;
 		dataChunkIndex = 0;
 		status = NSStreamStatusNotOpen;
 		delegate = nil;
-		
-		NSInteger index = 0;
-		for (;index < [dataContainer count]; ++index)
-		{
-			NSData *dataChunk = [dataContainer objectAtIndex:index];
-			totalLength += [dataChunk length];
-		}
+		dataSource = nil;		
 	}
 	
 	return self;
 }
 
-- (void)dealloc
-{
-	[dataContainer release];
-	
-	[super dealloc];
-}
-
 #pragma mark Input Stream implementation
 - (NSInteger)read:(uint8_t *)aBuffer maxLength:(NSUInteger)aLength
 {
-	if (dataChunkIndex >= [dataContainer count])
+	if (dataChunkIndex >= [[self.dataSource dataContainer] count])
 	{
 		status = NSStreamStatusAtEnd;
 		return 0;
@@ -73,7 +61,7 @@
 		return 0;
 	}	
 	
-	NSData *dataChunk = [dataContainer objectAtIndex:dataChunkIndex];
+	NSData *dataChunk = [[self.dataSource dataContainer] objectAtIndex:dataChunkIndex];
 	if (nil == dataChunk)
 	{
 		status = NSStreamStatusError;
@@ -111,9 +99,9 @@
 
 - (BOOL)hasBytesAvailable
 {
-	if (dataChunkIndex < [dataContainer count])
+	if (dataChunkIndex < [[self.dataSource dataContainer] count])
 	{
-		NSData *dataChunk = [dataContainer objectAtIndex:dataChunkIndex];
+		NSData *dataChunk = [[self.dataSource dataContainer] objectAtIndex:dataChunkIndex];
 		if (dataChunkLocation < [dataChunk length])
 		{
 			return YES;
@@ -131,6 +119,15 @@
 
 - (NSUInteger)length
 {
+	if (0 == totalLength)
+	{
+		NSInteger index = 0;
+		for (;index < [[self.dataSource dataContainer] count]; ++index)
+		{
+			NSData *dataChunk = [[self.dataSource dataContainer] objectAtIndex:index];
+			totalLength += [dataChunk length];
+		}		
+	}
 	return totalLength;
 }
 
