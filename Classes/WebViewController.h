@@ -29,7 +29,7 @@
 
 @interface WebViewController : UIViewController <UIWebViewDelegate>
 {
-    IBOutlet UIWebView* _webView;
+	UIWebView* _webView;
 	
 	NSURLRequest* _request;
     NSString* _content;
@@ -40,6 +40,8 @@
 
 - (id)initWithRequest:(NSURLRequest*)request;
 - (id)initWithHTML:(NSString*)content;
+
+@property (nonatomic, retain) IBOutlet UIWebView* _webView;
 
 @end
 
