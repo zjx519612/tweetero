@@ -39,6 +39,8 @@ const NSTimeInterval kWebViewRetryInterval = 15.0;
 
 @implementation WebViewController
 
+@synthesize _webView;
+
 - (id)initWithRequest:(NSURLRequest*)request
 {
 	self = [super initWithNibName:@"WebView" bundle:nil];
@@ -75,7 +77,9 @@ const NSTimeInterval kWebViewRetryInterval = 15.0;
 		[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	}
     [_webView release];
+	_webView = nil;
 	[_request release];
+	[[NSURLCache sharedURLCache] removeAllCachedResponses];
 	[super dealloc];
 }
 
