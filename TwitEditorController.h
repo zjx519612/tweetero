@@ -56,22 +56,21 @@ enum _TwitEditorSuspendedOperations
                                                     UIActionSheetDelegate, MGConnectionDelegate, 
                                                     UIAlertViewDelegate> 
 {
-    IBOutlet UISegmentedControl *pickImage;
-    IBOutlet UIBarButtonItem *cancelButton;
-    IBOutlet UINavigationItem *navItem;
-    IBOutlet ImagePreview *image;
-    IBOutlet UITextView *messageText;
-    IBOutlet UILabel *charsCount;
-    IBOutlet UIProgressView *progress;
-    IBOutlet UILabel *progressStatus;
+	UISegmentedControl *pickImage;
+    UIBarButtonItem *cancelButton;
+    UINavigationItem *navItem;
+    ImagePreview *image;
+    UITextView *messageText;
+    UILabel *charsCount;
+    UIProgressView *progress;
+    UILabel *progressStatus;
 	BOOL			inTextEditingMode;
 
 	UIActionSheet *progressSheet;
-	//ImagePickerController *imgPicker;
-	IBOutlet UISegmentedControl *postImageSegmentedControl;
+	UISegmentedControl *postImageSegmentedControl;
 	UIBarButtonItem *segmentBarItem;
-	IBOutlet UISegmentedControl *imagesSegmentedControl;
-	IBOutlet UISegmentedControl *locationSegmentedControl;
+	UISegmentedControl *imagesSegmentedControl;
+	UISegmentedControl *locationSegmentedControl;
 	UIColor *defaultTintColor;
 	
 	NSString* currentMediaYFrogURL;
@@ -154,7 +153,6 @@ enum _TwitEditorSuspendedOperations
 - (BOOL)addLocation;
 
 @property (nonatomic, retain) UIActionSheet *progressSheet;
-
 @property (nonatomic, retain) NSString *currentMediaYFrogURL;
 @property (nonatomic, retain) id <TwitterConnectionProtocol> connectionDelegate;
 @property (nonatomic, retain) NSDictionary *_message;
@@ -163,5 +161,17 @@ enum _TwitEditorSuspendedOperations
 @property (nonatomic, retain) UIImage *previewImage;
 @property (nonatomic, retain) NSData *pickedPhotoData;
 @property (nonatomic, retain) NSString *location;
+
+@property (nonatomic, retain) IBOutlet UISegmentedControl *pickImage;
+@property (nonatomic, retain) IBOutlet UIBarButtonItem *cancelButton;
+@property (nonatomic, retain) IBOutlet UINavigationItem *navItem;
+@property (nonatomic, retain) IBOutlet ImagePreview *image;
+@property (nonatomic, retain) IBOutlet UITextView *messageText;
+@property (nonatomic, retain) IBOutlet UILabel *charsCount;
+@property (nonatomic, retain) IBOutlet UIProgressView *progress;
+@property (nonatomic, retain) IBOutlet UILabel *progressStatus;
+@property (nonatomic, retain) IBOutlet UISegmentedControl *postImageSegmentedControl;
+@property (nonatomic, retain) IBOutlet UISegmentedControl *imagesSegmentedControl;
+@property (nonatomic, retain) IBOutlet UISegmentedControl *locationSegmentedControl;
 
 @end
