@@ -63,6 +63,10 @@ static int NetworkActivityIndicatorCounter = 0;
 {
     [self registerUserDefault];
 
+	NSURLCache *sharedCache = [[NSURLCache alloc] initWithMemoryCapacity:0 diskCapacity:0 diskPath:nil];
+	[NSURLCache setSharedURLCache:sharedCache];
+	[sharedCache release];
+	
     AccountManager *accountManager = [AccountManager manager];
     AccountController *accountController = [[AccountController alloc] initWithManager:accountManager];
     
