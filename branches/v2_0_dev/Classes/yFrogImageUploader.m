@@ -28,7 +28,6 @@
 #import "TweetterAppDelegate.h"
 #import "MGTwitterEngineFactory.h"
 #import "LocationManager.h"
-#import "YFDataInputStream.h"
 #include "util.h"
 #include "config.h"
 #import "MGTwitterEngine.h"
@@ -42,8 +41,6 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 @interface ImageUploader()
 
 - (NSString *)getApiURL;
-- (void)closeConnection;
-- (BOOL)openConnection:(NSURLRequest*)request;
 
 @end
 
@@ -55,13 +52,13 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 @synthesize userData;
 @synthesize delegate;
 @synthesize contentType;
+@synthesize uploadDataContainer;
 
 -(id)init
 {
 	self = [super init];
 	if(self)
 	{
-		result = [[NSMutableData alloc] initWithCapacity:128];
 		canceled = NO;
 		scaleIfNeed = NO;
 		isHeaderTag = NO;
@@ -85,44 +82,29 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
         videoUploadEngine = [engine retain];
     }
 }
-/*
-- (id)retain
-{
-	return [super retain];
-}
-- (oneway void)release
-{
-	[super release];
-}
-
-- (id)autorelease
-{
-	return [super autorelease];
-}
-*/
 
 -(void)dealloc
 {
 	YFLog(@"Image Uploader - DEALLOC");
-	
-    //[self setVideoUploadEngine:nil];
+		
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
     [videoUploadEngine release];
+	[result release];
+	[retryTimer release];
+	
 	self.delegate = nil;
-	[self closeConnection];
 	self.connection = nil;
 	self.contentXMLProperty = nil;
 	self.newURL = nil;
 	self.userData = nil;
 	self.contentType = nil;
-	[result release];
-	[retryTimer release];
+	self.uploadDataContainer = nil;
+	
 	[super dealloc];
 }
 
 - (void)postData:(NSData *)anImageData
 {
-	NSAutoreleasePool *thePool = [[NSAutoreleasePool alloc] init];
-	
 	if (nil == anImageData || canceled)
 	{
 		return;
@@ -186,14 +168,18 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 	NSData *bodyData = anImageData;
 	NSData *endData = [[NSString stringWithFormat:@"\r\n--%@--\r\n\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding];
 	NSArray *datasArray = [NSArray arrayWithObjects:headerData, bodyData, endData, nil];
-	YFDataInputStream *stream = [[YFDataInputStream alloc] initWithDataContainer:datasArray];
+	
+	self.uploadDataContainer = datasArray;
+	YFDataInputStream *stream = [[YFDataInputStream alloc] init];
+	stream.dataSource = self;
 	
 	NSURL *url = [NSURL URLWithString:[self getApiURL]];
 	NSMutableURLRequest *request = tweeteroMutableURLRequest(url);
-	[request setCachePolicy:NSURLRequestReloadIgnoringCacheData];
+	[request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
 	[request setHTTPShouldHandleCookies:NO];
 	[request setTimeoutInterval:HTTPUploadTimeout];
 	[request setHTTPMethod:@"POST"];
+	[request setHTTPShouldHandleCookies:NO];
 	[request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", boundary] forHTTPHeaderField:@"Content-type"];
     [request setValue:[NSString stringWithFormat:@"%d", [stream length]] forHTTPHeaderField:@"Content-length"];
 	
@@ -201,24 +187,25 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 	[stream release];
 
     [delegate uploadedDataSize:[stream length]];
-	
-	[self closeConnection];	
-	if (![self openConnection:request]) 
+		
+	connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+	if (connection)
+	{
+		result = [[NSMutableData data] retain];
+	}
+	else
 	{
 		[delegate uploadedImage:nil sender:self];
+		return;
 	}
 	
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
-	
-	[thePool release];
 }
 
 - (void)postData:(NSData*)data contentType:(NSString*)mediaContentType
 {
 	self.contentType = mediaContentType;
-	// Convert data to image if needed
-	UIImage *theImage = nil;
-	[self postImage:theImage];
+	[self postData:data contentType:self.contentType];
 }
 
 
@@ -316,8 +303,13 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
     [result appendData:data];
 }
 
-- (void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
+- (void) connection:(NSURLConnection *)aConnection didFailWithError:(NSError *)error
 {
+	[connection release];
+	connection = nil;
+	[result release];
+	result = nil;
+	
 	if (retriesCounter < RETRIES_NUMBER_LIMIT)
 	{
 		retriesCounter++;
@@ -338,10 +330,9 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
     [delegate uploadedProccess:bytesWritten totalBytesWritten:totalBytesWritten];
 }
 
-- (NSCachedURLResponse *) connection:(NSURLConnection *)connection 
-                   willCacheResponse:(NSCachedURLResponse *)cachedResponse
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse
 {
-     return cachedResponse;
+	return nil;
 }
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
@@ -391,8 +382,11 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 	}	
 }
 
-- (void) connectionDidFinishLoading:(NSURLConnection *)connection
+- (void) connectionDidFinishLoading:(NSURLConnection *)aConnection
 {
+	[connection release];
+	connection = nil;
+	
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
     
 	YFLog(@"Image Uploader Result: %@", [[[NSString alloc] initWithData:result encoding:4] autorelease]);
@@ -403,9 +397,9 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 	[parser setShouldResolveExternalEntities:NO];
 	[parser parse];
 	[parser release];
-    
-	[result setLength:0];
-	
+	[result release];
+	result = nil;
+
 	if (isPresentGatewayError && retriesCounter < RETRIES_NUMBER_LIMIT)
 	{
 		retriesCounter++;
@@ -425,6 +419,9 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 	if(connection)
 	{
 		[connection cancel];
+		[connection release];
+		connection = nil;
+		
 		[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	}
 	[self setVideoUploadEngine:nil];
@@ -441,9 +438,25 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
     if (nil != retryTimer)
     {
         [retryTimer invalidate];
-        [retryTimer autorelease];
+        [retryTimer release];
         retryTimer = nil;
     }
+	
+	[connection cancel];
+	[connection release];
+	connection = nil;
+	
+	[contentXMLProperty release];
+	contentXMLProperty = nil;
+	
+	[newURL release];
+	newURL = nil;
+	
+	[userData release];
+	userData = nil;
+	
+	[contentType release];
+	contentType = nil;
 	
 	[delegate imageUploadDidFailedBySender:self];
 }
@@ -462,29 +475,6 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
     theCurrentServerImage = theServerIndex;
 		
     return [NSString stringWithFormat:@"http://load%d.imageshack.us/upload_api.php", theServerIndex];
-}
-
-- (void)closeConnection
-{
-    if (nil != connection)
-    {
-		[connection cancel];
-        [connection release];
-        connection = nil;
-    }
-}
-
-- (BOOL)openConnection:(NSURLRequest*)request
-{
-    if (nil != connection)
-	{
-        return NO;
-	}
-    
-    connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    [connection start];
-    
-    return nil != connection;
 }
 
 #pragma mark ISVideoUploadEngine Delegate
@@ -516,6 +506,12 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 
 - (void)didResumeUploading:(ISVideoUploadEngine *)engine
 {
+}
+
+#pragma mark YFDataInputStream DataSource
+- (NSArray *)dataContainer
+{
+	return self.uploadDataContainer;
 }
 
 @end
