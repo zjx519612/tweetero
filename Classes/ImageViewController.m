@@ -44,6 +44,10 @@
 @synthesize _yFrogURL;
 @synthesize connectionDelegate;
 @synthesize originalMessage;
+@synthesize imageView;
+@synthesize scrollView;
+@synthesize imageActionsSegmentedControl;
+@synthesize saveButton;
 
 - (id)initWithYFrogURL:(NSString*)yFrogURL
 {
@@ -162,6 +166,18 @@
 	[defaultTintColor release];
 	self.connectionDelegate = nil;
 	self.originalMessage = nil;
+	
+	[imageView release];
+	imageView = nil;
+	
+	[scrollView release];
+	scrollView = nil;
+	
+	[imageActionsSegmentedControl release];
+	imageActionsSegmentedControl = nil;
+	
+	[saveButton release];
+	saveButton = nil;
 	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];

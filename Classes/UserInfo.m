@@ -52,6 +52,11 @@ static NSString* kActionCell = @"UserInfoActionCell";
 
 @synthesize isUserReceivingUpdatesForConnectionID;
 @synthesize userInfoConnectionID;
+@synthesize infoView;
+@synthesize notifySwitch;
+@synthesize followButton;
+@synthesize followBtn;
+@synthesize tableView;
 
 - (id)initWithUserName:(NSString*)uname
 {
@@ -105,6 +110,17 @@ static NSString* kActionCell = @"UserInfoActionCell";
 	[_username release];
 	self.isUserReceivingUpdatesForConnectionID = nil;
     self.userInfoConnectionID = nil;
+	
+	[infoView release];
+	infoView = nil;
+	[notifySwitch release];
+	notifySwitch = nil;
+	[followButton release];
+	followButton = nil;
+	[followBtn release];
+	followBtn = nil;
+	[tableView release];
+	tableView = nil;
     
     [super dealloc];
 }

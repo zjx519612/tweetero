@@ -76,6 +76,7 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
 
 @synthesize searchProvider = _searchProvider;
 @synthesize query = _query;
+@synthesize _searchBar;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -114,6 +115,7 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
     [TweetterAppDelegate decreaseNetworkActivityIndicator];
     [_result release];
     [_searchBar release];
+	_searchBar = nil;
     [_indicator release];
     [_searchController release];
     [super dealloc];

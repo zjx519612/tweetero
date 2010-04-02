@@ -45,12 +45,12 @@ enum {
 
 @interface UserInfo : UIViewController <UITableViewDelegate, UITableViewDataSource, UserInfoViewDelegate>
 {
-    IBOutlet UIWebView *infoView;
-	IBOutlet UISwitch *notifySwitch;
+    UIWebView *infoView;
+	UISwitch *notifySwitch;
     
-    IBOutlet UISegmentedControl *followButton;
-    IBOutlet UIButton *followBtn;
-	IBOutlet UITableView *tableView;
+    UISegmentedControl *followButton;
+    UIButton *followBtn;
+	UITableView *tableView;
     
 	BOOL _gotInfo;
 	BOOL _shouldUpdateUserInfo;
@@ -75,5 +75,11 @@ enum {
 
 @property (nonatomic, copy) NSString *isUserReceivingUpdatesForConnectionID;
 @property (nonatomic, copy) NSString *userInfoConnectionID;
+
+@property (nonatomic, retain) IBOutlet UIWebView *infoView;
+@property (nonatomic, retain) IBOutlet UISwitch *notifySwitch;
+@property (nonatomic, retain) IBOutlet UISegmentedControl *followButton;
+@property (nonatomic, retain) IBOutlet UIButton *followBtn;
+@property (nonatomic, retain) IBOutlet UITableView *tableView;
 
 @end

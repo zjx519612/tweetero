@@ -30,6 +30,9 @@
 
 @implementation AboutController
 
+@synthesize productName;
+@synthesize version;
+
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad 
 {
@@ -51,6 +54,12 @@
 
 - (void)dealloc 
 {
+	[productName release];
+	productName = nil;
+	
+	[version release];
+	version = nil;
+	
     [super dealloc];
 }
 
