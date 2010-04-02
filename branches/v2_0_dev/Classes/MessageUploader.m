@@ -133,7 +133,7 @@
 		self._connection = uploader;
 		if(_imageData)
 		{
-			[uploader postImage:[UIImage  imageWithData:_imageData] delegate:self userData:nil];
+			[uploader postData:_imageData delegate:self userData:nil];
 //			[uploader postJPEGData:_imageData delegate:self userData:nil];//this method does not scale image
 		}
 		else
@@ -158,6 +158,14 @@
 }
 
 */
+
+- (void)uploadedDataSize:(NSInteger)size
+{
+}
+
+- (void)uploadedProccess:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten
+{
+}
 
 - (void)uploadedImage:(NSString*)yFrogURL sender:(ImageUploader*)sender
 {
