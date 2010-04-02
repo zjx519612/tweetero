@@ -27,6 +27,7 @@
 #import <Foundation/Foundation.h>
 #import "TwitterConnectionProtocol.h"
 #import "ISVideoUploadEngine.h"
+#import "YFDataInputStream.h"
 
 @class ImageUploader;
 
@@ -40,18 +41,18 @@
 
 @end
 
-
-
-@interface ImageUploader : NSObject <TwitterConnectionProtocol, ISVideoUploadEngineDelegate>
+@interface ImageUploader : NSObject <TwitterConnectionProtocol, ISVideoUploadEngineDelegate, YFDataInputStreamDataSource>
 {
 	NSMutableData*	result;
 	id <ImageUploaderDelegate> delegate;
 	id userData;
 	
 	NSURLConnection *connection;
+
 	NSInteger retriesCounter;
 	NSTimer *retryTimer;
 	
+	NSArray *uploadDataContainer;
 	NSMutableString* contentXMLProperty;
 	NSString*		newURL;
 	BOOL			canceled;
@@ -70,12 +71,12 @@
 - (void)cancel;
 - (BOOL)canceled;
 
-
 @property (nonatomic, retain) NSURLConnection *connection;
 @property (nonatomic, retain) NSMutableString* contentXMLProperty;
 @property (nonatomic, retain) NSString* newURL;
 @property (nonatomic, retain) NSString* contentType;
 @property (nonatomic, retain) id userData;
+@property (nonatomic, retain) NSArray *uploadDataContainer;
 @property (nonatomic, assign) id <ImageUploaderDelegate> delegate;
 
 @end
