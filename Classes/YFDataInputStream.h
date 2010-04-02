@@ -26,20 +26,26 @@
 
 #import <Foundation/Foundation.h>
 
+@protocol YFDataInputStreamDataSource
+
+- (NSArray *)dataContainer;
+
+@end
+
 @interface YFDataInputStream : NSInputStream
 {
-@private
-	NSArray *dataContainer;
-	
+@private	
 	NSUInteger totalLength;
 	NSInteger dataChunkIndex;
 	NSInteger dataChunkLocation;
 	NSStreamStatus status;
 	
 	id delegate;
+	id<YFDataInputStreamDataSource> dataSource;
 }
 
-- (id)initWithDataContainer:(NSArray *)aDataContainer;
 - (NSUInteger)length;
+
+@property (nonatomic, assign) id dataSource;
 
 @end
