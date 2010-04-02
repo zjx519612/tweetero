@@ -450,6 +450,10 @@
 @synthesize connectionIdentifier = _connectionIdentifier;
 @synthesize dataSourceClass = _dataSourceClass;
 
+@synthesize tweetNavigate;
+@synthesize _actionSegment;
+@synthesize contentTable;
+
 - (id)initWithStore:(id <TweetViewDelegate>)store messageIndex:(int)index
 {
     if (self = [super initWithNibName:@"TweetView" bundle:nil])
@@ -496,6 +500,8 @@
         [_webView stopLoading];
         [TweetterAppDelegate decreaseNetworkActivityIndicator];
     }
+	
+	[_webView release];
     
 	int connectionsCount = [_twitter numberOfConnections];
 	[_twitter closeAllConnections];
@@ -515,6 +521,14 @@
         [_imagesLinks release];
     if (_connectionsDelegates)
         [_connectionsDelegates release];
+	
+	[tweetNavigate release];
+	tweetNavigate = nil;
+	[_actionSegment release];
+	_actionSegment = nil;
+	[contentTable release];
+	contentTable = nil;
+	
     [super dealloc];
 }
 
@@ -708,7 +722,7 @@
 	{
 		ImageUploader * uploader = [[ImageUploader alloc] init];
 		[_connectionsDelegates addObject:uploader];
-		[uploader postImage:image delegate:self userData:sender.origURL];
+		[uploader postData:UIImageJPEGRepresentation(image, 1.0f) delegate:self userData:sender.origURL];
 		[uploader release];
 	}
 	[self implementOperationIfPossible];

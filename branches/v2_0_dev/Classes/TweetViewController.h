@@ -63,9 +63,9 @@ typedef enum {
                                                    MFMailComposeViewControllerDelegate>
 {
 @private
-    IBOutlet UISegmentedControl         *tweetNavigate;
-    IBOutlet UISegmentedControl         *_actionSegment;
-    IBOutlet UITableView                *contentTable;
+    UISegmentedControl         *tweetNavigate;
+    UISegmentedControl         *_actionSegment;
+    UITableView                *contentTable;
 	UIActionSheet                       *_progressSheet;    
     UserInfoView                        *_headView;
     UIView                              *_footerView;
@@ -89,6 +89,10 @@ typedef enum {
 @property (nonatomic, retain) UIActionSheet *_progressSheet;
 @property (nonatomic, retain) NSString *connectionIdentifier;
 @property (nonatomic, assign) Class dataSourceClass;
+
+@property (nonatomic, retain) IBOutlet UISegmentedControl *tweetNavigate;
+@property (nonatomic, retain) IBOutlet UISegmentedControl *_actionSegment;
+@property (nonatomic, retain) IBOutlet UITableView *contentTable;
 
 - (id)initWithStore:(id <TweetViewDelegate>)store messageIndex:(int)index;
 - (id)initWithStore:(id <TweetViewDelegate>)store;
