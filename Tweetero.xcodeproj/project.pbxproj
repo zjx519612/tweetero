@@ -102,6 +102,7 @@
 		498D96D30F62EFA9004E1B20 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 498D96CC0F62EFA9004E1B20 /* MainWindow.xib */; };
 		498D96D40F62EFA9004E1B20 /* Login.xib in Resources */ = {isa = PBXBuildFile; fileRef = 498D96CE0F62EFA9004E1B20 /* Login.xib */; };
 		49B3F5B50F66A78000DFFE04 /* yFrogImageDownoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 49B3F5B30F66A78000DFFE04 /* yFrogImageDownoader.m */; };
+		A797595D116622630035F33C /* MovieIcon.tif in Resources */ = {isa = PBXBuildFile; fileRef = A797595C116622630035F33C /* MovieIcon.tif */; };
 		A7BB56C611464FDF00940E86 /* mapRemove.tiff in Resources */ = {isa = PBXBuildFile; fileRef = A7BB56C511464FDF00940E86 /* mapRemove.tiff */; };
 		A7C5E1B4115CE6FC00D6999D /* YFDataInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = A7C5E1B3115CE6FC00D6999D /* YFDataInputStream.m */; };
 		A7C6CAFF113FCD9600A02E17 /* oAuthButton.png in Resources */ = {isa = PBXBuildFile; fileRef = A7C6CAFE113FCD9600A02E17 /* oAuthButton.png */; };
@@ -325,6 +326,7 @@
 		49B3F5B30F66A78000DFFE04 /* yFrogImageDownoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = yFrogImageDownoader.m; path = Classes/yFrogImageDownoader.m; sourceTree = SOURCE_ROOT; };
 		49B3F5B40F66A78000DFFE04 /* yFrogImageDownoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yFrogImageDownoader.h; path = Classes/yFrogImageDownoader.h; sourceTree = SOURCE_ROOT; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A797595C116622630035F33C /* MovieIcon.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = MovieIcon.tif; path = Resource/Images/MovieIcon.tif; sourceTree = "<group>"; };
 		A7BB56C511464FDF00940E86 /* mapRemove.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = mapRemove.tiff; path = Resource/Images/mapRemove.tiff; sourceTree = "<group>"; };
 		A7C5E1B2115CE6FC00D6999D /* YFDataInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YFDataInputStream.h; sourceTree = "<group>"; };
 		A7C5E1B3115CE6FC00D6999D /* YFDataInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YFDataInputStream.m; sourceTree = "<group>"; };
@@ -789,6 +791,7 @@
 				00C6670C10C02D000057D8CD /* statusfav.png */,
 				00C666AD10C021010057D8CD /* unfavorite.png */,
 				0010987C10A308C700DBD5A9 /* delete-top.tif */,
+				A797595C116622630035F33C /* MovieIcon.tif */,
 				0010987D10A308C700DBD5A9 /* directmsg.png */,
 				0010987E10A308C700DBD5A9 /* edit.tif */,
 				0010987F10A308C700DBD5A9 /* refresh.tif */,
@@ -971,6 +974,7 @@
 				00C6670D10C02D000057D8CD /* statusfav.png in Resources */,
 				A7C6CAFF113FCD9600A02E17 /* oAuthButton.png in Resources */,
 				A7BB56C611464FDF00940E86 /* mapRemove.tiff in Resources */,
+				A797595D116622630035F33C /* MovieIcon.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
