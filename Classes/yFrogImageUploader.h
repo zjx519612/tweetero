@@ -61,6 +61,9 @@
 	BOOL			isPresentGatewayError;
 	NSString*		contentType;
     ISVideoUploadEngine *videoUploadEngine;
+	
+	int imageDimension;
+	int imageRotationAngle;
 }
 
 - (void)postJPEGData:(NSData*)imageJPEGData delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data;
@@ -70,6 +73,9 @@
 - (void)postData:(NSData*)image delegate:(id <ImageUploaderDelegate>)dlgt userData:(id)data; // call postJPEGData:delegate:userData:
 - (void)cancel;
 - (BOOL)canceled;
+
+- (void)setImageDimension:(int)inNewDimension;
+- (void)setImageRotationAngle:(int)inNewAngle;
 
 @property (nonatomic, retain) NSURLConnection *connection;
 @property (nonatomic, retain) NSMutableString* contentXMLProperty;

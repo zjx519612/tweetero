@@ -64,6 +64,8 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 		isHeaderTag = NO;
 		isPresentGatewayError = NO;
 		retriesCounter = 0;
+		imageDimension = 0;
+		imageRotationAngle = 0;
 	}
 	return self;
 }
@@ -147,9 +149,27 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
     [headerData appendData:[@"Content-Disposition: form-data; name=\"key\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [headerData appendData:[kTweeteroDevKey dataUsingEncoding:NSUTF8StringEncoding]];
 	
+	if (0 < imageDimension)
+	{
+		[headerData appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+		[headerData appendData:[@"Content-Disposition: form-data; name=\"optimage\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+		[headerData appendData:[[NSString stringWithString:@"1"] dataUsingEncoding:NSUTF8StringEncoding]];
+		
+		[headerData appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+		[headerData appendData:[@"Content-Disposition: form-data; name=\"optsize\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+		[headerData appendData:[[NSString stringWithFormat:@"%dx%d", imageDimension, imageDimension] dataUsingEncoding:NSUTF8StringEncoding]];				
+	}
+	
+	if (0 < imageRotationAngle)
+	{
+		[headerData appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+		[headerData appendData:[@"Content-Disposition: form-data; name=\"rotate\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+		[headerData appendData:[[NSString stringWithFormat:@"%d", imageRotationAngle] dataUsingEncoding:NSUTF8StringEncoding]];		
+	}
+	
 	if([[LocationManager locationManager] locationDefined])
 	{
-        [headerData appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+        [headerData appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 		[headerData appendData:[@"Content-Disposition: form-data; name=\"tags\"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
 		[headerData appendData:[[NSString stringWithFormat:@"geotagged, geo:lat=%+.6f, geo:lon=%+.6f",
 					[[LocationManager locationManager] latitude],
@@ -186,6 +206,9 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 	[request setHTTPBodyStream:stream];
 	[stream release];
 
+	[self setImageDimension:0];
+	[self setImageRotationAngle:0];
+	
     [delegate uploadedDataSize:[stream length]];
 		
 	connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
@@ -290,6 +313,16 @@ NSString *const kGatewayTimeOutError = @"504 Gateway Time-out";
 	self.contentType = JPEG_CONTENT_TYPE;
 	
 	[self postData:anImageData];
+}
+
+- (void)setImageDimension:(int)inNewDimension
+{
+	imageDimension = inNewDimension;
+}
+
+- (void)setImageRotationAngle:(int)inNewAngle
+{
+	imageRotationAngle = inNewAngle;
 }
 
 #pragma mark NSURLConnection delegate methods

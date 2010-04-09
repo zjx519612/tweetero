@@ -103,6 +103,9 @@ enum _TwitEditorSuspendedOperations
     
     int                     _dataSize;
     BOOL                    _canShowCamera;
+	
+	int imageDimension;
+	int imageRotationAngle;
 }
 
 - (id)init;

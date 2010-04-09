@@ -421,7 +421,7 @@
 			}
 			
 			[self setImage:img movie:nil];
-			[self performSelector:@selector(convertPickedImageAndStartUpload) withObject:nil afterDelay:0.25];
+			[self performSelector:@selector(updatePickedPhotoDataAndStartUpload) withObject:nil afterDelay:0.25];
 		}
 		else
 		{
@@ -778,11 +778,12 @@
     
 	// Image uploader will be released after finishing upload process by setting
 	// self.connectionDelegate property to nil on uploadedImage: sender method
-	ImageUploader * uploader = [[ImageUploader alloc] init];
+	ImageUploader *uploader = [[ImageUploader alloc] init];
 	self.connectionDelegate = uploader;
 	[self retainActivityIndicator];
 	if(pickedPhoto && pickedPhotoData)
 	{
+		[uploader setImageDimension:imageDimension];
 		[uploader postData:self.pickedPhotoData delegate:self userData:pickedPhoto];
 	}
 	else
@@ -834,6 +835,36 @@
 
 - (void)updatePickedPhotoDataAndStartUpload
 {
+	BOOL isNeedToResize = NO;
+	BOOL isNeedToRotate = NO;
+	int newDimension = isImageNeedToConvert(self.pickedPhoto, &isNeedToResize, &isNeedToRotate);
+	imageDimension = 0;
+	if(isNeedToResize)
+	{
+		imageDimension = newDimension;
+	}
+	
+	imageRotationAngle = 0;
+	UIImageOrientation orient = self.pickedPhoto.imageOrientation;
+	switch(orient) 
+	{
+		case UIImageOrientationUp:
+			imageRotationAngle = 90;
+			break;
+			
+		case UIImageOrientationDown:
+			imageRotationAngle = 270;
+			break;
+			
+		case UIImageOrientationLeft:
+			imageRotationAngle = 180;
+			break;
+			
+		case UIImageOrientationRight:
+			imageRotationAngle = 0;
+			break;
+	}
+	
 	self.pickedPhotoData = UIImageJPEGRepresentation(self.pickedPhoto, 1.0f);
 
 	[self performSelector:@selector(reducePickedPhotoSizeAndStartUpload) withObject:nil afterDelay:0.1];
@@ -869,25 +900,7 @@
 		self.progressSheet = nil;
 	}		
 }
-/*
-- (void)startUploadingOfPickedMediaIfNeed
-{
-	if(!self.currentMediaYFrogURL && image.image && !connectionDelegate)
-	{
-		ImageUploader * uploader = [[ImageUploader alloc] init];
-		self.connectionDelegate = uploader;
-		[self retainActivityIndicator];
-		[uploader postImage:image.image delegate:self userData:image.image];
-		[uploader release];
-	}
-	
-	if(self.progressSheet && self.progressSheet.tag == PROCESSING_PHOTO_SHEET_TAG)
-	{
-		[self.progressSheet dismissWithClickedButtonIndex:-1 animated:YES];
-		self.progressSheet = nil;
-	}		
-}
-*/
+
 - (void)postImageAction 
 {
 	if(![self mediaIsPicked] && ![[messageText.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length])
