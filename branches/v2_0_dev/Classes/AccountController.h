@@ -6,6 +6,7 @@
 {
 @private
     BOOL                  _canAnimate;
+	BOOL shouldShowTabControllerOnAutoLogin;
 	UITableView *_tableAccounts;
     AccountManager       *_manager;
     MGTwitterEngine      *_twitter;

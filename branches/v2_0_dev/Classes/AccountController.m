@@ -47,6 +47,8 @@
         
         _tableAccounts = nil;
         _manager = nil;
+		
+		shouldShowTabControllerOnAutoLogin = YES;
         
         [[NSNotificationCenter defaultCenter] addObserver:self 
                                                  selector:@selector(saveAccountNotification:) 
@@ -96,9 +98,10 @@
     if (_tableAccounts)
         [_tableAccounts reloadData];
 
-    if (self.accountManager.loggedUserAccount)
+    if (self.accountManager.loggedUserAccount && shouldShowTabControllerOnAutoLogin)
     {
         self.canAnimate = NO;
+		shouldShowTabControllerOnAutoLogin = NO;
         [self showTabController];
     }
 }
