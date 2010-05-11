@@ -551,12 +551,12 @@
 		00B69FD21061193D005E8DF6 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				00CB31AD108CB31F00B03CD8 /* MoreTab */,
+				0048606C108895AC00409013 /* Tabs */,
 				002FF1A410D7BA2400E69703 /* MoreController.h */,
 				002FF1A510D7BA2400E69703 /* MoreController.m */,
 				002FF1A610D7BA2400E69703 /* TwTabController.h */,
 				002FF1A710D7BA2400E69703 /* TwTabController.m */,
-				00CB31AD108CB31F00B03CD8 /* MoreTab */,
-				0048606C108895AC00409013 /* Tabs */,
 				00DDB2F6105E9E190020C9C1 /* AccountController.h */,
 				00DDB2F5105E9E190020C9C1 /* AccountController.m */,
 				D9CCC4D10F5CDAEA009CACBB /* LoginController.h */,

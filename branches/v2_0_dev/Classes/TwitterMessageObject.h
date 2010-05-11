@@ -7,7 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+//#import "TwMessageCell.h"
 
+@class TwMessageCell;
 @interface TwitterMessageObject : NSObject {
 @private
     NSString    *_messageId;
@@ -23,6 +25,7 @@
     BOOL         _isFavorite;
     NSArray     *_yfrogLinks;
     NSArray     *_yfrogThumbnails;
+    TwMessageCell   *_cell;
 }
 
 @property (nonatomic, retain) NSString *messageId;
@@ -38,6 +41,7 @@
 @property (nonatomic, assign) BOOL isFavorite;
 @property (nonatomic, retain) NSArray *yfrogLinks;
 @property (nonatomic, retain) NSArray *yfrogThumbnails;
+@property (nonatomic, retain) TwMessageCell *cell;
 
 - (id)init;
 

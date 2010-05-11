@@ -24,12 +24,6 @@ const float kImageGridThumbnailHeight = 84.0f;
     }
     return self;
 }
-/*
-- (void)drawRect:(CGRect)rect 
-{
-    // Drawing code
-}
-*/
 
 - (void)layoutSubviews
 {
@@ -87,9 +81,13 @@ const float kImageGridThumbnailHeight = 84.0f;
         if (_images)
             [_images release];
         _images = newImages;
-        
-        [self setNeedsLayout];
     }
+    [self setNeedsLayout];
+}
+
+- (void)invalidate
+{
+    [self setNeedsLayout];
 }
 
 - (void)startIndicator
@@ -111,48 +109,6 @@ const float kImageGridThumbnailHeight = 84.0f;
 {
     [_indicator stopAnimating];
     [_indicator removeFromSuperview];
-}
-
-@end
-
-
-
-//------------------------------------------------------------------
-@implementation TwImageGridViewProxy
-
-@synthesize imageLinks = _imageLinks;
-
-- (void)dealloc
-{
-    self.imageLinks = nil;
-    [super dealloc];
-}
-
-- (void)setImages:(NSArray*)newImages
-{
-}
-
-- (NSArray*)images
-{
-    return nil;
-}
-
-- (CGSize)calculateSize:(float)maxWidth
-{
-    CGSize size = CGSizeZero;
-    
-    if (_imageLinks) {
-        int count = [_imageLinks count];
-        
-        int cols = (int)(maxWidth / (kImageGridThumbnailWidth + 2.));
-        int rows = count / cols;
-        if (count % cols > 0)
-            rows++;
-        
-        size.width = cols * (kImageGridThumbnailWidth + 2.);
-        size.height = rows * (kImageGridThumbnailHeight + 2.);
-    }
-    return size;
 }
 
 @end

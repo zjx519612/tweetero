@@ -94,6 +94,7 @@ const NSInteger kRetriesNumber = 3;
 {
     [super viewDidLoad];
 	
+    _loadingImageCount = 0;
     [self initTwitterMessageObjectCache];
 	_errorDesc = nil;
 	_lastMessage = NO;
@@ -224,18 +225,35 @@ const NSInteger kRetriesNumber = 3;
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath 
 {
-    NSString *CellIdentifier = ![self noMessages] && indexPath.row < [_messages count]? @"TwittListCell": @"UICell";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) 
-	{
-        cell = [self tableviewCellWithReuseIdentifier:CellIdentifier];
+    UITableViewCell *cell = nil;
+    if ([self noMessages])
+    {
+        cell = [tableView dequeueReusableCellWithIdentifier:@"UICell"];
+        if (cell == nil)
+            cell = [self tableviewCellWithReuseIdentifier:@"UICell"];
+        cell.textLabel.text = (_errorDesc ? _errorDesc : (_loading ? @"" : [self noMessagesString]));
     }
-    
-    [self configureCell:cell forIndexPath:indexPath];
-	
+    else
+    {
+        if(indexPath.row < [_messages count])
+        {
+            NSDictionary *messageData = [_messages objectAtIndex:indexPath.row];
+            
+            TwitterMessageObject *object = [self twitterMessageObjectByDictionary:messageData];
+            if (object.cell == nil)
+                object.cell = (TwMessageCell*)[self tableviewCellWithReuseIdentifier:@"TwittListCell"];
+            [object.cell setTwitterMessageObject:object];
+            cell = object.cell;
+        }
+        else
+        {
+            cell = [tableView dequeueReusableCellWithIdentifier:@"UICell"];
+            if (cell == nil)
+                cell = [self tableviewCellWithReuseIdentifier:@"UICell"];
+            cell.textLabel.text = NSLocalizedString(@"Load More...", @"");
+        }
+    }
 	cell.contentView.backgroundColor = indexPath.row % 2 ? [UIColor colorWithRed:0.95 green:0.95 blue:0.95 alpha:1]: [UIColor whiteColor];
-    
     return cell;
 }
 
@@ -355,6 +373,8 @@ const NSInteger kRetriesNumber = 3;
 {
     ISLog(@"Receive status");
     YFLog(@"%@", statuses);
+    
+    NSLog(@"TIME_DEBUG: %@", [NSDate date]);
     /*
 	if([statuses count] < MESSAGES_PER_PAGE)
 	{
@@ -368,6 +388,7 @@ const NSInteger kRetriesNumber = 3;
     
 	if(!_messages)
 	{
+        NSLog(@"NEW DATA");
 		if([statuses count] > 0)
             _messages = [statuses retain];
         
@@ -375,6 +396,7 @@ const NSInteger kRetriesNumber = 3;
 	}
 	else
 	{
+        NSLog(@"UPDATE DATA");
 		NSArray *messages = _messages;
         
 		_messages = [[messages arrayByAddingObjectsFromArray:statuses] retain];
@@ -401,6 +423,8 @@ const NSInteger kRetriesNumber = 3;
 	
 	if(self.navigationItem.leftBarButtonItem)
 		self.navigationItem.leftBarButtonItem.enabled = YES;
+    
+    NSLog(@"TIME_DEBUG: %@", [NSDate date]);
 }
 
 NSInteger dateReverseSort(id num1, id num2, void *context)
@@ -581,6 +605,8 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
     messageObject.avatar                = loadAndScaleImage(messageObject.avatarUrl, avatarViewSize);
     messageObject.yfrogLinks            = yFrogLinksArrayFromText(text);
     
+    //NSLog(@"CREATE MESSAGE_OBJECT: Links: %@", messageObject.yfrogLinks);
+    
     BOOL isFavorite = NO;
     
     id fav = [message objectForKey:@"favorited"];
@@ -588,8 +614,11 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
         isFavorite = [fav boolValue];
     
     messageObject.isFavorite = isFavorite;
-    
-    [self loadThumbnailsForMessageObject:messageObject];
+    if (messageObject.yfrogLinks)
+    {
+        _loadingImageCount++;
+        [self loadThumbnailsForMessageObject:messageObject];
+    }
     
     return [messageObject autorelease];
 }
@@ -666,7 +695,9 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
         [data setObject:copyId forKey:@"id"];
         [data setObject:message.yfrogLinks forKey:@"links"];
         
-        [self performSelectorInBackground:@selector(loadThumbnailsThread:) withObject:data];
+        //[self performSelectorInBackground:@selector(loadThumbnailsThread:) withObject:data];
+        
+        [NSThread detachNewThreadSelector:@selector(loadThumbnailsThread:) toTarget:self withObject:data];
         [copyId release];
     }
 }
@@ -680,7 +711,7 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
     
     CGSize thumbSize = CGSizeMake(kImageGridThumbnailWidth, kImageGridThumbnailHeight);
     
-    NSMutableArray *images = [NSMutableArray array]; //[[NSMutableArray alloc] init];
+    NSMutableArray *images = [NSMutableArray array];
 
     for (NSString *link in links)
     {
@@ -707,14 +738,22 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
         }
     }
     
-    NSMutableDictionary *resultData = [[NSMutableDictionary alloc] initWithCapacity:2];
-    
-    [resultData setObject:messageId forKey:@"id"];
-    [resultData setObject:images forKey:@"images"];
-    
-    [self performSelectorOnMainThread:@selector(thumbnailWasLoaded:) withObject:resultData waitUntilDone:NO];
-    
+    TwitterMessageObject *object = [self lookupTwitterMessageObjectById:messageId];
+    if (object)
+    {
+        object.yfrogThumbnails = images;
+        if (object.cell)
+        {
+            [object.cell updateContent:object];
+        }
+    }
+
     [pool release];
+}
+
+- (void)reloadTableData
+{
+    [self.tableView reloadData];
 }
 
 - (void)thumbnailWasLoaded:(NSDictionary*)result
@@ -732,9 +771,11 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
                 object.yfrogThumbnails = images;
             //[images release];
         }
-        [result release];
+        //[result release];
         
-        [self.tableView reloadData];
+        //if (_loadingImageCount == 0)
+        //    [self performSelectorOnMainThread:@selector(reloadTableData) withObject:nil waitUntilDone:NO];
+        //[self.tableView reloadData];
     }
 }
 

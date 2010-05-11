@@ -23,6 +23,7 @@
 @synthesize isFavorite = _isFavorite;
 @synthesize yfrogLinks = _yfrogLinks;
 @synthesize yfrogThumbnails = _yfrogThumbnails;
+@synthesize cell = _cell;
 
 - (id)init
 {
@@ -46,6 +47,7 @@
     self.avatar = nil;
     self.yfrogLinks = nil;
     self.yfrogThumbnails = nil;
+    self.cell = nil;
     [super dealloc];
 }
 

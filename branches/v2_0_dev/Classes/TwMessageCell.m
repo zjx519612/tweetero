@@ -26,6 +26,10 @@
 #define YFROG_IMAGE_Y           TEXT_OFFSET_Y + TEXT_HEIGHT
 #define ROW_HEIGHT              70
 
+@interface TwMessageCell()
+- (CGSize)calculateSize:(float)maxWidth imageCount:(int)count;
+@end
+
 @implementation TwMessageCell
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier 
@@ -101,21 +105,16 @@
         CGRect cellFrame = [self frame];
 
         [_screennameLabel setText:object.screenname];
-        
         [_messageLabel setText:object.message];
         [_messageLabel setFrame:CGRectMake(TEXT_OFFSET_X, TEXT_OFFSET_Y, TEXT_WIDTH + YFROG_IMAGE_WIDTH - 10, TEXT_HEIGHT)];
         [_messageLabel sizeToFit];
-
         [_dateLabel setText:object.creationFormattedDate];
-        
         [_avatarImage setImage:object.avatar];
         
         UIImage *favoriteImage = nil;
         if (object.isFavorite)
-        {
-            //YFLog(@"FAVORITE_IMAGE");
             favoriteImage = [UIImage imageNamed:@"statusfav.png"];
-        }
+        
         [_favoriteImage setImage:favoriteImage];
         
         float row_max_y = _messageLabel.frame.origin.y + _messageLabel.frame.size.height + BORDER_WIDTH;
@@ -123,7 +122,7 @@
         cellFrame.size.height = max(row_max_y, ROW_HEIGHT);
         
         BOOL hasThumbnails = NO;
-        if (object.yfrogLinks && [object.yfrogLinks count] > 0)
+        if ((object.yfrogLinks && [object.yfrogLinks count] > 0) || (object.yfrogThumbnails && [object.yfrogThumbnails count] > 0))
             hasThumbnails = YES;
         
         _imageGrid.hidden = !hasThumbnails;
@@ -131,11 +130,9 @@
         {
             float max_grid_width = cellFrame.size.width - _avatarImage.frame.size.width + BORDER_WIDTH * 2;
             
-            TwImageGridViewProxy *proxy = [[TwImageGridViewProxy alloc] init];
-            proxy.imageLinks = object.yfrogLinks;
-            
-            CGSize grid_size = [proxy calculateSize:max_grid_width];
-            [proxy release];
+            CGSize grid_size = CGSizeZero;
+            if (object.yfrogLinks)
+                grid_size = [self calculateSize:max_grid_width imageCount:[object.yfrogLinks count]];
             
             CGRect grid_frame = CGRectMake(_avatarImage.frame.size.width + BORDER_WIDTH * 2, row_max_y, grid_size.width, grid_size.height);
             
@@ -150,7 +147,34 @@
         }
         
         [self setFrame:cellFrame];
+        
+        //NSLog(@"ImageGrid: %@, Links: %@, Thumbnails: %@", [_imageGrid description], object.yfrogLinks, object.yfrogThumbnails);
     }
+}
+
+- (void)updateContent:(TwitterMessageObject*)object
+{
+    if (object.yfrogThumbnails) {
+        _imageGrid.images = object.yfrogThumbnails;
+        _imageGrid.hidden = NO;
+        [_imageGrid stopIndicator];
+        [_imageGrid invalidate];
+    }
+}
+
+- (CGSize)calculateSize:(float)maxWidth imageCount:(int)count
+{
+    CGSize size = CGSizeZero;
+    
+    int cols = (int)(maxWidth / (kImageGridThumbnailWidth + 2.));
+    int rows = count / cols;
+    if (count % cols > 0)
+        rows++;
+    
+    size.width = cols * (kImageGridThumbnailWidth + 2.);
+    size.height = rows * (kImageGridThumbnailHeight + 2.);
+    
+    return size;
 }
 
 @end

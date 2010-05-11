@@ -19,20 +19,8 @@ extern const float kImageGridThumbnailHeight;
 
 @property (nonatomic, retain) NSArray *images;
 
+- (void)invalidate;
 - (void)startIndicator;
 - (void)stopIndicator;
-
-@end
-
-
-// Proxy class
-@interface TwImageGridViewProxy : TwImageGridView {
-@private
-    NSArray *_imageLinks;
-}
-
-@property (nonatomic, retain) NSArray *imageLinks;
-
-- (CGSize)calculateSize:(float)maxWidth;
 
 @end
