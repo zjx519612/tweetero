@@ -140,6 +140,7 @@
 	{
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
         
+        NSLog(@"TIME_DEBUG: %@", [NSDate date]);
 		[_twitter getFollowedTimelineFor:nil since:nil startingAtPage:numPage count:count];
 	}
 }

@@ -23,22 +23,3 @@ typedef enum {
 @property (nonatomic) int frameType;
 
 @end
-
-@interface ActiveImageView : CustomImageView
-{
-    UIActivityIndicatorView *_indictator;
-    NSString                *_imageUrl;
-    unsigned                 _width;
-    unsigned                 _height;
-}
-
-@property (nonatomic, copy) NSString *imageUrl;
-@property (nonatomic) unsigned width;
-@property (nonatomic) unsigned height;
-
-- (void)update;
-
-- (void)start;
-- (void)stop;
-
-@end

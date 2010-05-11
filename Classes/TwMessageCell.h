@@ -11,6 +11,7 @@
 #import "TwImageGridView.h"
 #import "TwitterMessageObject.h"
 
+@class TwitterMessageObject;
 @interface TwMessageCell : UITableViewCell {
 @private
     UILabel         *_screennameLabel;
@@ -22,5 +23,6 @@
 }
 
 - (void)setTwitterMessageObject:(TwitterMessageObject*)object;
+- (void)updateContent:(TwitterMessageObject*)object;
 
 @end

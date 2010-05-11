@@ -1036,11 +1036,13 @@
 	{
 		if(connectionDelegate)
 			[connectionDelegate cancel];
+        [self setImageImage:nil];
 		[self setImage:nil movie:nil];
 		[self setMessageTextText:@""];
 		[messageText becomeFirstResponder];
 		inTextEditingMode = YES;
 		[self setNavigatorButtons];
+        [self progressClear];
 	}
 	else
 	{

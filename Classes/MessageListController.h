@@ -46,6 +46,8 @@
 	BOOL                 _loading;
 	NSString            *_errorDesc;
     NSMutableDictionary *_yFrogImages;
+    
+    int _loadingImageCount;
 }
 
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count;
