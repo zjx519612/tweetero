@@ -88,7 +88,11 @@ UIActionSheet * ShowActionSheet(NSString* title, id <UIActionSheetDelegate> dele
 	UIActionSheet* progressSheet = [[UIActionSheet alloc] initWithTitle:title delegate:delegate cancelButtonTitle:cancelButtonTitle destructiveButtonTitle:nil otherButtonTitles:nil];
 	progressSheet.actionSheetStyle = UIActionSheetStyleDefault;
 	
-	UIActivityIndicatorView* progressInd = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(-18.5, -3.0, 40.0, 40.0)];
+    float y = -3;
+    if (cancelButtonTitle == nil)
+        y = -10;
+    
+	UIActivityIndicatorView* progressInd = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(-18.5, y, 40.0, 40.0)];
 	progressInd.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
 	[progressInd sizeToFit];
 	progressInd.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin |

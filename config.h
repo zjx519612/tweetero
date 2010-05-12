@@ -16,4 +16,6 @@
 
 #define kYFrogVerifyCredentialUrlMask   @"https://twitter.com/account/verify_credentials.xml?oauth_version=%@&oauth_nonce=%@&oauth_timestamp=%@&oauth_consumer_key=%@&oauth_token=%@&oauth_signature_method=%@&oauth_signature=%@"
 
+#include "config-private.h"
+
 #endif //__Config_h__

@@ -62,22 +62,44 @@ const NSInteger kRetriesNumber = 3;
 
 @implementation MessageListController
 
+- (id)init
+{
+    NSLog(@"INIT - init %@, %p", NSStringFromClass([self class]), self);
+    
+    if (self = [super init]) {
+        _twitter = nil;
+    }
+    return self;
+}
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    NSLog(@"INIT - initWithNib %@, %p", NSStringFromClass([self class]), self);
+    
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        _twitter = nil;
+    }
+    return self;
+}
+
 - (void)dealloc
 {
-    ISLog(@"DEALLOC MESSAGE_LIST_CONTROLLER");
+    NSLog(@"DEALLOC - %@", NSStringFromClass([self class]));
     
     [self releaseTwitterMessageObjectCache];
-	while (_indicatorCount) 
-	{
+	while (_indicatorCount) {
 		[self releaseActivityIndicator];
 	}
 	
 	int connectionsCount = [_twitter numberOfConnections];
-	[_twitter closeAllConnections];
+	
+    [_twitter closeAllConnections];
 	[_twitter removeDelegate];
 	[_twitter release];
-	while(connectionsCount-- > 0)
-		[TweetterAppDelegate decreaseNetworkActivityIndicator];
+    
+	while(connectionsCount-- > 0) {
+        [TweetterAppDelegate decreaseNetworkActivityIndicator];
+    }
 
 	[_messages release];
 	
@@ -101,6 +123,11 @@ const NSInteger kRetriesNumber = 3;
 	_loading = [[AccountManager manager] isValidLoggedUser];
 	_indicatorCount = 0;
 	
+    if (_twitter) {
+        [_twitter closeAllConnections];
+        [_twitter release];
+    }
+    
     _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(accountChanged:) name:@"AccountChanged" object:nil];
 
