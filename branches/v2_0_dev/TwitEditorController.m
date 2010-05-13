@@ -37,34 +37,34 @@
 #import "AccountManager.h"
 #import "Logger.h"
 
-#define DEBUG_VIDEO_UPLOAD              0
+#define DEBUG_VIDEO_UPLOAD                      0
 #if DEBUG_VIDEO_UPLOAD
-#   define DEBUG_VIDEO_FILE_NAME        @"test"
-#   define DEBUG_VIDEO_FILE_EXT         @"mov"
+#   define DEBUG_VIDEO_FILE_NAME                @"test"
+#   define DEBUG_VIDEO_FILE_EXT                 @"mov"
 #endif
 
-#define DEBUG_IMAGE_UPLOAD				0
+#define DEBUG_IMAGE_UPLOAD                      0
 #if DEBUG_IMAGE_UPLOAD
-#   define DEBUG_IMAGE_FILE_NAME        @"test"
-#   define DEBUG_IMAGE_FILE_EXT         @"jpg"
+#   define DEBUG_IMAGE_FILE_NAME                @"test"
+#   define DEBUG_IMAGE_FILE_EXT                 @"jpg"
 #endif
 
 
-#define SEND_SEGMENT_CNTRL_WIDTH			130
-#define FIRST_SEND_SEGMENT_WIDTH			 66
+#define SEND_SEGMENT_CNTRL_WIDTH                130
+#define FIRST_SEND_SEGMENT_WIDTH                66
 
-#define IMAGES_SEGMENT_CONTROLLER_TAG		487
-#define SEND_TWIT_SEGMENT_CONTROLLER_TAG	 42
+#define IMAGES_SEGMENT_CONTROLLER_TAG           487
+#define SEND_TWIT_SEGMENT_CONTROLLER_TAG        42
 
-#define PROGRESS_ACTION_SHEET_TAG										214
-#define PHOTO_Q_SHEET_TAG												436
-#define PROCESSING_PHOTO_SHEET_TAG										3
+#define PROGRESS_ACTION_SHEET_TAG               214
+#define PHOTO_Q_SHEET_TAG                       436
+#define PROCESSING_PHOTO_SHEET_TAG              3
 
-#define PHOTO_ENABLE_SERVICES_ALERT_TAG									666
-#define PHOTO_DO_CANCEL_ALERT_TAG										13
+#define PHOTO_ENABLE_SERVICES_ALERT_TAG         666
+#define PHOTO_DO_CANCEL_ALERT_TAG               13
 
-#define K_UI_TYPE_MOVIE													@"public.movie"
-#define K_UI_TYPE_IMAGE													@"public.image"
+#define K_UI_TYPE_MOVIE                         @"public.movie"
+#define K_UI_TYPE_IMAGE                         @"public.image"
 
 @implementation ImagePickerController
 
@@ -73,7 +73,6 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
 	[super viewDidDisappear:NO];
-	//[twitEditor startUploadingOfPickedMediaIfNeed];
 }
 
 - (void)dealloc
@@ -95,7 +94,6 @@
 @synthesize previewImage;
 @synthesize pickedPhotoData;
 @synthesize location;
-
 @synthesize pickImage;
 @synthesize cancelButton;
 @synthesize navItem;
@@ -240,13 +238,8 @@
 
 - (void)initData
 {
-	//_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
     _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
-    
-    //YFLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).authorizeURL path]);
-    //YFLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).accessTokenURL path]);
-    //YFLog(@"%@", [((SA_OAuthTwitterEngine*)_twitter).requestTokenURL path]);
-    
+    savedTextAfterMemoryWarning = nil;
 	inTextEditingMode = NO;
 	suspendedOperation = noTEOperations;
 	photoURLPlaceholderMask = [NSLocalizedString(@"YFrog image URL placeholder", @"") retain];
@@ -294,6 +287,10 @@
 - (void)dealloc 
 {
     YFLog(@"tweetEditor - DEALLOC");
+    if (savedTextAfterMemoryWarning) {
+        [savedTextAfterMemoryWarning release];
+        savedTextAfterMemoryWarning = nil;
+    }
 	while (_indicatorCount) 
 		[self releaseActivityIndicator];
 	[_twitter closeAllConnections];
@@ -469,11 +466,8 @@
 - (void)movieFinishedCallback:(NSNotification*)aNotification
 {
     MPMoviePlayerController* theMovie = [aNotification object];
- 
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                name:MPMoviePlayerPlaybackDidFinishNotification
-                object:theMovie];
- 
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:MPMoviePlayerPlaybackDidFinishNotification object:theMovie];
+    
     // Release the movie instance created in playMovieAtURL:
     [theMovie release];
 }
@@ -524,16 +518,16 @@
 	if(_queueIndex >= 0)
 	{
 		[[TweetQueue sharedQueue] replaceMessage: messageBody 
-                                       withImageData: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhotoData : nil  
+                                   withImageData: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhotoData : nil  
                                        withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
                                        inReplyTo: _queuedReplyId
                                          forUser: username
-                                         atIndex:_queueIndex];
+                                         atIndex: _queueIndex];
 	}
 	else
 	{
 		[[TweetQueue sharedQueue] addMessage: messageBody 
-                                   withImageData: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhotoData : nil  
+                               withImageData: (pickedPhoto && !currentMediaYFrogURL) ? pickedPhotoData : nil  
                                    withMovie: (pickedVideo && !currentMediaYFrogURL) ? pickedVideo : nil
                                    inReplyTo: _message ? [[_message objectForKey:@"id"] intValue] : 0
                                      forUser: username];
@@ -541,10 +535,8 @@
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-//- (void)viewDidLoad 
 - (void)loadView
 {
-    //[super viewDidLoad];
     [super loadView];
 	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
 	temporaryBarButtonItem.title = NSLocalizedString(@"Back", @"");
@@ -566,6 +558,12 @@
 	if(!cameraEnabled && !libraryEnabled)
 		[pickImage setHidden:YES];
 
+    if (savedTextAfterMemoryWarning)
+    {
+        [self setMessageTextText:savedTextAfterMemoryWarning];
+        [savedTextAfterMemoryWarning release];
+        savedTextAfterMemoryWarning = nil;
+    }
 	[messageText becomeFirstResponder];
 	inTextEditingMode = YES;
 	
@@ -636,6 +634,9 @@
 
 - (void)didReceiveMemoryWarning 
 {
+    if (savedTextAfterMemoryWarning)
+        [savedTextAfterMemoryWarning release];
+    savedTextAfterMemoryWarning = [messageText.text copy];
     [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
     // Release anything that's not essential, such as cached data
 }
@@ -702,8 +703,6 @@
 		buttons[i++] = NSLocalizedString(@"Use video camera", @"");
 	if(photoLibraryEnabled)
 		buttons[i++] = NSLocalizedString(@"Use library", @"");
-    //if(movieLibraryEnabled)
-	//	buttons[i++] = NSLocalizedString(@"Use video library", @"");
 	if(imageAlreadyExists)
 		buttons[i++] = NSLocalizedString(@"RemoveImageTitle" , @"");
 	
@@ -813,9 +812,7 @@
 - (void)convertPickedImageAndStartUpload
 {	
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	//[[NSNotificationCenter defaultCenter] postNotificationName: @"ClearCaches" object: nil];
-	
+    
 	BOOL needToResize = NO;
 	BOOL needToRotate = NO;
 	int newDimension = isImageNeedToConvert(self.pickedPhoto, &needToResize, &needToRotate);
@@ -829,7 +826,6 @@
 	}
 	
 	[pool release];
-	
 	[self performSelector:@selector(updatePickedPhotoDataAndStartUpload) withObject:nil afterDelay:0.5];
 }
 
@@ -949,13 +945,7 @@
 	postImageSegmentedControl.enabled = NO;
     
     NSString* mgTwitterConnectionID = [self sendMessage:messageBody];
-	//if(_message)
-	//	mgTwitterConnectionID = [_twitter sendUpdate:messageBody inReplyTo:[[_message objectForKey:@"id"] intValue]];
-	//else if(_queueIndex >= 0)
-	//	mgTwitterConnectionID = [_twitter sendUpdate:messageBody inReplyTo:_queuedReplyId];
-	//else
-	//	mgTwitterConnectionID = [_twitter sendUpdate:messageBody];
-		
+    
 	MGConnectionWrap * mgConnectionWrap = [[MGConnectionWrap alloc] initWithTwitter:_twitter connection:mgTwitterConnectionID delegate:self];
 	self.connectionDelegate = mgConnectionWrap;
 	[mgConnectionWrap release];

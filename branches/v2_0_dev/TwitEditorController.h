@@ -73,6 +73,8 @@ enum _TwitEditorSuspendedOperations
 	UISegmentedControl *locationSegmentedControl;
 	UIColor *defaultTintColor;
 	
+    NSString *savedTextAfterMemoryWarning;
+    
 	NSString* currentMediaYFrogURL;
 	id <TwitterConnectionProtocol>  connectionDelegate;
 	TwitEditorSuspendedOperations suspendedOperation;
