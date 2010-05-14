@@ -11,10 +11,8 @@
 #import "MGTwitterYAJLParser.h"
 
 @interface MGTwitterSearchYAJLParser : MGTwitterYAJLParser {
-
-	BOOL insideArray;
-	NSMutableDictionary *_results;
-	NSMutableDictionary *_status;
+@private
+    NSMutableArray *_collection;
 }
 
 @end

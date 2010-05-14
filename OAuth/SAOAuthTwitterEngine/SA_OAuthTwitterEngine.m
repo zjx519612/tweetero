@@ -327,14 +327,25 @@
 	}
 	// --------------------------------------------------------------------------------
 
-    NSString *urlString = [NSString stringWithFormat:@"%@://%@/%@", 
-                           (_secureConnection) ? @"https" : @"http",
-                           _APIDomain, fullPath];
+    NSString *domain, *protocol;
+    if (requestType == MGTwitterSearchRequest) {
+        domain = _searchDomain;
+        protocol = @"http";
+    } else {
+        domain = _APIDomain;
+        protocol = (_secureConnection) ? @"https" : @"http";
+    }
+    
+    NSString *urlString = [NSString stringWithFormat:@"%@://%@/%@", protocol, domain, fullPath];
     NSURL *finalURL = [NSURL URLWithString:urlString];
     if (!finalURL) {
         return nil;
     }
 	
+    NSLog(@"");
+    NSLog(@"-> Open Connection: %@", finalURL);
+    NSLog(@"");
+    
 	// --------------------------------------------------------------------------------
 	// modificaiton from the base clase
 	// the base class creates a regular url request

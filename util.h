@@ -58,6 +58,7 @@ NSMutableURLRequest* tweeteroMutableURLRequest(NSURL* url);
 BOOL isNullable(id obj);
 
 UIImage* loadAndScaleImage(NSString *url, CGSize size);
+NSDate* CreateDate(NSString *value);
 NSString* FormatNSDate(NSDate* date);
 
 NSDictionary* GoogleMapsCoordsFromUrl(NSURL *url);
