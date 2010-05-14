@@ -24,13 +24,12 @@ typedef enum {
     NSMutableDictionary     *_queries;
     NSMutableDictionary     *_twitterConnection;
     MGTwitterEngine         *_twitter;
-    id                       _delegate;
     NSMutableDictionary     *_connections;
     NSMutableArray          *_searchResult;
+    NSMutableArray          *_observers;
 }
 
 @property (nonatomic, readonly) MGTwitterEngine *twitter;
-@property (nonatomic, retain) id delegate;
 
 // Allocate and return SearchProvider object. Object is autoreleased.
 + (SearchProvider *)providerWithDelegate:(id)delegate;
@@ -76,6 +75,9 @@ typedef enum {
 - (BOOL)isEndOfSearch;
 
 - (void)closeSearch;
+
+- (void)addObserver:(id)observer;
+- (void)removeObserver:(id)observer;
 
 @end
 

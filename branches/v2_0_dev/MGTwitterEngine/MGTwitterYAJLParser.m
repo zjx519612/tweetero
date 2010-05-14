@@ -7,7 +7,6 @@
 
 #import "MGTwitterYAJLParser.h"
 
-
 @implementation MGTwitterYAJLParser
 
 #pragma mark Callbacks
@@ -218,6 +217,12 @@ static yajl_callbacks callbacks = {
 		deliveryOptions = theDeliveryOptions;
 		delegate = theDelegate;
 		
+        
+        NSString *s__11 = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];
+        NSLog(@"SEARCH RESPONSE: %@", s__11);
+        [s__11 release];
+        
+        
 		if (deliveryOptions & MGTwitterEngineDeliveryAllResultsOption)
 		{
 			parsedObjects = [[NSMutableArray alloc] initWithCapacity:0];
@@ -260,6 +265,7 @@ static yajl_callbacks callbacks = {
 				0, // allowComments: if nonzero, javascript style comments will be allowed in the input (both /* */ and //)
 				0  // checkUTF8: if nonzero, invalid UTF8 strings will cause a parse error
 			};
+
 			_handle = yajl_alloc(&callbacks, &cfg, NULL, self);
 			if (! _handle)
 			{
@@ -277,6 +283,8 @@ static yajl_callbacks callbacks = {
 
 			// free the yajl parser
 			yajl_free(_handle);
+            
+            [self normalizeParsedObjects];
 		}
 		
 		// notify the delegate that parsing completed
@@ -286,6 +294,10 @@ static yajl_callbacks callbacks = {
 	return self;
 }
 
+- (void)normalizeParsedObjects
+{
+    
+}
 
 - (void)dealloc
 {

@@ -14,6 +14,7 @@
 @interface SearchProvider(Private)
 
 - (void)notifyAboutEndOfSearch:(NSArray*)result forQuery:(NSString*)query;
+- (void)notifyAboutSearchError:(NSString*)query;
 - (void)setNotificationValue:(SPNotificationValue)value forIdentifier:(NSString *)identifier;
 - (void)setNotificationValue:(SPNotificationValue)value forIdentifier:(NSString *)identifier forQuery:(NSString *)query;
 - (void)removeNotification:(NSString *)identifier;
@@ -30,20 +31,19 @@
 static SearchProvider *sharedProvider = nil;
 
 @synthesize twitter = _twitter;
-@synthesize delegate = _delegate;
 
-+ (SearchProvider *)providerWithDelegate:(id)delegate
++ (SearchProvider *)providerWithObserver:(id)observer
 {
-    SearchProvider *provider = [[SearchProvider alloc] initWithDelegate:delegate];
+    SearchProvider *provider = [[SearchProvider alloc] initWithObserver:observer];
     return [provider autorelease];
 }
 
-+ (SearchProvider *)sharedProviderUsingDelegate:(id)delegate
++ (SearchProvider *)sharedProviderWithObserver:(id)observer
 {
     if (sharedProvider == nil)
-        sharedProvider = [[SearchProvider alloc] initWithDelegate:delegate];
+        sharedProvider = [[SearchProvider alloc] initWithObserver:observer];
     else
-        sharedProvider.delegate = delegate;
+        [sharedProvider addObserver:observer];
     return sharedProvider;
 }
 
@@ -51,7 +51,6 @@ static SearchProvider *sharedProvider = nil;
 {
     if (sharedProvider)
     {
-        [sharedProvider setDelegate:nil];
         [sharedProvider release];
         sharedProvider = nil;
     }
@@ -64,15 +63,15 @@ static SearchProvider *sharedProvider = nil;
     return nil;
 }
 
-- (id)initWithDelegate:(id)delegate
+- (id)initWithObserver:(id)observer
 {
     if ((self = [super init]))
     {
         _queries = [[NSMutableDictionary alloc] init];
         _twitterConnection = [[NSMutableDictionary alloc] init];
-        //_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
         _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
-        self.delegate = delegate;
+        _observers = [[NSMutableArray alloc] init];
+        [self addObserver:observer];
     }
     return self;
 }
@@ -80,7 +79,7 @@ static SearchProvider *sharedProvider = nil;
 - (void)dealloc
 {
     [self closeSearch];
-    self.delegate = nil;
+    [_observers release];
     [_twitter release];
     [_twitterConnection release];
     [_queries release];
@@ -101,29 +100,12 @@ static SearchProvider *sharedProvider = nil;
 }
 
 // Return YES if query with query id present in dictionary
-/*
-- (BOOL)hasQueryById:(int)queryId
-{
-    NSNumber *value = [NSNumber numberWithInt:queryId];
-    return ([[_queries allValues] indexOfObjectIdenticalTo:value] != NSNotFound);
-}
-*/
 - (BOOL)hasQueryById:(NSString*)queryId
 {
     return ([[_queries allValues] indexOfObjectIdenticalTo:queryId] != NSNotFound);
 }
 
 // Save query string in tweeter
-/*
-- (void)saveQuery:(NSString *)query forId:(int)queryId
-{
-   if (![self hasQuery:query])
-    {
-        NSString *identifier = [_twitter searchSaveQuery:query];
-        [self setNotificationValue:SPSearchDidSaved forIdentifier:identifier];
-    }
-}
-*/
 - (void)saveQuery:(NSString *)query forId:(NSString*)queryId
 {
     if (![self hasQuery:query])
@@ -148,22 +130,6 @@ static SearchProvider *sharedProvider = nil;
 }
 
 // Remove saved search query with query id
-/*
-- (void)removeQueryById:(int)queryId
-{
-    if (queryId > 0)
-    {
-        NSString *query = [self queryById:queryId];
-
-        if (query)
-        {
-            [_twitter searchDestroyQuery:queryId];
-            [_queries removeObjectForKey:query];
-            [self updateQueries:nil];
-        }
-    }
-}
-*/
 - (void)removeQueryById:(NSString*)queryId
 {
     YFLog(@"REMOVE_QUERY_BY_ID: %@", queryId);
@@ -182,21 +148,6 @@ static SearchProvider *sharedProvider = nil;
 }
 
 // Return query string by id
-/*
-- (NSString *)queryById:(int)queryId
-{
-    NSString *query = nil;
-    for (NSString *key in [_queries allKeys])
-    {
-        if ([[_queries objectForKey:key] intValue] == queryId)
-        {
-            query = key;
-            break;
-        }
-    }
-    return query;
-}
-*/
 - (NSString *)queryById:(NSString*)queryId
 {
     NSString *query = nil;
@@ -213,15 +164,6 @@ static SearchProvider *sharedProvider = nil;
 }
 
 // Return id for query string
-/*
-- (int)queryId:(NSString *)query
-{
-    NSNumber *value = [_queries objectForKey:query];
-    if (!value)
-        return 0;
-    return [value unsignedLongValue];
-}
- */
 - (NSString*)queryId:(NSString *)query
 {
     return [_queries objectForKey:query];
@@ -252,12 +194,38 @@ static SearchProvider *sharedProvider = nil;
     [_twitter closeAllConnections];
 }
 
+- (void)addObserver:(id)observer
+{
+    if (_observers && observer && [_observers indexOfObject:observer] == NSNotFound) {
+        [_observers addObject:observer];
+    }
+}
+
+- (void)removeObserver:(id)observer
+{
+    if (_observers && observer && [_observers indexOfObject:observer] != NSNotFound) {
+        [_observers removeObject:observer];
+    }
+}
+
 #pragma mark MGTwitterEngineDelegate
 - (void)searchResultsReceived:(NSArray *)searchResults forRequest:(NSString *)connectionIdentifier
 {
     YFLog(@"SEARCH RESULT FOR ID: %@", connectionIdentifier);
     
     SPNotificationValue notification = [self notificationForIdentifier:connectionIdentifier];
+    
+    NSLog(@"SEARCH RECEIVED: %@", searchResults);
+    
+    if (searchResults.count > 0) {
+        id item = [searchResults objectAtIndex:0];
+        if ([item isKindOfClass:[NSDictionary class]]) {
+            id results = [item objectForKey:@"results"];
+            if (results && [results isKindOfClass:[NSArray class]]) {
+                searchResults = results;
+            }
+        }
+    }
     
     //YFLog(@"%@", searchResults);
     if (notification == SPInvalidValue)
@@ -284,12 +252,18 @@ static SearchProvider *sharedProvider = nil;
                     [_connections setObject:queryConnectionIdent forKey:updateConnectionIdent];
                 }
             }
+            
+            if ([_connections count] == 0) {
+                NSString *query = [self queryForIdentifier:connectionIdentifier];
+                [self notifyAboutSearchError:query];
+            }
             break;
         case SPSavedSearch:
             [self updateQueries:searchResults];
-            if (self.delegate && [self.delegate respondsToSelector:@selector(searchSavedSearchReceived:)])
+            for (id obs in _observers)
             {
-                [self.delegate performSelector:@selector(searchSavedSearchReceived:) withObject:searchResults];
+                if (obs && [obs respondsToSelector:@selector(searchSavedSearchReceived:)])
+                    [obs performSelector:@selector(searchSavedSearchReceived:) withObject:searchResults];
             }
             break;
         case SPUpdateState:
@@ -311,11 +285,7 @@ static SearchProvider *sharedProvider = nil;
     {
         query = [self queryForIdentifier:connectionIdentifier];
     }
-    
-    if (self.delegate && [self.delegate respondsToSelector:@selector(searchDidEndWithError:)]) 
-    {
-        [self.delegate performSelector:@selector(searchDidEndWithError:) withObject:query];
-    }
+    [self notifyAboutSearchError:query];
 }
 
 #pragma mark Unusable MGTwitterEngineDelegate methods
@@ -330,20 +300,21 @@ static SearchProvider *sharedProvider = nil;
 {
     YFLog(@"CURRENT CONNECTION ID: %@", connectionIdentifier);
     YFLog(@"ALL CONNECTIONS: %@", _connections);
+    
     NSString *searchIdentifier = [[_connections objectForKey:connectionIdentifier] retain];
+    NSString *query = [self queryForIdentifier:searchIdentifier];
+    
     [_connections removeObjectForKey:connectionIdentifier];
     if (statuses && [statuses count] > 0) 
     {
-        NSString *query = nil;
         NSDictionary *item = [statuses objectAtIndex:0];
         if (item != nil && [item objectForKey:@"id"]) 
         {
-            query = [self queryForIdentifier:searchIdentifier];
             [_searchResult addObject:item];
-        }
-        if (query)
             [self notifyAboutEndOfSearch:statuses forQuery:query];
+        }
     }
+    
     [searchIdentifier release];
 }
 
@@ -374,18 +345,7 @@ static SearchProvider *sharedProvider = nil;
         [self setNotificationValue:SPSearchData forIdentifier:identifier forQuery:query];
     }
 }
-/*
-- (void)searchForQueryId:(int)queryId
-{
-    NSString *query = [self queryById:queryId];
-    
-    if ([self validateQuery:query] == YES)
-    {
-        NSString *identifier = [_twitter getSearchSavedResultById:queryId];
-        [self setNotificationValue:SPSearchData forIdentifier:identifier forQuery:query];
-    }
-}
-*/
+
 - (void)searchForQueryId:(NSString*)queryId
 {
     NSString *query = [self queryById:queryId];
@@ -396,12 +356,7 @@ static SearchProvider *sharedProvider = nil;
         [self setNotificationValue:SPSearchData forIdentifier:identifier forQuery:query];
     }
 }
-/*
-- (void)searchForQueryId:(int)queryId fromPage:(int)page count:(int)count
-{
-    [self searchForQueryId:queryId];
-}
-*/
+
 - (void)searchForQueryId:(NSString*)queryId fromPage:(int)page count:(int)count
 {
     [self searchForQueryId:queryId];
@@ -419,9 +374,19 @@ static SearchProvider *sharedProvider = nil;
 
 - (void)notifyAboutEndOfSearch:(NSArray*)result forQuery:(NSString*)query
 {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(searchDidEnd:forQuery:)])
+    for (id obs in _observers)
     {
-        [self.delegate performSelector:@selector(searchDidEnd:forQuery:) withObject:result withObject:query];
+        if ([obs respondsToSelector:@selector(searchDidEnd:forQuery:)])
+            [obs performSelector:@selector(searchDidEnd:forQuery:) withObject:result withObject:query];
+    }
+}
+
+- (void)notifyAboutSearchError:(NSString*)query
+{
+    for (id obs in _observers)
+    {
+        if ([obs respondsToSelector:@selector(searchDidEndWithError:)])
+            [obs performSelector:@selector(searchDidEndWithError:) withObject:query];
     }
 }
 
@@ -487,9 +452,10 @@ static SearchProvider *sharedProvider = nil;
             }
         }
         // Notificate delegate object about changing
-        if (self.delegate && [self.delegate respondsToSelector:@selector(searchProviderDidUpdated)])
+        for (id obs in _observers)
         {
-            [self.delegate performSelector:@selector(searchProviderDidUpdated)];
+            if ([obs respondsToSelector:@selector(searchProviderDidUpdated)])
+                [obs performSelector:@selector(searchProviderDidUpdated)];
         }
     }
 }

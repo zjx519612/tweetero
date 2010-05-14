@@ -41,6 +41,8 @@
 	URL:(NSURL *)URL
 	deliveryOptions:(MGTwitterEngineDeliveryOptions)deliveryOptions;
 
+- (void)normalizeParsedObjects;
+
 // subclass utilities
 - (void)addValue:(id)value forKey:(NSString *)key;
 - (void)addValue:(id)value forKey:(NSString *)key;

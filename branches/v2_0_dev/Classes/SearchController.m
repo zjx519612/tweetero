@@ -109,7 +109,6 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
     self.query = nil;
     if (self.searchProvider) {
         [self.searchProvider closeSearch];
-        self.searchProvider.delegate = nil;
         self.searchProvider = nil;
     }
     [TweetterAppDelegate decreaseNetworkActivityIndicator];
@@ -123,9 +122,10 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
 
 - (void)viewDidAppear:(BOOL)animated
 {
+    YFLog(@"VIEW DID APPEAR SEARCH CONTROLLER");
     [super viewDidAppear:animated];
     
-    self.searchProvider = [SearchProvider sharedProviderUsingDelegate:self];
+    self.searchProvider = [SearchProvider sharedProviderWithObserver:self];
     
     _pageNum = START_AT_PAGE;
     _searchBar.text = self.query;
@@ -152,6 +152,7 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
         //self.searchProvider.delegate = nil;
         //self.searchProvider = nil;
     //}
+    [self.searchProvider removeObserver:self];
     [super viewDidDisappear:animated];
 }
 
@@ -204,10 +205,7 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
     if (recievedData && [recievedData count] > 0)
 	{
         if (!_result)
-		{
 			_result = [NSMutableArray new];
-		}
-		
         [_result addObjectsFromArray:recievedData];
     }
 	
@@ -232,6 +230,7 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
     }
     _emptyString = NSLocalizedString(@"Search_NotFound", @"");
     _hasConnectionError = YES;
+    [self reloadData];
 }
 
 - (void)searchProviderDidUpdated
