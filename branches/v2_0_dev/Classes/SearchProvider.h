@@ -32,13 +32,13 @@ typedef enum {
 @property (nonatomic, readonly) MGTwitterEngine *twitter;
 
 // Allocate and return SearchProvider object. Object is autoreleased.
-+ (SearchProvider *)providerWithDelegate:(id)delegate;
++ (SearchProvider *)providerWithObserver:(id)observer;
 
-+ (SearchProvider *)sharedProviderUsingDelegate:(id)delegate;
++ (SearchProvider *)sharedProviderWithObserver:(id)observer;
 
 + (SearchProvider *)sharedProviderRelease;
 
-- (id)initWithDelegate:(id)delegate;
+- (id)initWithObserver:(id)observer;
 
 // Update object
 - (void)update;

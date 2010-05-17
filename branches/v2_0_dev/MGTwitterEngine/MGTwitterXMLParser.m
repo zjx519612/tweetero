@@ -111,10 +111,36 @@ connectionIdentifier:(NSString *)theIdentifier requestType:(MGTwitterRequestType
         [currentNode setObject:boolNumber forKey:elementName];
     } else if ([elementName isEqualToString:@"created_at"]) {
         // Change date-string into an NSDate.
-        NSDate *creationDate = [NSDate dateWithNaturalLanguageString:[currentNode objectForKey:elementName]];
+        //NSDate *creationDate = [NSDate dateWithNaturalLanguageString:[currentNode objectForKey:elementName]];
+        NSString *value = [currentNode objectForKey:elementName];
+        
+        NSString *dateFormat = nil;
+        if ([value hasSuffix:@"+0000"])
+        {
+            // format for Search API: "Fri, 06 Feb 2009 07:28:06 +0000"
+            // strptime([value UTF8String], "%a, %d %b %Y %H:%M:%S +0000", &theTime);
+            dateFormat = @"EEE, dd MMM yyyy HH:mm:ss ZZZ";
+        }
+        else
+        {
+            // format for REST API: "Thu Jan 15 02:04:38 +0000 2009"
+            // strptime([value UTF8String], "%a %b %d %H:%M:%S +0000 %Y", &theTime);
+            dateFormat = @"EEE MMM dd HH:mm:ss ZZZ yyyy";
+        }
+        
+        NSDateFormatterBehavior def = [NSDateFormatter defaultFormatterBehavior];
+        [NSDateFormatter setDefaultFormatterBehavior:NSDateFormatterBehavior10_4];
+
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:dateFormat];
+        NSDate *creationDate = [dateFormatter dateFromString:value];
+        [dateFormatter release];
+        
         if (creationDate) {
             [currentNode setObject:creationDate forKey:elementName];
         }
+        
+        [NSDateFormatter setDefaultFormatterBehavior:def];
     }
 }
 

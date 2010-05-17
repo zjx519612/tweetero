@@ -164,8 +164,6 @@ const NSInteger kRetriesNumber = 3;
 
 - (void)didReceiveMemoryWarning 
 {
-	ISLog(@"MEMORY WARNING");
-	
 	[self releaseTwitterMessageObjectCache];
 	[self initTwitterMessageObjectCache];
 	[self clearMessagesCache];
@@ -352,15 +350,12 @@ const NSInteger kRetriesNumber = 3;
 #pragma mark MGTwitterEngineDelegate methods
 - (void)requestSucceeded:(NSString *)connectionIdentifier
 {
-    ISLog(@"Success");
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	_loading = NO;
 }
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
-    ISLog(@"Failed");
-		
 	if(self.navigationItem.leftBarButtonItem)
 			self.navigationItem.leftBarButtonItem.enabled = YES;
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
@@ -398,20 +393,9 @@ const NSInteger kRetriesNumber = 3;
 
 - (void)statusesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier
 {
-    ISLog(@"Receive status");
     YFLog(@"%@", statuses);
     
     NSLog(@"TIME_DEBUG: %@", [NSDate date]);
-    /*
-	if([statuses count] < MESSAGES_PER_PAGE)
-	{
-		_lastMessage = YES;
-		if(_messages)
-			[self.tableView deleteRowsAtIndexPaths:
-					[NSArray arrayWithObject: [NSIndexPath indexPathForRow:[_messages count] inSection:0]]
-				withRowAnimation:UITableViewRowAnimationTop];
-	}
-	*/
     
 	if(!_messages)
 	{
@@ -463,17 +447,6 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 
 - (void)directMessagesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier;
 {
-    ISLog(@"Receive Direct message");
-    /*
-	if([statuses count] < MESSAGES_PER_PAGE)
-	{
-		_lastMessage = YES;
-		if(_messages && [_messages count] > 0 && [self.tableView numberOfRowsInSection:0] > [_messages count])
-			[self.tableView deleteRowsAtIndexPaths:
-					[NSArray arrayWithObject: [NSIndexPath indexPathForRow:[_messages count] inSection:0]]
-				withRowAnimation:UITableViewRowAnimationTop];
-	}
-	*/
 	if(!_messages)
 	{
 		if([statuses count] > 0)
@@ -522,8 +495,6 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 #pragma mark ===
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count
 {
-    ISLog(@"Start load message");
-
     if ([[AccountManager manager] isValidLoggedUser])
 	{
 		if(_errorDesc)
@@ -542,8 +513,6 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 
 - (void)reloadAll
 {
-    ISLog(@"Reload data");
-    
 	_lastMessage = NO;
 	_pagenum = 1;
 

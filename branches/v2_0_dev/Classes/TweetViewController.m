@@ -745,6 +745,15 @@
 {
 }
 
+- (void)imageUploadDidFailedBySender:(ImageUploader *)sender
+{
+}
+
+- (BOOL)shouldChangeImage:(UIImage *)anImage withNewImage:(UIImage *)newImage
+{
+    return NO;
+}
+
 #pragma mark UserInfoView Delegate
 - (void)userDetailPressed
 {
