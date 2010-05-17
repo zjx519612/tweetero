@@ -84,6 +84,14 @@
 // Retrieved images are sent to the delegate via the -imageReceived:forRequest: method.
 - (NSString *)getImageAtURL:(NSString *)urlString;
 
+// Connection/Request methods
+- (NSString *)_sendRequestWithMethod:(NSString *)method 
+                                path:(NSString *)path 
+                     queryParameters:(NSDictionary *)params
+                                body:(NSString *)body 
+                         requestType:(MGTwitterRequestType)requestType 
+                        responseType:(MGTwitterResponseType)responseType;
+
 #pragma mark REST API methods
 
 // ======================================================================================================

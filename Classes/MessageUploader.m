@@ -50,7 +50,6 @@
 	self = [super init];
 	if(self)
 	{
-		//_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
         _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
 		self._body = text;
 		self._imageData = JPEGData;	
@@ -94,7 +93,7 @@
 	return canceled;
 }
 
--(void)postMessage
+- (void)postMessage
 {
 	if(canceled)
 	{
@@ -104,7 +103,6 @@
 		[self autorelease];
 		return;
 	}
-		
 	
 	[self retain];
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
@@ -122,7 +120,7 @@
 	[mgConnectionWrap release];
 }
 
-- (void) send
+- (void)send
 {
 	if(!self._imageData && ! self._videoURL)
 		[self postMessage];
@@ -132,32 +130,12 @@
 		ImageUploader * uploader = [[ImageUploader alloc] init];
 		self._connection = uploader;
 		if(_imageData)
-		{
 			[uploader postData:_imageData delegate:self userData:nil];
-//			[uploader postJPEGData:_imageData delegate:self userData:nil];//this method does not scale image
-		}
 		else
 			[uploader postMP4Data:[NSData dataWithContentsOfURL:_videoURL] delegate:self userData:nil];
 		[uploader release];
 	}
 }
-
-/*
-- (void) send
-{
-	if(!self._imageData)
-		[self postMessage];
-	else
-	{
-		[self retain];
-		ImageUploader * uploader = [[ImageUploader alloc] init];
-		self._connection = uploader;
-		[uploader postJPEGData:_imageData delegate:self userData:nil];
-		[uploader release];
-	}
-}
-
-*/
 
 - (void)uploadedDataSize:(NSInteger)size
 {
@@ -184,6 +162,15 @@
 	[self autorelease];
 }
 
+- (void)imageUploadDidFailedBySender:(ImageUploader *)sender
+{
+}
+
+- (BOOL)shouldChangeImage:(UIImage *)anImage withNewImage:(UIImage *)newImage
+{
+    return NO;
+}
+
 - (void)requestSucceeded:(NSString *)connectionIdentifier
 {
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
@@ -192,7 +179,6 @@
 		[self._delegate MessageUploadFinished:YES sender:self];
 	[self autorelease];
 }
-
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
@@ -211,6 +197,5 @@
 		[self._delegate MessageUploadFinished:NO sender:self];
 	[self autorelease];
 }
-
 
 @end

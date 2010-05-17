@@ -8,29 +8,22 @@
 
 #import "TweetPlayer.h"
 
-
 @implementation TweetPlayer
 
 -(void)didRotate:(NSNotification *)theNotification 
 {
-  UIInterfaceOrientation interfaceOrientation = [[UIDevice currentDevice] orientation];
-  
-  [super setOrientation:interfaceOrientation animated:YES];
+    UIInterfaceOrientation interfaceOrientation = [[UIDevice currentDevice] orientation];
+    [super performSelector:@selector(setOrientation:animated:) withObject:(id)interfaceOrientation withObject:(id)YES];
+    //[super setOrientation:interfaceOrientation animated:YES];
 }
 
 - (id)initWithContentURL:(NSURL *)url
 {
 	self = [super initWithContentURL:url];
 	if(self)
-	{
-		
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self
-				selector:@selector(didRotate:)
-				name:UIDeviceOrientationDidChangeNotification
-				object:nil];
+    {
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRotate:) name:UIDeviceOrientationDidChangeNotification object:nil];
 	}
-	
 	return self;
 }
 
@@ -38,17 +31,14 @@
 {
 	[super play];
 	UIInterfaceOrientation interfaceOrientation = [[UIDevice currentDevice] orientation];
-	[super setOrientation:interfaceOrientation animated:NO];
+    [super performSelector:@selector(setOrientation:animated:) withObject:(id)interfaceOrientation withObject:(id)NO];
+	//[super setOrientation:interfaceOrientation animated:NO];
 }
 
-- (void) dealloc
+- (void)dealloc
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self 
-				name:UIDeviceOrientationDidChangeNotification 
-				object:nil];
-				
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
 	[super dealloc];
 }
-
 
 @end

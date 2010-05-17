@@ -56,7 +56,6 @@
 - (void)setUser:(NSString*)user
 {
 	_user = [user retain];
-	//toField.text = [NSString stringWithFormat:@"Direct Message to %@", _user];
 }
 
 - (NSString *)username
@@ -71,7 +70,6 @@
 	if(_message)
 		replyToId = [[_message objectForKey:@"id"] intValue];
 	
-	//[sendButton setEnabled:NO];
 	NSString* connectionID = [_twitter sendDirectMessage:body to:_user];
 	if(connectionID)
 	{
@@ -97,154 +95,5 @@
 	if([[TweetQueue sharedQueue] getMessage:&text andImageData:&imageData movieURL:&movieURL inReplyTo:&_queuedReplyId forUser:&username atIndex:index])
         [self setUser:username];
 }
-
-@end
-
-@implementation NewMessageControllerOld
-
-- (void)viewDidLoad
-{
-	[super viewDidLoad];
-	_textModified = NO;
-	self.navigationItem.rightBarButtonItem = sendButton;
-	self.navigationItem.leftBarButtonItem = cancelButton;
-	//_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
-    _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
-	_message = nil;
-	_user = nil;
-	textEdit.text = @"";
-	textEdit.delegate = self;
-	[self textViewDidChange:textEdit];	
-}
-
-- (void)dealloc
-{
-	int connectionsCount = [_twitter numberOfConnections];
-	[_twitter closeAllConnections];
-	[_twitter removeDelegate];
-	[_twitter release];
-	while(connectionsCount-- > 0)
-		[TweetterAppDelegate decreaseNetworkActivityIndicator];
-
-	[_message release];
-	[_user release];
-	[super dealloc];
-}
-
-- (void)textViewDidChange:(UITextView *)textView
-{
-	charsCount.text = [NSString stringWithFormat:@"%d", MAX_SYMBOLS_COUNT_IN_TEXT_VIEW - [textView.text length]];
-	_textModified = YES;
-}
-
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
-{
-	return MAX_SYMBOLS_COUNT_IN_TEXT_VIEW >= [textView.text length] - range.length + [text length];
-}
-
-
-- (void)setReplyToMessage:(NSDictionary*)message
-{
-	_message = [message retain];
-	NSString *replyToUser = [[_message objectForKey:@"user"] objectForKey:@"screen_name"];
-	textEdit.text = [NSString stringWithFormat:@"@%@ ", replyToUser];
-	_textModified = NO;
-	[self textViewDidChange:textEdit];
-}
-
-- (void)setRetwit:(NSString*)body whose:(NSString*)username
-{
-	if(username)
-		textEdit.text = [NSString stringWithFormat:NSLocalizedString(@"ReTwitFormat", @""), username, body];
-	else
-		textEdit.text = body;
-	_textModified = NO;
-	[self textViewDidChange:textEdit];
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-	[super viewDidAppear:animated];
-	[textEdit becomeFirstResponder];
-}
-
-
-- (IBAction)send 
-{
-    int replyToId = 0;
-	
-	if(_message)
-	{
-		replyToId = [[_message objectForKey:@"id"] intValue];
-	}
-	
-	[sendButton setEnabled:NO];
-	NSString* connectionID = [_twitter sendDirectMessage:textEdit.text to:_user];
-	if(connectionID)
-	{
-		[TweetterAppDelegate increaseNetworkActivityIndicator];
-		[cancelButton setEnabled:NO];
-	}
-}
-
-- (IBAction)cancel;
-{
-	if(!_textModified || [textEdit.text length] == 0)
-	{
-		[self.navigationController popViewControllerAnimated:YES];
-		return;
-	}
-	
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"The message is not sent", @"") 
-                                                    message:NSLocalizedString(@"Your changes will be lost", @"")
-												   delegate:self 
-                                          cancelButtonTitle:NSLocalizedString(@"Cancel", @"") 
-                                          otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
-	[alert show];
-	[alert release];
-		
-}
-
-- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-	if(buttonIndex > 0)
-		[self.navigationController popViewControllerAnimated:YES];
-}
-
-
-#pragma mark MGTwitterEngineDelegate methods
-
-
-- (void)requestSucceeded:(NSString *)connectionIdentifier
-{
-	[cancelButton setEnabled:YES];
-	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"DirectMessageSent" object:nil];
-	[self.navigationController popViewControllerAnimated:YES];
-}
-
-
-- (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
-{
-	[sendButton setEnabled:YES];
-	[cancelButton setEnabled:YES];
-	
-	[TweetterAppDelegate decreaseNetworkActivityIndicator];
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Failed!", @"") 
-                                                    message:[error localizedDescription]
-												   delegate:nil 
-                                          cancelButtonTitle:NSLocalizedString(@"OK", @"") 
-                                          otherButtonTitles:nil];
-	[alert show];	
-	[alert release];
-}
-
-
-- (void)setUser:(NSString*)user
-{
-	_user = [user retain];
-	toField.text = [NSString stringWithFormat:NSLocalizedString(@"Direct Message to %@", @""), _user];
-}
-
 
 @end

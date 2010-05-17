@@ -46,7 +46,6 @@
 		0073C081106A498A006A0D62 /* MGTwitterStatusesYAJLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C079106A498A006A0D62 /* MGTwitterStatusesYAJLParser.m */; };
 		0073C082106A498A006A0D62 /* MGTwitterUsersYAJLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C07B106A498A006A0D62 /* MGTwitterUsersYAJLParser.m */; };
 		0073C083106A498A006A0D62 /* MGTwitterYAJLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C07D106A498A006A0D62 /* MGTwitterYAJLParser.m */; };
-		0073C0B8106A54D7006A0D62 /* searchutil.m in Sources */ = {isa = PBXBuildFile; fileRef = 0073C0B7106A54D7006A0D62 /* searchutil.m */; };
 		0075C6BD107610FB003A655F /* defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0075C6BC107610FB003A655F /* defaults.plist */; };
 		00851F8510F3578A00F178F7 /* TwLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 00851F8410F3578A00F178F7 /* TwLabel.m */; };
 		0088208D107251AC0055FC91 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0088208C107251AC0055FC91 /* MessageUI.framework */; };
@@ -87,7 +86,6 @@
 		00F2C55F10907D2500A2298C /* SA_OAuthTwitterController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00F2C55910907D2500A2298C /* SA_OAuthTwitterController.m */; };
 		00F2C56010907D2500A2298C /* SA_OAuthTwitterEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 00F2C55B10907D2500A2298C /* SA_OAuthTwitterEngine.m */; };
 		00F2C56110907D2500A2298C /* twitter_load.png in Resources */ = {isa = PBXBuildFile; fileRef = 00F2C55C10907D2500A2298C /* twitter_load.png */; };
-		00F6597710B6DA7600D9001B /* Logger.m in Sources */ = {isa = PBXBuildFile; fileRef = 00F6597610B6DA7600D9001B /* Logger.m */; };
 		0F5E42450F951968001D74D5 /* yfrog.png in Resources */ = {isa = PBXBuildFile; fileRef = 0F5E42440F951968001D74D5 /* yfrog.png */; };
 		1D3623260D0F684500981E51 /* TweetterAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* TweetterAppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
@@ -224,8 +222,6 @@
 		0073C07B106A498A006A0D62 /* MGTwitterUsersYAJLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGTwitterUsersYAJLParser.m; sourceTree = "<group>"; };
 		0073C07C106A498A006A0D62 /* MGTwitterYAJLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGTwitterYAJLParser.h; sourceTree = "<group>"; };
 		0073C07D106A498A006A0D62 /* MGTwitterYAJLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGTwitterYAJLParser.m; sourceTree = "<group>"; };
-		0073C0B6106A54D7006A0D62 /* searchutil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = searchutil.h; sourceTree = "<group>"; };
-		0073C0B7106A54D7006A0D62 /* searchutil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = searchutil.m; sourceTree = "<group>"; };
 		00851F8310F3578A00F178F7 /* TwLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwLabel.h; sourceTree = "<group>"; };
 		00851F8410F3578A00F178F7 /* TwLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwLabel.m; sourceTree = "<group>"; };
 		0088208C107251AC0055FC91 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
@@ -302,7 +298,6 @@
 		00F2C55C10907D2500A2298C /* twitter_load.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = twitter_load.png; sourceTree = "<group>"; };
 		00F2C6B01090C7C400A2298C /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		00F6597510B6DA7600D9001B /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Logger.h; path = Classes/Logger.h; sourceTree = "<group>"; };
-		00F6597610B6DA7600D9001B /* Logger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Logger.m; path = Classes/Logger.m; sourceTree = "<group>"; };
 		0F5E42440F951968001D74D5 /* yfrog.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = yfrog.png; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* TweetterAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetterAppDelegate.h; sourceTree = "<group>"; };
@@ -732,13 +727,10 @@
 			isa = PBXGroup;
 			children = (
 				00F6597510B6DA7600D9001B /* Logger.h */,
-				00F6597610B6DA7600D9001B /* Logger.m */,
 				AA847E5C0F67662F007DFEC1 /* util.h */,
 				AA847E5B0F67662F007DFEC1 /* util.m */,
 				28A0AB4B0D9B1048005BE974 /* Tweetter_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
-				0073C0B6106A54D7006A0D62 /* searchutil.h */,
-				0073C0B7106A54D7006A0D62 /* searchutil.m */,
 				00F2C6B01090C7C400A2298C /* config.h */,
 			);
 			name = "Other Sources";
@@ -1036,7 +1028,6 @@
 				0073C081106A498A006A0D62 /* MGTwitterStatusesYAJLParser.m in Sources */,
 				0073C082106A498A006A0D62 /* MGTwitterUsersYAJLParser.m in Sources */,
 				0073C083106A498A006A0D62 /* MGTwitterYAJLParser.m in Sources */,
-				0073C0B8106A54D7006A0D62 /* searchutil.m in Sources */,
 				000CE659106BA24F00CA6E93 /* yajl.c in Sources */,
 				000CE65A106BA24F00CA6E93 /* yajl_alloc.c in Sources */,
 				000CE65B106BA24F00CA6E93 /* yajl_buf.c in Sources */,
@@ -1052,7 +1043,6 @@
 				00F2C55F10907D2500A2298C /* SA_OAuthTwitterController.m in Sources */,
 				00F2C56010907D2500A2298C /* SA_OAuthTwitterEngine.m in Sources */,
 				0010998A10A329B200DBD5A9 /* MGTwitterEngineFactory.m in Sources */,
-				00F6597710B6DA7600D9001B /* Logger.m in Sources */,
 				002FF1A810D7BA2400E69703 /* MoreController.m in Sources */,
 				002FF1A910D7BA2400E69703 /* TwTabController.m in Sources */,
 				002FF20A10D7CB9500E69703 /* TwActivityIndicator.m in Sources */,

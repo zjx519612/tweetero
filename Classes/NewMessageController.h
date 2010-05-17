@@ -40,28 +40,3 @@
 - (NSString *)username;
 
 @end
-
-@interface NewMessageControllerOld : UIViewController <UITextViewDelegate> 
-{
-    IBOutlet UITextView *textEdit;
-    IBOutlet id sendButton;
-	IBOutlet id cancelButton;
-	IBOutlet UILabel *charsCount;
-	IBOutlet UILabel *toField;
-	id _navDelegate;
-	BOOL _textModified;
-	MGTwitterEngine *_twitter;
-	NSDictionary *_message;
-    NSString *_user;
-}
-- (IBAction)send;
-- (IBAction)cancel;
-
-- (void)setReplyToMessage:(NSDictionary*)message;
-- (void)setUser:(NSString*)user;
-- (void)setRetwit:(NSString*)body whose:(NSString*)username;
-
-- (void)textViewDidChange:(UITextView *)textView;
-- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text;
-
-@end

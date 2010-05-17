@@ -68,14 +68,6 @@ static NSString *_password;
 - (NSString *)_dateToHTTP:(NSDate *)date;
 - (NSString *)_encodeString:(NSString *)string;
 
-// Connection/Request methods
-- (NSString *)_sendRequestWithMethod:(NSString *)method 
-                                path:(NSString *)path 
-                     queryParameters:(NSDictionary *)params
-                                body:(NSString *)body 
-                         requestType:(MGTwitterRequestType)requestType 
-                        responseType:(MGTwitterResponseType)responseType;
-
 // Parsing methods
 - (void)_parseDataForConnection:(MGTwitterHTTPURLConnection *)connection;
 

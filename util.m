@@ -40,13 +40,13 @@ void traceDict(NSDictionary *dict)
         if ([key isKindOfClass:[NSString class]])
             keyStr = key;
         else
-            keyStr = [NSString stringWithCString:NAMEOF(key)];
+            keyStr = NSStringFromClass([key class]);
         
         NSString *valStr;
         if ([obj isKindOfClass:[NSString class]])
             valStr = obj;
         else
-            valStr = [NSString stringWithCString:NAMEOF(key)];
+            valStr = NSStringFromClass([key class]);
         YFLog(@"%@: %@\n", keyStr, valStr);
     }
 }
@@ -433,7 +433,7 @@ NSString* getLinkWithTag(NSString *tag)
             idx++;
         }
         buf[i] = 0;
-        link = [NSString stringWithCString:buf length:i];
+        link = [NSString stringWithUTF8String:buf];
     }
     return link;
 }
