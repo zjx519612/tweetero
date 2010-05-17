@@ -170,7 +170,9 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [[self.accountManager allAccountUsername] count];
+    if ([self.accountManager hasAccounts])
+        return [[self.accountManager allAccountUsername] count];
+    return 1;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -182,8 +184,17 @@
     if (cell == nil)
         cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:kCellIdentifier] autorelease];
     
-    cell.textLabel.text = [[self.accountManager allAccountUsername] objectAtIndex:indexPath.row];
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    if ([self.accountManager hasAccounts]) {
+        cell.textLabel.text = [[self.accountManager allAccountUsername] objectAtIndex:indexPath.row];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:24];
+        cell.textLabel.textAlignment = UITextAlignmentLeft;
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    } else {
+        cell.textLabel.text = NSLocalizedString(@"Please, add one or more accounts!", @"");
+        cell.textLabel.font = [UIFont systemFontOfSize:16];
+        cell.textLabel.textAlignment = UITextAlignmentCenter;
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
     
     return cell;
 }

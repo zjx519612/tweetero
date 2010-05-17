@@ -91,24 +91,27 @@ static int NetworkActivityIndicatorCounter = 0;
 
 - (void)didRotate:(NSNotification*)notification
 {
-    @try
+    if ([SettingsController autoCameraMode])
     {
-        if ([navigationController.topViewController isKindOfClass:[TwTabController self]] &&
-            ![navigationController.modalViewController isKindOfClass:[UIImagePickerController self]])
+        @try
         {
-            UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
-            
-            if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera] &&
-                UIInterfaceOrientationIsLandscape(orientation))
+            if ([navigationController.topViewController isKindOfClass:[TwTabController self]] &&
+                ![navigationController.modalViewController isKindOfClass:[UIImagePickerController self]])
             {
-                TwitEditorController *editor = [[TwitEditorController alloc] initInCameraMode];
-                [navigationController pushViewController:editor animated:YES];
-                [editor release];
+                UIInterfaceOrientation orientation = [[UIDevice currentDevice] orientation];
+                
+                if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera] &&
+                    UIInterfaceOrientationIsLandscape(orientation))
+                {
+                    TwitEditorController *editor = [[TwitEditorController alloc] initInCameraMode];
+                    [navigationController pushViewController:editor animated:YES];
+                    [editor release];
+                }
             }
         }
-    }
-    @catch (...)
-    {
+        @catch (...)
+        {
+        }
     }
 }
 

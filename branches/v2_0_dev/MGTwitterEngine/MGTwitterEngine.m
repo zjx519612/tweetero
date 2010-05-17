@@ -938,14 +938,14 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
 			[_delegate connectionFinished];
     }
     
-    if (NO) {
-        // Display headers for debugging.
-        NSHTTPURLResponse *resp = (NSHTTPURLResponse *)response;
-        YFLog(@"(%d) [%@]:\\r%@", 
-              [resp statusCode], 
-              [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], 
-              [resp allHeaderFields]);
-    }
+//    if (NO) {
+//        // Display headers for debugging.
+//        NSHTTPURLResponse *resp = (NSHTTPURLResponse *)response;
+//        YFLog(@"(%d) [%@]:\\r%@", 
+//              [resp statusCode], 
+//              [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], 
+//              [resp allHeaderFields]);
+//    }
 }
 
 

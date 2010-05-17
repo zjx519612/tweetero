@@ -76,7 +76,6 @@
 		00E2555C1095B8A80065E0F9 /* timeline.png in Resources */ = {isa = PBXBuildFile; fileRef = 00E255451095B8A80065E0F9 /* timeline.png */; };
 		00E2555F1095B8A80065E0F9 /* tweetsnap2.png in Resources */ = {isa = PBXBuildFile; fileRef = 00E255481095B8A80065E0F9 /* tweetsnap2.png */; };
 		00E255601095B8A80065E0F9 /* unsent.tif in Resources */ = {isa = PBXBuildFile; fileRef = 00E255491095B8A80065E0F9 /* unsent.tif */; };
-		00E255611095B8A80065E0F9 /* yfrog.png in Resources */ = {isa = PBXBuildFile; fileRef = 00E2554A1095B8A80065E0F9 /* yfrog.png */; };
 		00E255621095B8A80065E0F9 /* yfrog1.png in Resources */ = {isa = PBXBuildFile; fileRef = 00E2554B1095B8A80065E0F9 /* yfrog1.png */; };
 		00E255631095B8A80065E0F9 /* yfrog_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 00E2554C1095B8A80065E0F9 /* yfrog_icon.png */; };
 		00E2565B1095E68B0065E0F9 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 00E256591095E6840065E0F9 /* Localizable.strings */; };
@@ -260,7 +259,6 @@
 		00E255451095B8A80065E0F9 /* timeline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = timeline.png; path = Resource/Images/timeline.png; sourceTree = "<group>"; };
 		00E255481095B8A80065E0F9 /* tweetsnap2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tweetsnap2.png; path = Resource/Images/tweetsnap2.png; sourceTree = "<group>"; };
 		00E255491095B8A80065E0F9 /* unsent.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = unsent.tif; path = Resource/Images/unsent.tif; sourceTree = "<group>"; };
-		00E2554A1095B8A80065E0F9 /* yfrog.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = yfrog.png; path = Resource/Images/yfrog.png; sourceTree = "<group>"; };
 		00E2554B1095B8A80065E0F9 /* yfrog1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = yfrog1.png; path = Resource/Images/yfrog1.png; sourceTree = "<group>"; };
 		00E2554C1095B8A80065E0F9 /* yfrog_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = yfrog_icon.png; path = Resource/Images/yfrog_icon.png; sourceTree = "<group>"; };
 		00E256481095E5F20065E0F9 /* RU_ru */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = RU_ru; path = RU_ru.lproj/ImageView.xib; sourceTree = "<group>"; };
@@ -803,7 +801,6 @@
 				00E255451095B8A80065E0F9 /* timeline.png */,
 				00E255481095B8A80065E0F9 /* tweetsnap2.png */,
 				00E255491095B8A80065E0F9 /* unsent.tif */,
-				00E2554A1095B8A80065E0F9 /* yfrog.png */,
 				00E2554B1095B8A80065E0F9 /* yfrog1.png */,
 				00E2554C1095B8A80065E0F9 /* yfrog_icon.png */,
 				005EA149106BDC3B0014EC03 /* about.png */,
@@ -953,7 +950,6 @@
 				00E2555C1095B8A80065E0F9 /* timeline.png in Resources */,
 				00E2555F1095B8A80065E0F9 /* tweetsnap2.png in Resources */,
 				00E255601095B8A80065E0F9 /* unsent.tif in Resources */,
-				00E255611095B8A80065E0F9 /* yfrog.png in Resources */,
 				00E255621095B8A80065E0F9 /* yfrog1.png in Resources */,
 				00E255631095B8A80065E0F9 /* yfrog_icon.png in Resources */,
 				00E2565B1095E68B0065E0F9 /* Localizable.strings in Resources */,

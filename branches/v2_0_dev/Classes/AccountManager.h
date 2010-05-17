@@ -58,6 +58,8 @@
 
 - (NSArray*)allAccountUsername;
 
+- (BOOL)hasAccounts;
+
 - (BOOL)hasAccountWithUsername:(NSString*)username;
 
 - (void)login:(UserAccount*)account;
