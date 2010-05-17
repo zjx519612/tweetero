@@ -67,7 +67,8 @@
 - (void)userInfoReceived:(NSArray *)userInfo forRequest:(NSString *)connectionIdentifier;
 {
     YFLog(@"USER INFO RECEIVE");
-	
+	YFLog(@"%@", userInfo);
+    
     if (![_userInfoConnectionID isEqualToString:connectionIdentifier])
 	{
 		return;

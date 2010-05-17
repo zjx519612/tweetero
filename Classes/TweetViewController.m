@@ -554,9 +554,9 @@
 {
     [super viewDidAppear:animated];
     [self.navigationController.view setNeedsLayout];
-    TweetterAppDelegate *app = (TweetterAppDelegate*)[UIApplication sharedApplication].delegate;
-    YFLog(@"TweetViewController: app.window.frame: %@", NSStringFromCGRect(app.window.frame));
-    YFLog(@"TweetViewController: self.view.frame: %@", NSStringFromCGRect(self.view.frame));
+    //TweetterAppDelegate *app = (TweetterAppDelegate*)[UIApplication sharedApplication].delegate;
+    //YFLog(@"TweetViewController: app.window.frame: %@", NSStringFromCGRect(app.window.frame));
+    //YFLog(@"TweetViewController: self.view.frame: %@", NSStringFromCGRect(self.view.frame));
     [self.view.superview setFrame:CGRectMake(0, 64, 320, 416)];
     [self.view.superview setNeedsLayout];
     [self.navigationController.view setNeedsLayout];

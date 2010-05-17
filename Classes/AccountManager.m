@@ -195,6 +195,11 @@
     return [NSArray arrayWithArray:[_accounts allKeys]];
 }
 
+- (BOOL)hasAccounts
+{
+    return ([self allAccountUsername].count > 0);
+}
+
 - (BOOL)hasAccountWithUsername:(NSString*)username
 {
     return !([self accountByUsername:username] == nil);

@@ -122,20 +122,27 @@
 	while (nil != (moreItem = [moreItemsEnumerator nextObject]))
 	{
 		MoreItem *theItem = (MoreItem *)moreItem;
-		if ([[theItem title] isEqualToString:@"Followers"])
+		if ([[theItem title] isEqualToString:NSLocalizedString(@"Followers", @"")])
 		{
 			NSString *theTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", NSLocalizedString([theItem title], @""),
 						[[[AccountManager manager] loggedUserAccount] valueForKey:@"followers_count"]];
 			theItem.title = theTitle;
 			[theTitle release];
 		}
-		else if ([[theItem title] isEqualToString:@"Following"])
+		else if ([[theItem title] isEqualToString:NSLocalizedString(@"Following", @"")])
 		{
 			NSString *theTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", NSLocalizedString([theItem title], @""),
 						[[[AccountManager manager] loggedUserAccount] valueForKey:@"friends_count"]];
 			theItem.title = theTitle;
 			[theTitle release];
 		}
+        else if ([[theItem title] isEqualToString:NSLocalizedString(@"My Tweets", @"")]) {
+            
+			NSString *theTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", NSLocalizedString([theItem title], @""),
+                                  [[[AccountManager manager] loggedUserAccount] valueForKey:@"statuses_count"]];
+			theItem.title = theTitle;
+			[theTitle release];
+        }
 	}
 	
     [self.tableView reloadData];

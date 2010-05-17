@@ -32,30 +32,23 @@
 
 @implementation SettingsController
 
--(id)init
++ (BOOL)autoCameraMode
 {
-	self = [super init];
-	if(self)
-	{
-		
-	}
-	return self;
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"AutoCameraMode"];
 }
 
-
--(id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
+- (id)init
 {
-	self = [super initWithNibName:nibName bundle:nibBundle];
-	if(self)
-	{
-		
-	}
-	return self;
+	return [super init];
 }
 
-- (void) setNavigatorButtons
+- (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
 {
+	return [super initWithNibName:nibName bundle:nibBundle];
+}
 
+- (void)setNavigatorButtons
+{
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
@@ -69,18 +62,15 @@
 	firstMailAddressView.hidden = YES;
 	postMailLabel.hidden = YES;
 	postMailSwitch.hidden = YES;
-	
 	[self accountChanged:nil];
 }
 
 - (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-
 }
 
 - (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-
 }
 
 - (void)didReceiveMemoryWarning 
@@ -89,14 +79,13 @@
     // Release anything that's not essential, such as cached data
 }
 
-
-- (void)dealloc 
+- (void)dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
 }
 
-- (IBAction) postLocationChanged
+- (IBAction)postLocationChanged
 {
 	[[NSUserDefaults standardUserDefaults] setBool:postLocationsSwitch.on forKey:@"UseLocations"];
 	if(postLocationsSwitch.on)
@@ -106,13 +95,17 @@
 	[[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateLocationDefaultsChanged" object: nil];
 }
 
+- (IBAction)cameraModeChanged
+{
+    [[NSUserDefaults standardUserDefaults] setBool:autoCameraModeSwitch.on forKey:@"AutoCameraMode"];
+}
 
-- (IBAction) postMailChanged
+- (IBAction)postMailChanged
 {
 	[[NSUserDefaults standardUserDefaults] setBool:postMailSwitch.on forKey:@"PostMail"];
 }
 
-- (IBAction) postFirstMailAddressChanged
+- (IBAction)postFirstMailAddressChanged
 {
 	[[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithObject:firstMailAddressView.text] forKey:@"PostMailAddresses"];
 }
@@ -123,17 +116,16 @@
 	postLocationsSwitch.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"UseLocations"];
 	postMailSwitch.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"PostMail"];
 	scaleLargeImagesSwitch.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"ScalePhotosBeforeUploading"];
-
+    autoCameraModeSwitch.on = [SettingsController autoCameraMode];
+    
 	NSArray* addresses = [[NSUserDefaults standardUserDefaults] arrayForKey:@"PostMailAddresses"];
 	firstMailAddressView.text = (addresses && [addresses count]) ? [addresses objectAtIndex:0] : @"";
 }
-
 
 - (IBAction)login:(id)sender;
 {
 	//[LoginController showModal:self.navigationController];
 }
-
 
 - (void)updateLocationDefaultsChanged:(NSNotification*)notification
 {
@@ -142,7 +134,6 @@
 
 - (void)accountChanged:(NSNotification*)notification
 {
-	//if([MGTwitterEngine username] && [MGTwitterEngine password])
     if ([[AccountManager manager] isValidLoggedUser])
 	{
         UserAccount *account = [[AccountManager manager] loggedUserAccount];
@@ -154,10 +145,9 @@
 		loginInfo.text = NSLocalizedString(@"You are not logged in to Twitter", @"");
 		[loginButton setTitle:NSLocalizedString(@"Log In", @"") forState:0];
 	}
-	
 }
 
-- (IBAction) scaleLargeImagesChanged
+- (IBAction)scaleLargeImagesChanged
 {
 	[[NSUserDefaults standardUserDefaults] setBool:scaleLargeImagesSwitch.on forKey:@"ScalePhotosBeforeUploading"];
 }

@@ -33,16 +33,20 @@
 	IBOutlet UILabel*		postMailLabel;
 	IBOutlet UISwitch*		postMailSwitch;
 	IBOutlet UISwitch*		scaleLargeImagesSwitch;
+    IBOutlet UISwitch*      autoCameraModeSwitch;
 	IBOutlet UITextField*	firstMailAddressView;
 	IBOutlet UILabel*		loginInfo;
 	IBOutlet UIButton*		loginButton;
 }
 
-- (IBAction) postLocationChanged;
-- (IBAction) postMailChanged;
-- (IBAction) postFirstMailAddressChanged;
-- (IBAction) scaleLargeImagesChanged;
-- (IBAction) login:(id)sender;
++ (BOOL)autoCameraMode;
+
+- (IBAction)postLocationChanged;
+- (IBAction)postMailChanged;
+- (IBAction)cameraModeChanged;
+- (IBAction)postFirstMailAddressChanged;
+- (IBAction)scaleLargeImagesChanged;
+- (IBAction)login:(id)sender;
 
 
 - (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated;

@@ -10,6 +10,7 @@
 "502_Bad_Gateway"                               = "Сервер не отвечает.";
 "503_Service_Unavailable"                       = "Сервера Twitter работают, но они перегружены запросами. Пробуйте снова позже.";
 
+"Please, add one or more accounts!"             = "Добавьте одну или несколько учетных записей!";
 "Account_Verification"                          = "Проверка учетной записи...";
 "Search_NotFound"                               = "Не найдено ни одного сообщения...";
 "Search_IndicatorText"                          = "Поиск...";
