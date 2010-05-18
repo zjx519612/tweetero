@@ -190,7 +190,7 @@
         cell.textLabel.textAlignment = UITextAlignmentLeft;
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     } else {
-        cell.textLabel.text = NSLocalizedString(@"Please, add one or more accounts!", @"");
+        cell.textLabel.text = NSLocalizedString(@"Please, add one or more accounts.", @"");
         cell.textLabel.font = [UIFont systemFontOfSize:16];
         cell.textLabel.textAlignment = UITextAlignmentCenter;
         cell.accessoryType = UITableViewCellAccessoryNone;

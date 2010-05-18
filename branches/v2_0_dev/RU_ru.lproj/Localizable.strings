@@ -10,7 +10,7 @@
 "502_Bad_Gateway"                               = "Сервер не отвечает.";
 "503_Service_Unavailable"                       = "Сервера Twitter работают, но они перегружены запросами. Пробуйте снова позже.";
 
-"Please, add one or more accounts!"             = "Добавьте одну или несколько учетных записей!";
+"Please, add one or more accounts."             = "Добавьте одну или несколько учетных записей.";
 "Account_Verification"                          = "Проверка учетной записи...";
 "Search_NotFound"                               = "Не найдено ни одного сообщения...";
 "Search_IndicatorText"                          = "Поиск...";
@@ -125,7 +125,7 @@
 "You are not logged in to Twitter"              = "Вы не вошли в Twitter";
 "Log In"                                        = "Войти";
 "No Unsent Tweets"                              = "Очередь пуста";
-"%i of %i"                                      = "%i из %i";
+"Tweet %i of %i"                                = "Сообщение %i из %i";
 "%@\nfrom %@"                                   = "%@\nfrom %@";
 "%.1f of %.1f %@"                               = "%.1f из %.1f %@";
 "FOLLOWING"                                     = "ПОДПИСАТЬСЯ";
