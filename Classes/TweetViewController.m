@@ -83,7 +83,7 @@
 
 - (void)updateViewTitle
 {
-    self.title = [NSString stringWithFormat:NSLocalizedString(@"%i of %i", @""), _currentMessageIndex + 1, _count];
+    self.title = [NSString stringWithFormat:NSLocalizedString(@"Tweet %i of %i", @""), _currentMessageIndex + 1, _count];
 }
 
 - (void)activeCurrentMessage
@@ -462,7 +462,6 @@
         _headView = nil;
         _count = [_store messageCount];
         _currentMessageIndex = (index >= _count || index < 0) ? 0 : index;
-        //_twitter = [[MGTwitterEngine alloc] initWithDelegate:self];
         _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
         _defaultTintColor = [tweetNavigate.tintColor retain];
 		_imagesLinks = nil;
@@ -474,6 +473,8 @@
 		_webView.backgroundColor = [UIColor clearColor];
 		_webView.scalesPageToFit = NO;		
         _webView.delegate = self;
+        
+        self.navigationItem.backBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"Back" style:UIBarButtonItemStylePlain target:nil action:nil] autorelease];
         
         [_twitter setUsesSecureConnection:NO];
         [self createHeadView];
@@ -535,13 +536,6 @@
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-    /*
-	for (id view in _webView.subviews) 
-	{
-		if ([view respondsToSelector:@selector(setAllowsRubberBanding:)]) 
-			[view performSelector:@selector(setAllowsRubberBanding:) withObject:NO]; 
-	}
-    */
     tweetNavigate.frame = CGRectMake(0, 0, 80, 30);
     UIBarButtonItem *navigateBarItem = [[[UIBarButtonItem alloc] initWithCustomView:tweetNavigate] autorelease];
     self.navigationItem.rightBarButtonItem = navigateBarItem;
@@ -554,9 +548,6 @@
 {
     [super viewDidAppear:animated];
     [self.navigationController.view setNeedsLayout];
-    //TweetterAppDelegate *app = (TweetterAppDelegate*)[UIApplication sharedApplication].delegate;
-    //YFLog(@"TweetViewController: app.window.frame: %@", NSStringFromCGRect(app.window.frame));
-    //YFLog(@"TweetViewController: self.view.frame: %@", NSStringFromCGRect(self.view.frame));
     [self.view.superview setFrame:CGRectMake(0, 64, 320, 416)];
     [self.view.superview setNeedsLayout];
     [self.navigationController.view setNeedsLayout];

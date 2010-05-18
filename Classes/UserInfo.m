@@ -130,7 +130,6 @@ static NSString* kActionCell = @"UserInfoActionCell";
     [super viewDidLoad];
     
     [_userInfoView disableFollowingButton:YES];
-	//sendDirectMessage.hidden = YES;
     _isDirectMessage = NO;
     
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
@@ -148,6 +147,8 @@ static NSString* kActionCell = @"UserInfoActionCell";
 {
     [super viewDidAppear:animated];
     [self enableCellAtIndex:UActionDirectMessageIndex atSection:USAction enabled:_isDirectMessage];
+    BOOL isSelfUserInfo = [TweetterAppDelegate isCurrentUserName:_username];
+    [self enableCellAtIndex:UActionReplyIndex atSection:USAction enabled:!isSelfUserInfo];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -283,6 +284,9 @@ static NSString* kActionCell = @"UserInfoActionCell";
     _userInfoView.screenname = [userData objectForKey:@"screen_name"];
 	_userInfoView.username = [userData objectForKey:@"name"];
     self.navigationItem.title = _userInfoView.screenname;
+    
+    BOOL isSelfUserInfo = [TweetterAppDelegate isCurrentUserName:_userInfoView.screenname];
+    [self enableCellAtIndex:UActionReplyIndex atSection:USAction enabled:!isSelfUserInfo];
     
     _following = NO;
     id following = [userData objectForKey:@"following"];
