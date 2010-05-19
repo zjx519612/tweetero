@@ -1,4 +1,5 @@
 #import "AccountController.h"
+#import "TwActivityIndicator.h"
 #import "LoginController.h"
 #import "AccountManager.h"
 #import "UserAccount.h"
@@ -11,6 +12,8 @@
 - (void)showTabController;
 - (void)verifySelectedAccount;
 - (void)closeAndReleaserTwitter;
+- (void)showActivityWithLabel:(NSString*)message;
+- (void)hideCurrentActivity;
 @end
 
 @implementation AccountController
@@ -47,8 +50,8 @@
         
         _tableAccounts = nil;
         _manager = nil;
-		
-		shouldShowTabControllerOnAutoLogin = YES;
+		_activity = nil;
+		_shouldShowTabControllerOnAutoLogin = YES;
         
         [[NSNotificationCenter defaultCenter] addObserver:self 
                                                  selector:@selector(saveAccountNotification:) 
@@ -72,9 +75,11 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_tableAccounts release];
     [_manager release];
-	[loginController release];
+	[_loginController release];
     [self closeAndReleaserTwitter];
 	
+    if (_activity)
+        [_activity release];
 	[_tableAccounts release];
 	_tableAccounts = nil;
 	
@@ -88,6 +93,12 @@
     self.navigationItem.leftBarButtonItem.enabled = YES;
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self hideCurrentActivity];
+}
+
 - (void)viewDidDisappear:(BOOL)animated
 {
     [self closeAndReleaserTwitter];
@@ -98,30 +109,35 @@
     if (_tableAccounts)
         [_tableAccounts reloadData];
 
-    if (self.accountManager.loggedUserAccount && shouldShowTabControllerOnAutoLogin)
+    if (self.accountManager.loggedUserAccount && _shouldShowTabControllerOnAutoLogin)
     {
         self.canAnimate = NO;
-		shouldShowTabControllerOnAutoLogin = NO;
+		_shouldShowTabControllerOnAutoLogin = NO;
         [self showTabController];
     }
+}
+
+- (void)startIndicator
+{
+    [self showActivityWithLabel:NSLocalizedString(@"Goto twitter.com", @"")];
 }
 
 #pragma mark Actions
 // Create LoginController and push it to navigation controller.
 - (IBAction)clickAdd
 {
-//	LoginController *controller = [[LoginController alloc] initWithNibName:@"Login" bundle:nil];
-//	[self.navigationController pushViewController:controller animated:YES];
-//	[controller release];
-	
-	if (nil != loginController)
+	if (nil != _loginController)
 	{
-		[loginController release];
-		loginController = nil;
+		[_loginController release];
+		_loginController = nil;
 	}
 
-	loginController = [[LoginController alloc] init];
-	[loginController showOAuthViewInController:self.navigationController];
+    [NSThread detachNewThreadSelector:@selector(startIndicator) toTarget:self withObject:nil];
+    
+	_loginController = [[LoginController alloc] init];
+	[_loginController showOAuthViewInController:self.navigationController];
+    
+    [self hideCurrentActivity];
 }
 
 - (IBAction)clickEdit
@@ -146,14 +162,14 @@
     else if (buttonIndex == 1)
     {
         // Edit selected account. Navigate LoginController with account data.
-		if (nil != loginController)
+		if (nil != _loginController)
 		{
-			[loginController release];
-			loginController = nil;
+			[_loginController release];
+			_loginController = nil;
 		}
 		
-		loginController = [[LoginController alloc] initWithUserAccount:account];
-		[loginController showOAuthViewInController:self.navigationController];
+		_loginController = [[LoginController alloc] initWithUserAccount:account];
+		[_loginController showOAuthViewInController:self.navigationController];
 //      [self.navigationController pushViewController:login animated:YES];
 //      [login release];
     }
@@ -287,6 +303,22 @@
         [_twitter release];
         _twitter = nil;
     }
+}
+
+- (void)showActivityWithLabel:(NSString*)message
+{
+    if (!_activity)
+    {
+        _activity = [[TwActivityIndicator alloc] init];
+    }
+    [_activity.messageLabel setText:message];
+    [_activity show];
+}
+
+- (void)hideCurrentActivity
+{
+    if (_activity)
+        [_activity hide];
 }
 
 #pragma mark MGTwitterEngine delegate methods
