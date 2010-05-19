@@ -153,8 +153,7 @@ const NSString *LoginControllerAccountDidChange = @"LoginControllerAccountDidCha
     engine.consumerSecret = kTweeteroConsumerSecret;
     [engine requestRequestToken];
     
-    SA_OAuthTwitterController *oAuthController =
-	[SA_OAuthTwitterController controllerToEnterCredentialsWithTwitterEngine:engine delegate:self];
+    SA_OAuthTwitterController *oAuthController = [SA_OAuthTwitterController controllerToEnterCredentialsWithTwitterEngine:engine delegate:self];
     if (oAuthController)
 	{
 		[aNavigationController pushViewController:oAuthController animated:YES];

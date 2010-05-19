@@ -341,10 +341,6 @@
     if (!finalURL) {
         return nil;
     }
-	
-    NSLog(@"");
-    NSLog(@"-> Open Connection: %@", finalURL);
-    NSLog(@"");
     
 	// --------------------------------------------------------------------------------
 	// modificaiton from the base clase
