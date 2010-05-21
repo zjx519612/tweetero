@@ -129,6 +129,9 @@ static NSString* kActionCell = @"UserInfoActionCell";
 {
     [super viewDidLoad];
     
+    notifySwitch.on = NO;
+    notifySwitch.enabled = NO;
+    
     [_userInfoView disableFollowingButton:YES];
     _isDirectMessage = NO;
     

@@ -22,10 +22,9 @@ typedef enum {
     NSString        *_username;
     NSString        *_secretData;
     TwitterAuthType  _authType;
-	
 	MGTwitterEngine *_twitter;
-	NSString *_userInfoConnectionID;
-	NSDictionary *_userData;
+	NSString        *_userInfoConnectionID;
+	NSDictionary    *_userData;
 }
 
 @property (nonatomic, copy) NSString *username;
@@ -33,23 +32,5 @@ typedef enum {
 @property (nonatomic) TwitterAuthType authType;
 
 - (void)updateUserInfo;
-//- (TwitterAuthType)authType;
 
 @end
-/*
-// TwitterCommonUserAccount
-@interface TwitterCommonUserAccount : UserAccount
-{
-    NSString    *_password;
-}
-@property (nonatomic, copy) NSString *password;
-@end
-
-// TwitterOAuthUserAccount
-@interface TwitterOAuthUserAccount : UserAccount
-{
-    OAToken *_accessToken;
-}
-@property (nonatomic, retain) OAToken *accessToken;
-@end
-*/

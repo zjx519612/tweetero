@@ -124,24 +124,33 @@
 		MoreItem *theItem = (MoreItem *)moreItem;
 		if ([[theItem title] isEqualToString:NSLocalizedString(@"Followers", @"")])
 		{
-			NSString *theTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", NSLocalizedString([theItem title], @""),
-						[[[AccountManager manager] loggedUserAccount] valueForKey:@"followers_count"]];
-			theItem.title = theTitle;
-			[theTitle release];
+            id count = [[[AccountManager manager] loggedUserAccount] valueForKey:@"followers_count"];
+            if (count != nil)
+            {
+                NSString *theTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", NSLocalizedString([theItem title], @""), count];
+                theItem.title = theTitle;
+                [theTitle release];
+            }
 		}
 		else if ([[theItem title] isEqualToString:NSLocalizedString(@"Following", @"")])
 		{
-			NSString *theTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", NSLocalizedString([theItem title], @""),
-						[[[AccountManager manager] loggedUserAccount] valueForKey:@"friends_count"]];
-			theItem.title = theTitle;
-			[theTitle release];
+            id count = [[[AccountManager manager] loggedUserAccount] valueForKey:@"friends_count"];
+            if (count)
+            {
+                NSString *theTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", NSLocalizedString([theItem title], @""), count];
+                theItem.title = theTitle;
+                [theTitle release];
+            }
 		}
-        else if ([[theItem title] isEqualToString:NSLocalizedString(@"My Tweets", @"")]) {
-            
-			NSString *theTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", NSLocalizedString([theItem title], @""),
-                                  [[[AccountManager manager] loggedUserAccount] valueForKey:@"statuses_count"]];
-			theItem.title = theTitle;
-			[theTitle release];
+        else if ([[theItem title] isEqualToString:NSLocalizedString(@"MyTweets", @"")])
+        {
+            id count = [[[AccountManager manager] loggedUserAccount] valueForKey:@"statuses_count"];
+            if (count)
+            {
+                NSString *theTitle = [[NSString alloc] initWithFormat:@"%@ (%@)", NSLocalizedString([theItem title], @""), count];
+                theItem.title = theTitle;
+                [theTitle release];
+            }
         }
 	}
 	
@@ -282,42 +291,42 @@
     MoreItem *item = nil;
     
     item = [MoreItem item];
-    item.title = @"My Tweets";
+    item.title = NSLocalizedString(@"MyTweets", @"");
     item.nibName = @"UserMessageList";
     item.icon = [UIImage imageNamed:@"my-tweets.png"];
     item.controllerClass = [MyTweetViewController class];
     [_moreItems addObject:item];
     	
     item = [MoreItem item];
-    item.title = @"Followers";
+    item.title = NSLocalizedString(@"Followers", @"");
     item.nibName = @"UserMessageList";
     item.icon = [UIImage imageNamed:@"followers.png"];
     item.controllerClass = [FollowersController class];
     [_moreItems addObject:item];
     
     item = [MoreItem item];
-    item.title = @"Following";
+    item.title = NSLocalizedString(@"Following", @"");
     item.nibName = @"UserMessageList";
     item.icon = [UIImage imageNamed:@"following.png"];
     item.controllerClass = [FollowingController class];    
     [_moreItems addObject:item];
 
     item = [MoreItem item];
-    item.title = @"Search";
+    item.title = NSLocalizedString(@"Search", @"");
     item.nibName = @"SearchController";
     item.icon = [UIImage imageNamed:@"search.png"];
     item.controllerClass = [SearchController class];
     [_moreItems addObject:item];
     
     item = [MoreItem item];
-    item.title = @"Settings";
+    item.title = NSLocalizedString(@"Settings", @"");
     item.nibName = @"SettingsView";
     item.icon = [UIImage imageNamed:@"settings.png"];
     item.controllerClass = [SettingsController class];
     [_moreItems addObject:item];    
     
     item = [MoreItem item];
-    item.title = @"About";
+    item.title = NSLocalizedString(@"About", @"");
     item.nibName = @"About";
     item.icon = [UIImage imageNamed:@"about.png"];
     item.controllerClass = [AboutController class];

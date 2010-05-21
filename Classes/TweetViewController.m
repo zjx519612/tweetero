@@ -474,7 +474,7 @@
 		_webView.scalesPageToFit = NO;		
         _webView.delegate = self;
         
-        self.navigationItem.backBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"Back" style:UIBarButtonItemStylePlain target:nil action:nil] autorelease];
+        self.navigationItem.backBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Back", @"") style:UIBarButtonItemStylePlain target:nil action:nil] autorelease];
         
         [_twitter setUsesSecureConnection:NO];
         [self createHeadView];
@@ -935,7 +935,7 @@
         } else {
             msg = [error description];
         }
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Twitter Error!" message:msg delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Twitter Error!", @"") message:msg delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
         [alert release];
     }

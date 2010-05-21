@@ -120,6 +120,17 @@
     
 	NSArray* addresses = [[NSUserDefaults standardUserDefaults] arrayForKey:@"PostMailAddresses"];
 	firstMailAddressView.text = (addresses && [addresses count]) ? [addresses objectAtIndex:0] : @"";
+    
+    if ([[LocationManager locationManager] lastErrorCode] == 1)
+    {
+        postLocationsSwitch.on = NO;
+        [[NSUserDefaults standardUserDefaults] setBool:postLocationsSwitch.on forKey:@"UseLocations"];
+    }
+    else
+    {
+        postLocationsSwitch.enabled = YES;
+    }
+
 }
 
 - (IBAction)login:(id)sender;

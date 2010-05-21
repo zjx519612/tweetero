@@ -30,7 +30,7 @@
     
     _topBarItem = [[UIBarButtonItem alloc] initWithCustomView:userActionButton];	
 	
-	self.navigationItem.title = @"MyTweets";
+	self.navigationItem.title = NSLocalizedString(@"MyTweets", @"");
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(twittsUpdatedNotificationHandler:) name:@"TwittsUpdated" object:nil];
 }
 

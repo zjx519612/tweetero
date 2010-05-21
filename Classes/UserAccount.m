@@ -17,7 +17,6 @@
 
 - (id)init
 {
-    //NSAssert(NO, @"Object could not created");
     if (self = [super init])
     {
         self.authType = TwitterAuthCommon;		
@@ -82,55 +81,3 @@
 }
 
 @end
-
-// TwitterCommonUserAccount
-/*
-@implementation TwitterCommonUserAccount
-
-@synthesize password = _password;
-
-- (id)init
-{
-    return self;
-}
-
-- (void)dealloc
-{
-    self.password = nil;
-    [super dealloc];
-}
-
-- (NSString*)secretData
-{
-    return self.password;
-}
-
-- (TwitterAuthType)authType
-{
-    return TwitterCommon;
-}
-@end
-
-// TwitterOAuthUserAccount
-@implementation TwitterOAuthUserAccount
-
-@synthesize accessToken = _accessToken;
-
-- (id)init
-{
-    return self;
-}
-
-- (void)dealloc
-{
-    self.accessToken = nil;
-    [super dealloc];
-}
-
-- (TwitterAuthType)authType
-{
-    return TwitterOAuth;
-}
-
-@end
-*/
