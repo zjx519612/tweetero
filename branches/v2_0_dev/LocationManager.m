@@ -195,6 +195,7 @@ static BOOL initialized = NO;
 		[NSThread  detachNewThreadSelector:@selector(getTinyURLFromServer:) toTarget:self withObject:[self longURL]];
 		[[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateLocationNotification" object: nil];
 	}
+    lastErrorCode = 0;
 }
 
 - (BOOL) locationDenied
@@ -214,7 +215,7 @@ static BOOL initialized = NO;
 {
 	[self reset];
 
-    if ([error domain] == kCLErrorDomain) 
+    if (error && [error domain] == kCLErrorDomain) 
 	{
         switch ([error code]) 
 		{
@@ -227,6 +228,7 @@ static BOOL initialized = NO;
             default:
                 break;
         }
+        lastErrorCode = [error code];
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateLocationNotification" object: nil];
@@ -245,6 +247,11 @@ static BOOL initialized = NO;
 - (float) longitude
 {
 	return longitude;
+}
+
+- (int)lastErrorCode
+{
+    return lastErrorCode;
 }
 
 - (void) setTinyURLOnMainThread:(NSArray*)urls

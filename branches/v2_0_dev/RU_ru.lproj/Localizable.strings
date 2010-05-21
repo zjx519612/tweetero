@@ -59,7 +59,7 @@
 "Processing image..."                           = "Обработка изображения...";
 "No Replies"                                    = "Нет упоминаний";
 "Loading Replies..."                            = "Загрузка упоминаний...";
-
+"Twitter Error!"                                = "Ошибка Twitter!";
 // Account controller string definitions
 "Accounts"                                      = "Пользователи";
 "Edit"                                          = "Редактировать";
@@ -97,12 +97,12 @@
 "Recent Tweets"                                 = "Недавние сообщения";
 "No Direct Messages"                            = "Нет прямых сообщений";
 "Loading Direct Messages..."                    = "Загрузка прямых сообщений";
-
+"Search"                                        = "Поиск";
 "Delete"                                        = "Удалить";
 "Change"                                        = "Изменить";
 "More"                                          = "Еще";
 "Saved Searches"                                = "Сохраненный поиск";
-
+"MyTweets"                                      = "Мои твиты";
 "No Followers"                                  = "Нет подписчиков";
 "Loading the List of Followers..."              = "Загрузка списка подписчиков...";
 "Load More..."                                  = "Еще...";
@@ -113,6 +113,7 @@
 "Loading Tweets..."                             = "Загрузка сообщений...";
 "Not Error"                                     = "Ошибка";
 
+"Edit Mode"                                     = "Режим редактирования";
 "Wrong developer key"                           = "Некорректный ключ";
 "Unknown error"                                 = "Неизвестная ошибка";
 "Do you wish to delete this tweet?"             = "Удалить сообщение?";
@@ -126,7 +127,7 @@
 "You are not logged in to Twitter"              = "Вы не вошли в Twitter";
 "Log In"                                        = "Войти";
 "No Unsent Tweets"                              = "Очередь пуста";
-"Tweet %i of %i"                                = "Сообщение %i из %i";
+"Tweet %i of %i"                                = "Твит %i из %i";
 "%@\nfrom %@"                                   = "%@\nfrom %@";
 "%.1f of %.1f %@"                               = "%.1f из %.1f %@";
 "FOLLOWING"                                     = "ПОДПИСАТЬСЯ";
@@ -135,7 +136,7 @@
 "UNFOLLOW"                                      = "ОТПИСАТЬСЯ";
 "Network Failure"                               = "Ошибка сети";
 "User description is empty."                    = "Информация отсутствует";
-"Device Updates"                                = "Обновлять устройство";
+"Device Updates"                                = "Уведомлять";
 "Loading..."                                    = "Загрузка...";
 
 // Location format

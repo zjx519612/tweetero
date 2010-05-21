@@ -45,26 +45,25 @@ enum {
 
 @interface UserInfo : UIViewController <UITableViewDelegate, UITableViewDataSource, UserInfoViewDelegate>
 {
-    UIWebView *infoView;
-	UISwitch *notifySwitch;
-    
-    UISegmentedControl *followButton;
-    UIButton *followBtn;
-	UITableView *tableView;
-    
-	BOOL _gotInfo;
-	BOOL _shouldUpdateUserInfo;
-	MGTwitterEngine *_twitter;
-	NSString *_username;
-    BOOL _following;
-	NSString *isUserReceivingUpdatesForConnectionID;
-    NSString *userInfoConnectionID;
-	NSString *followersCount;
-    BOOL _isDirectMessage;
-    UserInfoView *_userInfoView;
-    NSMutableArray *_userTableSection;
+    UIWebView           *infoView;
+	UISwitch            *notifySwitch;
+    UISegmentedControl  *followButton;
+    UIButton            *followBtn;
+	UITableView         *tableView;
+	BOOL                 _gotInfo;
+	BOOL                 _shouldUpdateUserInfo;
+	MGTwitterEngine     *_twitter;
+	NSString            *_username;
+    BOOL                 _following;
+	NSString            *isUserReceivingUpdatesForConnectionID;
+    NSString            *userInfoConnectionID;
+	NSString            *followersCount;
+    BOOL                 _isDirectMessage;
+    UserInfoView        *_userInfoView;
+    NSMutableArray      *_userTableSection;
     NSMutableDictionary *_userTableImages;
 }
+
 - (id)initWithUserName:(NSString*)uname;
 - (IBAction)follow;
 - (IBAction)followers;

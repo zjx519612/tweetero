@@ -41,7 +41,7 @@
         [button release];
         
         // Edit button
-        button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(clickEdit)];
+        button = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Edit", @"") style:UIBarButtonItemStyleBordered target:self action:@selector(clickEdit)];
         self.navigationItem.leftBarButtonItem = button;
         [button release];
         
@@ -90,7 +90,7 @@
 {
     self.canAnimate = YES;
     self.navigationItem.rightBarButtonItem.enabled = YES;
-    self.navigationItem.leftBarButtonItem.enabled = YES;
+    self.navigationItem.leftBarButtonItem.enabled = [self.accountManager hasAccounts];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -142,7 +142,20 @@
 
 - (IBAction)clickEdit
 {
-    [_tableAccounts setEditing:!_tableAccounts.editing];
+    if (_tableAccounts.editing)
+    {
+        [_tableAccounts setEditing:NO];
+        self.navigationItem.leftBarButtonItem.title = NSLocalizedString(@"Edit", @"");
+        self.navigationItem.rightBarButtonItem.enabled = YES;
+        self.navigationItem.title = NSLocalizedString(@"Accounts", @"");
+    }
+    else
+    {
+        [_tableAccounts setEditing:YES];
+        self.navigationItem.leftBarButtonItem.title = NSLocalizedString(@"Back", @"");
+        self.navigationItem.rightBarButtonItem.enabled = NO;
+        self.navigationItem.title = NSLocalizedString(@"Edit Mode", @"");
+    }
     return;
 }
 
@@ -167,14 +180,9 @@
 			[_loginController release];
 			_loginController = nil;
 		}
-		
 		_loginController = [[LoginController alloc] initWithUserAccount:account];
 		[_loginController showOAuthViewInController:self.navigationController];
-//      [self.navigationController pushViewController:login animated:YES];
-//      [login release];
     }
-    
-    [_tableAccounts setEditing:NO];
     [_tableAccounts reloadData];
 }
 
@@ -220,20 +228,18 @@
 {
     if (!tableView.editing)
     {
-        NSIndexPath *index = [_tableAccounts indexPathForSelectedRow];
-        UITableViewCell *cell = [_tableAccounts cellForRowAtIndexPath:index];
-        
-        UserAccount *account = [self.accountManager accountByUsername:cell.textLabel.text];
-
-        self.navigationItem.rightBarButtonItem.enabled = NO;
-        self.navigationItem.leftBarButtonItem.enabled = NO;
-        
-        // Login with user
-        [self.accountManager login:account];
-        
-        [self verifySelectedAccount];
-        
-        //[self showTabController];
+        if ([self.accountManager hasAccounts])
+        {
+            NSIndexPath *index = [_tableAccounts indexPathForSelectedRow];
+            UITableViewCell *cell = [_tableAccounts cellForRowAtIndexPath:index];
+            UserAccount *account = [self.accountManager accountByUsername:cell.textLabel.text];
+            
+            self.navigationItem.rightBarButtonItem.enabled = NO;
+            self.navigationItem.leftBarButtonItem.enabled = NO;
+            // Login with user
+            [self.accountManager login:account];
+            [self verifySelectedAccount];
+        }
     }
     else
     {

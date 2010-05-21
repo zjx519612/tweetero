@@ -33,7 +33,7 @@
 	BOOL locationDefined;
 	float latitude;
 	float longitude;
-	
+    int lastErrorCode;
 	NSString* tinyURL;
 	BOOL locationDenied;
 }
@@ -46,7 +46,7 @@
 - (BOOL) locationDenied;
 - (float) latitude;
 - (float) longitude;
-
+- (int)lastErrorCode;
 - (NSString*) mapURL;
 - (NSString*) longURL;
 
