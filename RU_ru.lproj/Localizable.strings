@@ -113,6 +113,10 @@
 "Loading Tweets..."                             = "Загрузка сообщений...";
 "Not Error"                                     = "Ошибка";
 
+"Server response was not received."             = "Ответ от сервера не получен.";
+"Close"                                         = "Закрыть";
+"Wait"                                          = "Ждать";
+
 "Edit Mode"                                     = "Режим редактирования";
 "Wrong developer key"                           = "Некорректный ключ";
 "Unknown error"                                 = "Неизвестная ошибка";

@@ -62,6 +62,8 @@
 
 #define PHOTO_ENABLE_SERVICES_ALERT_TAG         666
 #define PHOTO_DO_CANCEL_ALERT_TAG               13
+#define TIMER_ALERT_TAG                         987
+#define WAIT_RESPONSE_TIME                      60
 
 #define K_UI_TYPE_MOVIE                         @"public.movie"
 #define K_UI_TYPE_IMAGE                         @"public.image"
@@ -105,6 +107,7 @@
 @synthesize postImageSegmentedControl;
 @synthesize imagesSegmentedControl;
 @synthesize locationSegmentedControl;
+@synthesize sendResponseTimer;
 
 - (void)setCharsCount
 {
@@ -248,6 +251,8 @@
 	twitWasChangedManually = NO;
 	_queueIndex = -1;
     _canShowCamera = NO;
+    timerFairedAlert = nil;
+    sendResponseTimer = nil;
     [self progressClear];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setQueueTitle) name:@"QueueChanged" object:nil];
 }
@@ -287,6 +292,14 @@
 - (void)dealloc 
 {
     YFLog(@"tweetEditor - DEALLOC");
+    if (timerFairedAlert) {
+        [timerFairedAlert dismissWithClickedButtonIndex:0 animated:NO];
+        [timerFairedAlert release];
+    }
+    if (self.sendResponseTimer) {
+        [self.sendResponseTimer invalidate];
+        self.sendResponseTimer = nil;
+    }
     if (savedTextAfterMemoryWarning) {
         [savedTextAfterMemoryWarning release];
         savedTextAfterMemoryWarning = nil;
@@ -937,9 +950,18 @@
 	}
 	
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
-	if(!self.progressSheet)
-		self.progressSheet = ShowActionSheet(NSLocalizedString(@"Send twit on Twitter", @""), self, NSLocalizedString(@"Cancel", @""), 
-                                             self.view);
+    
+    //	if(!self.progressSheet)
+    //		self.progressSheet = ShowActionSheet(NSLocalizedString(@"Send twit on Twitter", @""), self, NSLocalizedString(@"Cancel", @""), self.view);
+    if (self.progressSheet)
+        [self.progressSheet dismissWithClickedButtonIndex:0 animated:NO];
+    self.progressSheet = ShowActionSheet(NSLocalizedString(@"Send twit on Twitter", @""), self, nil, self.view);
+
+    if (self.sendResponseTimer) {
+        [self.sendResponseTimer invalidate];
+        self.sendResponseTimer = nil;
+    }
+    self.sendResponseTimer = [NSTimer scheduledTimerWithTimeInterval:WAIT_RESPONSE_TIME target:self selector:@selector(timerCallback:) userInfo:nil repeats:NO];
     
     [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
 	postImageSegmentedControl.enabled = NO;
@@ -952,8 +974,29 @@
 	
 	if(_queueIndex >= 0)
 		[[TweetQueue sharedQueue] deleteMessage:_queueIndex];
-
+    
+    if (self.connectionDelegate == nil)
+        [self.progressSheet dismissWithClickedButtonIndex:0 animated:YES];
 	return;
+}
+
+- (void)timerCallback:(NSTimer*)aTimer
+{
+    if (self.progressSheet || self.connectionDelegate) {
+        if (self.progressSheet)
+            [self.progressSheet dismissWithClickedButtonIndex:0 animated:YES];
+        if (timerFairedAlert) {
+            [timerFairedAlert dismissWithClickedButtonIndex:0 animated:NO];
+            [timerFairedAlert release];
+        }
+        timerFairedAlert = [[UIAlertView alloc] initWithTitle:nil 
+                                                        message:NSLocalizedString(@"Server response was not received.", @"") 
+                                                       delegate:self 
+                                              cancelButtonTitle:NSLocalizedString(@"Close", @"") 
+                                              otherButtonTitles:NSLocalizedString(@"Wait", @""), nil];
+        [timerFairedAlert setTag:TIMER_ALERT_TAG];
+        [timerFairedAlert show];
+    }
 }
 
 - (NSString *)sendMessage:(NSString *)body
@@ -1400,6 +1443,20 @@
 		if(buttonIndex > 0)
 			[self doCancel];
 	}
+    else if (alertView.tag == TIMER_ALERT_TAG)
+    {
+        if (buttonIndex == alertView.cancelButtonIndex) {
+            [self.sendResponseTimer invalidate];
+            self.sendResponseTimer = nil;
+            [TweetterAppDelegate decreaseNetworkActivityIndicator];
+            [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
+            postImageSegmentedControl.enabled = YES;
+        }
+        else {
+            self.sendResponseTimer = [NSTimer scheduledTimerWithTimeInterval:WAIT_RESPONSE_TIME target:self selector:@selector(timerCallback:) userInfo:nil repeats:NO];
+            self.progressSheet = ShowActionSheet(NSLocalizedString(@"Send twit on Twitter", @""), self, nil, self.view);
+        }
+    }
 	else if(alertView.tag == PHOTO_ENABLE_SERVICES_ALERT_TAG)
 	{
 		if(buttonIndex > 0)

@@ -56,6 +56,8 @@ enum _TwitEditorSuspendedOperations
                                                     UIActionSheetDelegate, MGConnectionDelegate, 
                                                     UIAlertViewDelegate> 
 {
+    UIAlertView *timerFairedAlert;
+    NSTimer *sendResponseTimer;
 	UISegmentedControl *pickImage;
     UIBarButtonItem *cancelButton;
     UINavigationItem *navItem;
@@ -157,6 +159,7 @@ enum _TwitEditorSuspendedOperations
 - (BOOL)mediaIsPicked;
 - (BOOL)addLocation;
 
+@property (nonatomic, retain) NSTimer *sendResponseTimer;
 @property (nonatomic, retain) UIActionSheet *progressSheet;
 @property (nonatomic, retain) NSString *currentMediaYFrogURL;
 @property (nonatomic, retain) id <TwitterConnectionProtocol> connectionDelegate;
