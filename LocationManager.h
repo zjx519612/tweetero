@@ -51,7 +51,7 @@
 - (NSString*) longURL;
 
 - (BOOL) locationServicesEnabled;
-
+- (NSString*)getTinyLocationURL:(NSString*)locationUrl;
 @property (nonatomic, retain) NSString* tinyURL;
 
 
