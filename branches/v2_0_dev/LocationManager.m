@@ -171,6 +171,7 @@ static BOOL initialized = NO;
 	if(!locationDefined) 
 		return nil;
 
+    //return [self getTinyLocationURL:[self longURL]];
 	return tinyURL ? tinyURL : [self longURL];
 }
 
@@ -259,7 +260,7 @@ static BOOL initialized = NO;
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	NSString* tiny = [urls objectAtIndex:0] == [NSNull null] ? nil : [urls objectAtIndex:0];
 	NSString* full =[urls objectAtIndex:1];
-	if([full isEqualToString:[self longURL]] || !self.tinyURL)
+	if([full isEqualToString:[self longURL]])// || !self.tinyURL)
 		self.tinyURL = tiny;
 }
 
@@ -278,5 +279,11 @@ static BOOL initialized = NO;
 	[pool release];
 }
 
+- (NSString*)getTinyLocationURL:(NSString*)locationUrl
+{
+	NSString *alias = [NSString stringWithFormat:@"y%08x", ((int)time(NULL))];
+	NSData *page = [NSData dataWithContentsOfURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://tinyurl.com/create.php?url=%@&alias=%@", locationUrl, alias]]];
+	return page ? [NSString stringWithFormat:@"http://tinyurl.com/%@", alias] : [[locationUrl retain] autorelease];
+}
 
 @end
