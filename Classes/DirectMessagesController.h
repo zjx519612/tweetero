@@ -32,6 +32,8 @@
 @private
     UIBarButtonItem *_topBarItem;
 	NSString        *_user;
+    NSMutableArray  *_connections;
+    NSMutableArray  *_allStatuses;
 }
 
 

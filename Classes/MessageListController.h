@@ -54,5 +54,8 @@
 - (void)reloadAll;
 - (void)retainActivityIndicator;
 - (void)releaseActivityIndicator;
+- (void)updateDirectMessages:(NSArray*)messages;
+- (void)requestSucceeded:(NSString *)connectionIdentifier;
+- (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error;
 
 @end

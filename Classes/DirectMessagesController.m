@@ -29,19 +29,27 @@
 #import "TweetterAppDelegate.h"
 #import "AccountManager.h"
 
+NSComparisonResult sortByDate(id num1, id num2, void *context)
+{
+	NSDate *d1 = [num1 objectForKey:@"created_at"];
+	NSDate *d2 = [num2 objectForKey:@"created_at"];
+	return [d2 compare:d1];
+}
+
 @implementation DirectMessagesController
 
 - (void)didReceiveMemoryWarning 
 {
-	[super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
-    // Release anything that's not essential, such as cached data
-	
-	// Refresh a table since base implementation should remove cached data
-	[self.tableView reloadData];
+	[super didReceiveMemoryWarning];
+    [self.tableView reloadData];
 }
 
 - (void)dealloc
 {
+    if (_connections) {
+        [_connections release];
+        _connections = nil;
+    }
   	[[NSNotificationCenter defaultCenter] removeObserver:self];
     [_topBarItem release];
     [super dealloc];
@@ -50,15 +58,9 @@
 - (void)viewDidLoad 
 {
     [super viewDidLoad];
-    
     if (_topBarItem != nil)
         [_topBarItem release];
-    
-    _topBarItem =[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"refresh.tif"] 
-                                                  style:UIBarButtonItemStyleBordered 
-                                                 target:self 
-                                                 action:@selector(reload)];
-    
+    _topBarItem =[[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"refresh.tif"] style:UIBarButtonItemStyleBordered target:self action:@selector(reload)];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reload) name:@"DirectMessageSent" object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(twittsUpdatedNotificationHandler:) name:@"TwittsUpdated" object:nil];
 }
@@ -89,13 +91,17 @@
 {
 	[super loadMessagesStaringAtPage:numPage count:count];
 
-    if ([[AccountManager manager] isValidLoggedUser])
-	{
-		[self retainActivityIndicator];
+    if ([[AccountManager manager] isValidLoggedUser]) {
+        if (!_connections) {
+            _connections = [[NSMutableArray alloc] init];
+        } else {
+            [_connections removeAllObjects];
+        }
+		//[self retainActivityIndicator];
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
-		[_twitter getDirectMessagesSince:nil startingAtPage:numPage];
+		[_connections addObject:[_twitter getDirectMessagesSince:nil startingAtPage:numPage]];
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
-		[_twitter getSentDirectMessagesSince:nil startingAtPage:numPage];
+		[_connections addObject:[_twitter getSentDirectMessagesSince:nil startingAtPage:numPage]];
 	}
 }
 
@@ -104,15 +110,78 @@
 	[self reloadAll];
 }
 
+- (void)reloadAll
+{
+    [_allStatuses release];
+    _allStatuses = nil;
+    [super reloadAll];
+}
+
 - (void)twittsUpdatedNotificationHandler:(NSNotification*)note
 {
     id object = [note object];
     
-    if ([object respondsToSelector:@selector(dataSourceClass)])
-    {
+    if ([object respondsToSelector:@selector(dataSourceClass)]) {
         Class ds_class = [object dataSourceClass];
         if (ds_class == [self class])
             [self reload];
+    }
+}
+
+- (void)removeRepeatedMessage:(NSMutableArray*)arr
+{
+    NSMutableArray *ids = [NSMutableArray array];
+    NSMutableArray *invalid = [NSMutableArray array];
+    for (int idx = 0; idx < arr.count; ++idx) {
+        NSDictionary *obj = [arr objectAtIndex:idx];
+        NSString *obj_id = [[obj objectForKey:@"id"] stringValue];
+        if ([ids indexOfObject:obj_id] != NSNotFound) {
+            [invalid addObject:[NSNumber numberWithInt:idx]];
+        } else {
+            [ids addObject:obj_id];
+        }
+    }
+    NSEnumerator *it = [invalid reverseObjectEnumerator];
+    NSNumber *index;
+    while (index = [it nextObject]) {
+        [arr removeObjectAtIndex:[index intValue]];
+    }
+}
+
+- (void)updateParentData
+{
+    if (_connections.count == 0) {
+        [_allStatuses sortUsingFunction:sortByDate context:nil];
+        [self removeRepeatedMessage:_allStatuses];
+        [super updateDirectMessages:_allStatuses];
+    }
+}
+
+- (void)requestSucceeded:(NSString *)connectionIdentifier
+{
+    [super requestSucceeded:connectionIdentifier];
+}
+
+- (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
+{
+    [super requestFailed:connectionIdentifier withError:error];
+    if ([_connections indexOfObject:connectionIdentifier] != NSNotFound) {
+        [_connections removeObject:connectionIdentifier];
+        [self updateParentData];
+    }
+}
+
+- (void)directMessagesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier
+{
+	if(!_allStatuses) {
+		if([statuses count] > 0)
+			_allStatuses = [[NSMutableArray alloc] initWithArray:statuses];
+	} else {
+        [_allStatuses addObjectsFromArray:statuses];
+	}
+    if ([_connections indexOfObject:connectionIdentifier] != NSNotFound) {
+        [_connections removeObject:connectionIdentifier];
+        [self updateParentData];
     }
 }
 
