@@ -265,8 +265,11 @@ const NSInteger kRetriesNumber = 3;
             NSDictionary *messageData = [_messages objectAtIndex:indexPath.row];
             
             TwitterMessageObject *object = [self twitterMessageObjectByDictionary:messageData];
+            NSLog(@"Message ID: %@", object.messageId);
             if (object.cell == nil)
                 object.cell = (TwMessageCell*)[self tableviewCellWithReuseIdentifier:@"TwittListCell"];
+            else
+                [object.cell setFrame:CGRectMake(0, 0, 320.0, ROW_HEIGHT)];
             [object.cell setTwitterMessageObject:object];
             cell = object.cell;
         }
@@ -287,7 +290,7 @@ const NSInteger kRetriesNumber = 3;
 	if(indexPath.row >= [_messages count]) return 50;
 	
 	UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
-    
+
 	return cell.frame.size.height;
 }
 
@@ -438,6 +441,20 @@ const NSInteger kRetriesNumber = 3;
     NSLog(@"TIME_DEBUG: %@", [NSDate date]);
 }
 
+- (void)updateDirectMessages:(NSArray*)messages
+{
+    if (_messages) {
+        [_messages release];
+    }
+    _messages = [messages retain];
+    [self.tableView reloadData];
+	[self releaseActivityIndicator];
+	if(self.navigationItem.leftBarButtonItem) {
+        self.navigationItem.leftBarButtonItem.enabled = YES;
+    }
+}
+
+/*
 NSInteger dateReverseSort(id num1, id num2, void *context)
 {
 	NSDate *d1 = [num1 objectForKey:@"created_at"];
@@ -458,7 +475,9 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 		NSArray *messages = _messages;
 		
 		[statuses setValue:[NSNumber numberWithBool:YES] forKey:@"NewItem"];
-		_messages = [[[messages arrayByAddingObjectsFromArray:statuses] sortedArrayUsingFunction:dateReverseSort context:nil] retain];
+		//_messages = [[[messages arrayByAddingObjectsFromArray:statuses] sortedArrayUsingFunction:dateReverseSort context:nil] retain];
+        _messages = [[messages arrayByAddingObjectsFromArray:statuses] retain];
+        
 		NSMutableArray *indices = [NSMutableArray arrayWithCapacity:[statuses count]];
 		for(int i = 0; i < [_messages count]; ++i)
 		{
@@ -474,9 +493,7 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 		}
 		@catch (NSException * e) 
 		{
-			YFLog(@"Direct Messages Error!!!\nNumber of rows: %d\n_messages: %@\nstatuses: %@\nIndices: %@\n",
-				[self tableView:self.tableView numberOfRowsInSection:0],
-				_messages, statuses, indices);
+			YFLog(@"Direct Messages Error!!!\nNumber of rows: %d\n_messages: %@\nstatuses: %@\nIndices: %@\n", [self tableView:self.tableView numberOfRowsInSection:0],_messages, statuses, indices);
 		}
 		@finally 
 		{
@@ -491,7 +508,7 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
 	if(self.navigationItem.leftBarButtonItem)
 		self.navigationItem.leftBarButtonItem.enabled = YES;
 }
-
+*/
 #pragma mark ===
 - (void)loadMessagesStaringAtPage:(int)numPage count:(int)count
 {

@@ -918,7 +918,7 @@
     YFLog(@"MGTwitterEngine Request FAILED");
     YFLog(@"%@", error);
 
-    [self enableFavoriteButton:YES];//DEBUG
+    //[self enableFavoriteButton:YES];//DEBUG
     
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
     if ([error code] == 401)
