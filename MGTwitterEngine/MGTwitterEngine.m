@@ -980,7 +980,6 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
         if (NO) {
             // Dump data as string for debugging.
             NSString *dataString = [NSString stringWithUTF8String:[receivedData bytes]];
-            NSLog(@"Succeeded! Received %d bytes of data:\\r\\r%@", [receivedData length], dataString);
         }
         
         if (NO) {
@@ -1049,9 +1048,6 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
         return nil;
     }
     NSString *path = [NSString stringWithFormat:@"friendships/create/%@.%@", username, API_FORMAT];
-    
-    NSLog(@"enableUpdatesFor: %@", path);
-    
     return [self _sendRequestWithMethod:HTTP_POST_METHOD path:path queryParameters:nil body:nil 
                             requestType:MGTwitterAccountRequest 
                            responseType:MGTwitterUser];
@@ -1065,9 +1061,6 @@ static NSMutableDictionary *createBaseDictionary(NSString *server, NSString *acc
         return nil;
     }
     NSString *path = [NSString stringWithFormat:@"friendships/destroy/%@.%@", username, API_FORMAT];
-    
-    NSLog(@"disableUpdatesFor: %@", path);
-    
     return [self _sendRequestWithMethod:HTTP_POST_METHOD path:path queryParameters:nil body:nil 
                             requestType:MGTwitterAccountRequest 
                            responseType:MGTwitterUser];

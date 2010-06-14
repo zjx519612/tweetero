@@ -147,8 +147,6 @@
         }
         
         [self setFrame:cellFrame];
-        
-        //NSLog(@"ImageGrid: %@, Links: %@, Thumbnails: %@", [_imageGrid description], object.yfrogLinks, object.yfrogThumbnails);
     }
 }
 

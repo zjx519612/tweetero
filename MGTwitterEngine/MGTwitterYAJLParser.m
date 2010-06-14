@@ -216,12 +216,6 @@ static yajl_callbacks callbacks = {
 		URL = [theURL retain];
 		deliveryOptions = theDeliveryOptions;
 		delegate = theDelegate;
-		
-        
-        NSString *s__11 = [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding];
-        NSLog(@"SEARCH RESPONSE: %@", s__11);
-        [s__11 release];
-        
         
 		if (deliveryOptions & MGTwitterEngineDeliveryAllResultsOption)
 		{
