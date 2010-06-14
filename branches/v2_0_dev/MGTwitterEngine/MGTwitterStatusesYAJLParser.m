@@ -23,6 +23,8 @@
 
 - (void)addValue:(id)value forKey:(NSString *)key
 {
+    if (value == nil)
+        return;
 	if ([[self childs] count] == 0)
 	{
 		// There are no opened child containers so add value to root container

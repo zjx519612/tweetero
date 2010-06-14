@@ -211,12 +211,7 @@ static SearchProvider *sharedProvider = nil;
 #pragma mark MGTwitterEngineDelegate
 - (void)searchResultsReceived:(NSArray *)searchResults forRequest:(NSString *)connectionIdentifier
 {
-    YFLog(@"SEARCH RESULT FOR ID: %@", connectionIdentifier);
-    
     SPNotificationValue notification = [self notificationForIdentifier:connectionIdentifier];
-    
-    NSLog(@"SEARCH RECEIVED: %@", searchResults);
-    
     if (searchResults.count > 0) {
         id item = [searchResults objectAtIndex:0];
         if ([item isKindOfClass:[NSDictionary class]]) {
@@ -226,11 +221,8 @@ static SearchProvider *sharedProvider = nil;
             }
         }
     }
-    
-    //YFLog(@"%@", searchResults);
     if (notification == SPInvalidValue)
         return;
-    
     switch (notification) 
     {
         case SPSearchDidSaved:
@@ -252,7 +244,6 @@ static SearchProvider *sharedProvider = nil;
                     [_connections setObject:queryConnectionIdent forKey:updateConnectionIdent];
                 }
             }
-            
             if ([_connections count] == 0) {
                 NSString *query = [self queryForIdentifier:connectionIdentifier];
                 [self notifyAboutSearchError:query];

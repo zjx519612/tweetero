@@ -44,6 +44,9 @@
 
 - (void)addValueToCollection:(id)collection value:(id)value forKey:(NSString*)key
 {
+    if (value == nil) {
+        return;
+    }
     if ([collection isKindOfClass:[NSDictionary class]]) {
         [collection setObject:value forKey:key];
     } else if ([collection isKindOfClass:[NSArray class]]) {

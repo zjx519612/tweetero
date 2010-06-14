@@ -64,8 +64,6 @@ const NSInteger kRetriesNumber = 3;
 
 - (id)init
 {
-    NSLog(@"INIT - init %@, %p", NSStringFromClass([self class]), self);
-    
     if (self = [super init]) {
         _twitter = nil;
     }
@@ -74,8 +72,6 @@ const NSInteger kRetriesNumber = 3;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-    NSLog(@"INIT - initWithNib %@, %p", NSStringFromClass([self class]), self);
-    
     if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
         _twitter = nil;
     }
@@ -84,8 +80,6 @@ const NSInteger kRetriesNumber = 3;
 
 - (void)dealloc
 {
-    NSLog(@"DEALLOC - %@", NSStringFromClass([self class]));
-    
     [self releaseTwitterMessageObjectCache];
 	while (_indicatorCount) {
 		[self releaseActivityIndicator];
@@ -265,7 +259,6 @@ const NSInteger kRetriesNumber = 3;
             NSDictionary *messageData = [_messages objectAtIndex:indexPath.row];
             
             TwitterMessageObject *object = [self twitterMessageObjectByDictionary:messageData];
-            NSLog(@"Message ID: %@", object.messageId);
             if (object.cell == nil)
                 object.cell = (TwMessageCell*)[self tableviewCellWithReuseIdentifier:@"TwittListCell"];
             else
@@ -397,12 +390,8 @@ const NSInteger kRetriesNumber = 3;
 - (void)statusesReceived:(NSArray *)statuses forRequest:(NSString *)connectionIdentifier
 {
     YFLog(@"%@", statuses);
-    
-    NSLog(@"TIME_DEBUG: %@", [NSDate date]);
-    
 	if(!_messages)
 	{
-        NSLog(@"NEW DATA");
 		if([statuses count] > 0)
             _messages = [statuses retain];
         
@@ -410,7 +399,6 @@ const NSInteger kRetriesNumber = 3;
 	}
 	else
 	{
-        NSLog(@"UPDATE DATA");
 		NSArray *messages = _messages;
         
 		_messages = [[messages arrayByAddingObjectsFromArray:statuses] retain];
@@ -437,8 +425,6 @@ const NSInteger kRetriesNumber = 3;
 	
 	if(self.navigationItem.leftBarButtonItem)
 		self.navigationItem.leftBarButtonItem.enabled = YES;
-    
-    NSLog(@"TIME_DEBUG: %@", [NSDate date]);
 }
 
 - (void)updateDirectMessages:(NSArray*)messages
@@ -617,8 +603,6 @@ NSInteger dateReverseSort(id num1, id num2, void *context)
     messageObject.avatarUrl             = [userData objectForKey:@"profile_image_url"];
     messageObject.avatar                = loadAndScaleImage(messageObject.avatarUrl, avatarViewSize);
     messageObject.yfrogLinks            = yFrogLinksArrayFromText(text);
-    
-    //NSLog(@"CREATE MESSAGE_OBJECT: Links: %@", messageObject.yfrogLinks);
     
     BOOL isFavorite = NO;
     
