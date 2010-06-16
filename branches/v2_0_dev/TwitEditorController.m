@@ -39,8 +39,8 @@
 
 #define DEBUG_VIDEO_UPLOAD                      0
 #if DEBUG_VIDEO_UPLOAD
-#   define DEBUG_VIDEO_FILE_NAME                @"youtube"
-#   define DEBUG_VIDEO_FILE_EXT                 @"mov"
+#   define DEBUG_VIDEO_FILE_NAME                @"video_m"
+#   define DEBUG_VIDEO_FILE_EXT                 @"mp4"
 #endif
 
 #define DEBUG_IMAGE_UPLOAD                      0

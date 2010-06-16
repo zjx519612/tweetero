@@ -695,6 +695,13 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
+		1246328F11C8C89500CDEBB5 /* Test */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Test;
+			sourceTree = "<group>";
+		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -737,6 +744,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				1246328F11C8C89500CDEBB5 /* Test */,
 				AAC3B7B00F6F380C008C9AF8 /* Images */,
 				00DDB2ED105E9D890020C9C1 /* TweetView.xib */,
 				0075C6BC107610FB003A655F /* defaults.plist */,
