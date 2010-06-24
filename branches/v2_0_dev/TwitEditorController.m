@@ -245,8 +245,10 @@
     savedTextAfterMemoryWarning = nil;
 	inTextEditingMode = NO;
 	suspendedOperation = noTEOperations;
-	photoURLPlaceholderMask = [NSLocalizedString(@"YFrog image URL placeholder", @"") retain];
-	videoURLPlaceholderMask = [NSLocalizedString(@"YFrog video URL placeholder", @"") retain];
+	//photoURLPlaceholderMask = [NSLocalizedString(@"YFrog image URL placeholder", @"") retain];
+	//videoURLPlaceholderMask = [NSLocalizedString(@"YFrog video URL placeholder", @"") retain];
+	photoURLPlaceholderMask = [[NSString stringWithFormat:@"%@ ",  NSLocalizedString(@"YFrog image URL placeholder", @"")] retain];
+	videoURLPlaceholderMask = [[NSString stringWithFormat:@"%@ ", NSLocalizedString(@"YFrog video URL placeholder", @"")] retain];
 	messageTextWillIgnoreNextViewAppearing = NO;
 	twitWasChangedManually = NO;
 	_queueIndex = -1;
@@ -945,8 +947,9 @@
 	NSString *messageBody = messageText.text;
 	if([self mediaIsPicked] && currentMediaYFrogURL)
 	{
-		messageBody = [messageBody stringByReplacingOccurrencesOfString:photoURLPlaceholderMask withString:currentMediaYFrogURL];
-		messageBody = [messageBody stringByReplacingOccurrencesOfString:videoURLPlaceholderMask withString:currentMediaYFrogURL];
+        NSString *formattedMediaUrl = [NSString stringWithFormat:@"%@ ", currentMediaYFrogURL];
+		messageBody = [messageBody stringByReplacingOccurrencesOfString:photoURLPlaceholderMask withString:formattedMediaUrl];
+		messageBody = [messageBody stringByReplacingOccurrencesOfString:videoURLPlaceholderMask withString:formattedMediaUrl];
 	}
 	
 	[TweetterAppDelegate increaseNetworkActivityIndicator];
@@ -1556,8 +1559,7 @@
 		return NO;
 	}
 	
-	NSString* mapURL = [NSString stringWithFormat:
-						NSLocalizedString(@"LocationLinkFormat", @""), [[LocationManager locationManager] mapURL]];
+	NSString* mapURL = [NSString stringWithFormat:NSLocalizedString(@"LocationLinkFormat", @""), [[LocationManager locationManager] mapURL]];
 	NSRange selectedRange = messageText.selectedRange;
 	if (nil == self.location)
 	{
