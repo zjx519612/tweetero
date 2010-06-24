@@ -172,7 +172,7 @@ static BOOL initialized = NO;
 		return nil;
 
     //return [self getTinyLocationURL:[self longURL]];
-	return tinyURL ? tinyURL : [self longURL];
+	return tinyURL ? tinyURL : [self getTinyLocationURL:[self longURL]];
 }
 
 
