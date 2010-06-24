@@ -109,4 +109,5 @@ typedef enum {
 - (void)searchDidEndWithError:(NSString *)query;
 - (void)searchSavedSearchReceived:(NSArray *)savedSearch;
 - (void)searchProviderDidUpdated;
+- (void)searchSearchResultCount:(int)count;
 @end

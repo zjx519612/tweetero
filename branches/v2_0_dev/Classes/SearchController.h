@@ -14,17 +14,17 @@
 @interface SearchController : UITableViewController <UISearchBarDelegate, SearchProviderDelegate, TweetViewDelegate>
 {
   @private
-	UISearchBar        *_searchBar;
+	UISearchBar                 *_searchBar;
     TwActivityIndicator         *_indicator;
     UISearchDisplayController   *_searchController;
     SearchProvider              *_searchProvider;
-    //NSArray                     *_result;
     NSMutableArray              *_result;
     int                          _pageNum;
     NSString                    *_query;
     BOOL                         _showSearchResult;
     BOOL                         _hasConnectionError;
     NSString                    *_emptyString;
+    BOOL                         _hasMoreCell;
 }
 
 @property (nonatomic, retain) SearchProvider *searchProvider;
