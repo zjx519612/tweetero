@@ -144,7 +144,7 @@
 "Loading..."                                    = "Загрузка...";
 
 // Location format
-"LocationLinkFormat"                            = "Location: %@";
+"LocationLinkFormat"                            = "Location: %@ ";
 
 //"You can not save message" = "You can not save message";
 "Error occur during message saving"             = "Ошибка при сохранении сообщения";
