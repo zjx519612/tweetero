@@ -180,9 +180,9 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
     _emptyString = @"";
     [self.tableView reloadData];
     [self activateIndicator:YES];
-    
+    _pageNum = START_AT_PAGE;
     _result = [NSMutableArray new];
-    
+    _hasMoreCell = NO;
     [self updateSearch];
     [_searchBar resignFirstResponder];
 }
@@ -199,14 +199,24 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
 }
 
 #pragma mark SearchProvider Delegate
+- (void)searchSearchResultCount:(int)count
+{
+    _hasMoreCell = (count >= MAX_SEARCH_COUNT);
+}
+
 - (void)searchDidEnd:(NSArray *)recievedData forQuery:(NSString *)query
 {
     _emptyString = @"";
     if (recievedData && [recievedData count] > 0)
 	{
         if (!_result)
-			_result = [NSMutableArray new];
-        [_result addObjectsFromArray:recievedData];
+			_result = [[NSMutableArray alloc] init];
+        for (id obj in recievedData) {
+            if ([_result indexOfObject:obj] == NSNotFound) {
+                [_result addObject:obj];
+            }
+        }
+        //[_result addObjectsFromArray:recievedData];
     }
 	
     if ([self.searchProvider isEndOfSearch])
@@ -252,9 +262,12 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
     if (_result)
     {
         count = [_result count];
+        int limit = MAX_SEARCH_COUNT * _pageNum - 5;
+        NSLog(@"Count: %d, Limit: %d", count, limit);
         if (count == 0)
             count = 1;
-        else if (count == MAX_SEARCH_COUNT * _pageNum)
+        //else if (count >= limit)
+        else if (_hasMoreCell)
             count++;
     }
     return count;
@@ -263,7 +276,7 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = nil;
-    BOOL isMoreCell = YES;
+    BOOL isMoreCell = _hasMoreCell;
     
     if (_result && [_result count] > 0) 
     {

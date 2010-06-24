@@ -14,6 +14,7 @@
 @interface SearchProvider(Private)
 
 - (void)notifyAboutEndOfSearch:(NSArray*)result forQuery:(NSString*)query;
+- (void)notifyAboutCountOfSearchResult:(int)count;
 - (void)notifyAboutSearchError:(NSString*)query;
 - (void)setNotificationValue:(SPNotificationValue)value forIdentifier:(NSString *)identifier;
 - (void)setNotificationValue:(SPNotificationValue)value forIdentifier:(NSString *)identifier forQuery:(NSString *)query;
@@ -234,7 +235,7 @@ static SearchProvider *sharedProvider = nil;
             
             _connections = [NSMutableDictionary new];
             _searchResult = [NSMutableArray new];
-            
+            [self notifyAboutCountOfSearchResult:searchResults.count];
             for (NSDictionary *item in searchResults) {
                 id itemId = [item objectForKey:@"id"];
                 if (itemId) {
@@ -369,6 +370,15 @@ static SearchProvider *sharedProvider = nil;
     {
         if ([obs respondsToSelector:@selector(searchDidEnd:forQuery:)])
             [obs performSelector:@selector(searchDidEnd:forQuery:) withObject:result withObject:query];
+    }
+}
+
+- (void)notifyAboutCountOfSearchResult:(int)count
+{
+    for (id obs in _observers) {
+        if ([obs respondsToSelector:@selector(searchSearchResultCount:)]) {
+            [obs searchSearchResultCount:count];
+        }
     }
 }
 
