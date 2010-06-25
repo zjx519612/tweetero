@@ -414,9 +414,13 @@
 
 - (void)updateFavoriteIcon
 {
-    UIImage *icon = (isFavorited ? [UIImage imageNamed:@"unfavorite.png"] : [UIImage imageNamed:@"favorite.png"]);
-    if (icon && _actionSegment)
+    UIImage *icon;
+    icon = (isFavorited ? [UIImage imageNamed:@"unfavorite.png"] : [UIImage imageNamed:@"favorite.png"]);
+    [icon retain];
+    if (icon && _actionSegment) {
         [_actionSegment setImage:icon forSegmentAtIndex:1];
+    }
+    [icon release];
 }
 
 - (void)enableFavoriteButton:(BOOL)enable

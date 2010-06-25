@@ -258,12 +258,10 @@ static NSComparisonResult searchResultsComparator(id searchItem1, id searchItem2
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     int count = 1;
-    
     if (_result)
     {
         count = [_result count];
         int limit = MAX_SEARCH_COUNT * _pageNum - 5;
-        NSLog(@"Count: %d, Limit: %d", count, limit);
         if (count == 0)
             count = 1;
         //else if (count >= limit)

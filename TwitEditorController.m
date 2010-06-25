@@ -39,8 +39,8 @@
 
 #define DEBUG_VIDEO_UPLOAD                      0
 #if DEBUG_VIDEO_UPLOAD
-#   define DEBUG_VIDEO_FILE_NAME                @"video_m"
-#   define DEBUG_VIDEO_FILE_EXT                 @"mp4"
+#   define DEBUG_VIDEO_FILE_NAME                @"youtube"
+#   define DEBUG_VIDEO_FILE_EXT                 @"mov"
 #endif
 
 #define DEBUG_IMAGE_UPLOAD                      0
@@ -68,18 +68,33 @@
 #define K_UI_TYPE_MOVIE                         @"public.movie"
 #define K_UI_TYPE_IMAGE                         @"public.image"
 
+#define DEBUG_ENTRY_POINTS                      1
+#if DEBUG_ENTRY_POINTS
+#   define LogClassNameAndSelector()            NSLog(@"%@: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd))
+#   define LogBeginOfSelector()                 NSLog(@"%@: -> %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd))
+#   define LogEndOfSelector()                   NSLog(@"%@: <- %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd))
+#else
+#   define LogClassNameAndSelector()
+#   define LogBeginOfSelector()
+#   define LogEndOfSelector()
+#endif
+
 @implementation ImagePickerController
 
 @synthesize twitEditor;
 
 - (void)viewDidDisappear:(BOOL)animated
 {
+    LogBeginOfSelector();
 	[super viewDidDisappear:NO];
+    LogEndOfSelector();
 }
 
 - (void)dealloc
 {
+    LogBeginOfSelector();
 	YFLog(@"Image picker - DEALLOC");
+    LogEndOfSelector();
 	[super dealloc];
 }
 
@@ -111,11 +126,14 @@
 
 - (void)setCharsCount
 {
+    LogBeginOfSelector();
 	charsCount.text = [NSString stringWithFormat:@"%d", MAX_SYMBOLS_COUNT_IN_TEXT_VIEW - [messageText.text length]];
+    LogEndOfSelector();
 }
 
 - (void)setNavigatorButtons
 {
+    LogBeginOfSelector();
 	if(self.navigationItem.leftBarButtonItem != cancelButton)
 	{
 		[[self navigationItem] setLeftBarButtonItem:cancelButton animated:YES];
@@ -136,44 +154,58 @@
 		if(self.navigationItem.rightBarButtonItem)
 			[[self navigationItem] setRightBarButtonItem:nil animated:YES];
 	}
+    LogEndOfSelector();
 }
 
 - (void)setMessageTextText:(NSString*)newText
 {
+    LogBeginOfSelector();
 	messageText.text = newText;
 	[self setCharsCount];
 	[self setNavigatorButtons];
+    LogEndOfSelector();
 }
 
 - (NSRange)locationRange
 {
+    LogBeginOfSelector();
 	if (nil == self.location)
 	{
+        LogEndOfSelector();
 		return NSMakeRange(0, 0);
 	}
-	
+    LogEndOfSelector();
 	return [messageText.text rangeOfString:self.location];
 }
 
 - (NSRange)urlPlaceHolderRange
 {
+    LogBeginOfSelector();
 	NSRange urlPlaceHolderRange = [messageText.text rangeOfString:photoURLPlaceholderMask];
 	if(urlPlaceHolderRange.location == NSNotFound)
 		urlPlaceHolderRange = [messageText.text rangeOfString:videoURLPlaceholderMask];
+    LogEndOfSelector();
 	return urlPlaceHolderRange;
 }
 
 - (NSString*)currentMediaURLPlaceholder
 {
-	if(pickedVideo)
-		return videoURLPlaceholderMask;
-	if(pickedPhoto)
-		return photoURLPlaceholderMask;
+    LogBeginOfSelector();
+	if(pickedVideo) {
+        LogEndOfSelector();
+        return videoURLPlaceholderMask;
+    }
+	if(pickedPhoto) {
+        LogEndOfSelector();
+        return photoURLPlaceholderMask;
+    }
+    LogEndOfSelector();
 	return nil;
 }
 
 - (void)setURLPlaceholder
 {
+    LogBeginOfSelector();
 	NSRange photoPlaceHolderRange = [messageText.text rangeOfString:photoURLPlaceholderMask];
 	NSRange videoPlaceHolderRange = [messageText.text rangeOfString:videoURLPlaceholderMask];
 	NSRange selectedRange = messageText.selectedRange;
@@ -237,10 +269,12 @@
 		}
 	}
 	messageText.selectedRange = selectedRange;
+    LogEndOfSelector();
 }
 
 - (void)initData
 {
+    LogBeginOfSelector();
     _twitter = [[MGTwitterEngineFactory createTwitterEngineForCurrentUser:self] retain];
     savedTextAfterMemoryWarning = nil;
 	inTextEditingMode = NO;
@@ -257,42 +291,52 @@
     sendResponseTimer = nil;
     [self progressClear];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setQueueTitle) name:@"QueueChanged" object:nil];
+    LogEndOfSelector();
 }
 
 - (id)initWithNibName:(NSString *)nibName bundle:(NSBundle *)nibBundle
 {
+    LogBeginOfSelector();
 	self = [super initWithNibName:nibName bundle:nibBundle];
 	if(self) {
         [self initData];
     }
+    LogEndOfSelector();
 	return self;
 }
 
 - (id)init
 {
+    LogBeginOfSelector();
+    LogEndOfSelector();
 	return [self initWithNibName:@"PostImage" bundle:nil];
 }
 
 - (id)initInCameraMode
 {
+    LogBeginOfSelector();
     if ((self = [self init]))
     {
         _canShowCamera = YES;
     }
+    LogEndOfSelector();
     return self;
 }
 
 -(void)dismissProgressSheetIfExist
 {
+    LogBeginOfSelector();
 	if(self.progressSheet)
 	{
 		[self.progressSheet dismissWithClickedButtonIndex:0 animated:YES];
 		self.progressSheet = nil;
 	}
+    LogEndOfSelector();
 }
 
 - (void)dealloc 
 {
+    LogBeginOfSelector();
     YFLog(@"tweetEditor - DEALLOC");
     if (timerFairedAlert) {
         [timerFairedAlert dismissWithClickedButtonIndex:0 animated:NO];
@@ -350,11 +394,13 @@
 	locationSegmentedControl = nil;
 	
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    LogEndOfSelector();
     [super dealloc];
 }
 
 - (void)setQueueTitle
 {
+    LogBeginOfSelector();
 	int count = [[TweetQueue sharedQueue] count];
 	NSString *title = nil;
 	if(count)
@@ -363,17 +409,21 @@
 		title = NSLocalizedString(@"EmptyQueueButtonTitleFormat", @"");
 	if(![[postImageSegmentedControl titleForSegmentAtIndex:0] isEqualToString:title])
 		[postImageSegmentedControl setTitle:title forSegmentAtIndex:0];
+    LogEndOfSelector();
 }
 
 - (void)setImageImage:(UIImage*)newImage
 {
+    LogBeginOfSelector();
 	image.image = newImage;
 	[self setURLPlaceholder];
 	[self setNavigatorButtons];
+    LogEndOfSelector();
 }
 
 - (void)setImage:(UIImage*)img movie:(NSURL*)url
 {
+    LogBeginOfSelector();
 	self.pickedPhoto = img;
 	self.pickedVideo = url;
 	
@@ -392,18 +442,22 @@
 	{
 		[self setImageImage:self.previewImage];
 	}
+    LogEndOfSelector();
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
+    LogBeginOfSelector();
 	messageTextWillIgnoreNextViewAppearing = YES;
 	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
 	[messageText becomeFirstResponder];
 	[self setNavigatorButtons];
+    LogEndOfSelector();
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishWithPickingPhoto:(UIImage *)img pickingMovie:(NSURL*)url
 {    
+    LogBeginOfSelector();
     [self progressClear];
     
 	[[picker parentViewController] dismissModalViewControllerAnimated:YES];
@@ -453,10 +507,12 @@
 	}
 
 	[messageText becomeFirstResponder];
+    LogEndOfSelector();
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
+    LogBeginOfSelector();
 #if DEBUG_VIDEO_UPLOAD
     NSString *debugVideoFilePath = [[NSBundle mainBundle] pathForResource:DEBUG_VIDEO_FILE_NAME ofType:DEBUG_VIDEO_FILE_EXT];
     NSURL *theMovieURL = [NSURL fileURLWithPath:debugVideoFilePath];
@@ -471,24 +527,30 @@
 	else if([[info objectForKey:@"UIImagePickerControllerMediaType"] isEqualToString:K_UI_TYPE_MOVIE])
 		[self imagePickerController:picker didFinishWithPickingPhoto:nil pickingMovie:[info objectForKey:@"UIImagePickerControllerMediaURL"]];
 #endif	
+    LogEndOfSelector();
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingImage:(UIImage *)img editingInfo:(NSDictionary *)editInfo 
 {
+    LogBeginOfSelector();
 	[self imagePickerController:picker didFinishWithPickingPhoto:img pickingMovie:nil];
+    LogEndOfSelector();
 }
 
 - (void)movieFinishedCallback:(NSNotification*)aNotification
 {
+    LogBeginOfSelector();
     MPMoviePlayerController* theMovie = [aNotification object];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:MPMoviePlayerPlaybackDidFinishNotification object:theMovie];
     
     // Release the movie instance created in playMovieAtURL:
     [theMovie release];
+    LogEndOfSelector();
 }
 
 - (void)imageViewTouched:(NSNotification*)notification
 {
+    LogBeginOfSelector();
 	if(pickedPhoto)
 	{
 		UIViewController *imgViewCtrl = [[ImageViewController alloc] initWithImage:pickedPhoto];
@@ -510,13 +572,16 @@
 		// Movie playback is asynchronous, so this method returns immediately.
 		[theMovie play];
 	}
+    LogEndOfSelector();
 }
 
 - (void)appWillTerminate:(NSNotification*)notification
 {
-	if(![self mediaIsPicked] && ![[messageText.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length])
-		return;
-
+    LogBeginOfSelector();
+	if(![self mediaIsPicked] && ![[messageText.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length]) {
+        LogEndOfSelector();
+        return;
+    }
 
 	NSString *messageBody = messageText.text;
 	if([self mediaIsPicked] && currentMediaYFrogURL)
@@ -547,11 +612,13 @@
                                    inReplyTo: _message ? [[_message objectForKey:@"id"] intValue] : 0
                                      forUser: username];
 	}
+    LogEndOfSelector();
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)loadView
 {
+    LogBeginOfSelector();
     [super loadView];
 	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
 	temporaryBarButtonItem.title = NSLocalizedString(@"Back", @"");
@@ -597,44 +664,60 @@
 	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 	[notificationCenter addObserver:self selector:@selector(imageViewTouched:) name:@"ImageViewTouched" object:image];
 	[notificationCenter addObserver:self selector:@selector(appWillTerminate:) name:UIApplicationWillTerminateNotification object:nil];
+    LogEndOfSelector();
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
+    LogBeginOfSelector();
 	NSRange urlPlaceHolderRange = [self urlPlaceHolderRange];
-	if(urlPlaceHolderRange.location == NSNotFound && [self mediaIsPicked])
+	if(urlPlaceHolderRange.location == NSNotFound && [self mediaIsPicked]) {
+        LogEndOfSelector();
 		return NO;
+    }
 	
-	if((urlPlaceHolderRange.location < range.location) && (urlPlaceHolderRange.location + urlPlaceHolderRange.length > range.location))
-		return NO;		
-	
-	if(NSIntersectionRange(urlPlaceHolderRange, range).length > 0)
+	if((urlPlaceHolderRange.location < range.location) && (urlPlaceHolderRange.location + urlPlaceHolderRange.length > range.location)){
+        LogEndOfSelector();
 		return NO;
+    }
+	
+	if(NSIntersectionRange(urlPlaceHolderRange, range).length > 0){
+        LogEndOfSelector();
+		return NO;
+    }
 	
 	NSRange locationRange = [self locationRange];
-	if ((locationRange.location < range.location) && (locationRange.location + locationRange.length > range.location))
+	if ((locationRange.location < range.location) && (locationRange.location + locationRange.length > range.location)){
+        LogEndOfSelector();
 		return NO;
-	
+    }
+	LogEndOfSelector();
 	return YES;
 }
 
 - (void)textViewDidChange:(UITextView *)textView
 {
+    LogBeginOfSelector();
 	twitWasChangedManually = YES;
 	[self setCharsCount];
 	[self setNavigatorButtons];
+    LogEndOfSelector();
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView
 {
+    LogBeginOfSelector();
 	inTextEditingMode = NO;
 	[self setNavigatorButtons];
+    LogEndOfSelector();
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView
 {
+    LogBeginOfSelector();
 	inTextEditingMode = YES;
 	[self setNavigatorButtons];
+    LogEndOfSelector();
 }
 
 - (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated
@@ -649,20 +732,25 @@
 
 - (void)didReceiveMemoryWarning 
 {
+    LogBeginOfSelector();
     if (savedTextAfterMemoryWarning)
         [savedTextAfterMemoryWarning release];
     savedTextAfterMemoryWarning = [messageText.text copy];
     [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    LogEndOfSelector();
     // Release anything that's not essential, such as cached data
 }
 
 - (IBAction)finishEditAction
 {
+    LogBeginOfSelector();
 	[messageText resignFirstResponder];
+    LogEndOfSelector();
 }
 
 - (NSArray*)availableMediaTypes:(UIImagePickerControllerSourceType) pickerSourceType
 {
+    LogBeginOfSelector();
 	SEL selector = @selector(availableMediaTypesForSourceType:);
 	NSMethodSignature *sig = [[UIImagePickerController class] methodSignatureForSelector:selector];
 	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:sig];
@@ -672,11 +760,13 @@
 	[invocation invoke];
 	NSArray *mediaTypes = nil;
 	[invocation getReturnValue:&mediaTypes];
+    LogEndOfSelector();
 	return mediaTypes;
 }
 
 - (void)grabImage 
 {
+    LogBeginOfSelector();
 	BOOL imageAlreadyExists = [self mediaIsPicked];
 	BOOL photoCameraEnabled = NO;
 	BOOL photoLibraryEnabled = NO;
@@ -728,14 +818,17 @@
 	actionSheet.tag = PHOTO_Q_SHEET_TAG;
 	[actionSheet showInView:self.view];
 	[actionSheet release];
+    LogEndOfSelector();
 	
 }
 
 - (void)progressClear
 {
+    LogBeginOfSelector();
     _dataSize = 0;
     [progressStatus setText:@""];
     [progress setProgress:0];
+    LogEndOfSelector();
 }
 
 - (void)progressUpdate:(NSInteger)bytesWritten
@@ -759,19 +852,20 @@
         else
             suffix = @"Kb";
     }
-    
-    
     sizeText = [NSString stringWithFormat:NSLocalizedString(@"%.1f of %.1f %@", @""), bytesWritten / denominator, _dataSize / denominator, suffix];
     [progressStatus setText:sizeText];
 }
 
 - (IBAction)attachImagesActions:(id)sender
 {
+    LogBeginOfSelector();
 	[self grabImage];
+    LogEndOfSelector();
 }
 
 - (void)startUpload
 {
+    LogBeginOfSelector();
 #ifdef TRACE
 	YFLog(@"YFrog_DEBUG: Executing startUpload of TwitEditController method...");
 #endif	
@@ -781,8 +875,10 @@
 		self.connectionDelegate = nil;
 	}
 	
-	if(![self mediaIsPicked])
-		return;
+	if(![self mediaIsPicked]) {
+        LogEndOfSelector();
+        return;
+    }
 
     [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
 	
@@ -822,10 +918,12 @@
     }
 	
 	[uploader release];
+    LogEndOfSelector();
 }
 
 - (void)convertPickedImageAndStartUpload
 {	
+    LogBeginOfSelector();
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
 	BOOL needToResize = NO;
@@ -842,10 +940,12 @@
 	
 	[pool release];
 	[self performSelector:@selector(updatePickedPhotoDataAndStartUpload) withObject:nil afterDelay:0.5];
+    LogEndOfSelector();
 }
 
 - (void)updatePickedPhotoDataAndStartUpload
 {
+    LogBeginOfSelector();
 	BOOL isNeedToResize = NO;
 	BOOL isNeedToRotate = NO;
 	int newDimension = isImageNeedToConvert(self.pickedPhoto, &isNeedToResize, &isNeedToRotate);
@@ -879,10 +979,12 @@
 	self.pickedPhotoData = UIImageJPEGRepresentation(self.pickedPhoto, 1.0f);
 
 	[self performSelector:@selector(reducePickedPhotoSizeAndStartUpload) withObject:nil afterDelay:0.1];
+    LogEndOfSelector();
 }
 
 - (void)reducePickedPhotoSizeAndStartUpload
 {
+    LogBeginOfSelector();
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	UIImage *modifiedImage = imageScaledToSize(self.pickedPhoto, 480);
@@ -898,10 +1000,12 @@
 	[pool release];
 	
 	[self performSelector:@selector(startUploadingOfPickedMediaIfNeed) withObject:nil afterDelay:0.1];
+    LogEndOfSelector();
 }
 
 - (void)startUploadingOfPickedMediaIfNeed
 {
+    LogBeginOfSelector();
 	if(!self.currentMediaYFrogURL && [self mediaIsPicked] && !connectionDelegate)
 		[self startUpload];
 	
@@ -910,12 +1014,16 @@
 		[self.progressSheet dismissWithClickedButtonIndex:-1 animated:YES];
 		self.progressSheet = nil;
 	}		
+    LogEndOfSelector();
 }
 
 - (void)postImageAction 
 {
-	if(![self mediaIsPicked] && ![[messageText.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length])
-		return;
+    LogBeginOfSelector();
+	if(![self mediaIsPicked] && ![[messageText.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length]) {
+        LogEndOfSelector();
+        return;
+    }
 
 	if([messageText.text length] > MAX_SYMBOLS_COUNT_IN_TEXT_VIEW)
 	{
@@ -924,6 +1032,7 @@
 													   delegate:nil cancelButtonTitle:nil otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
 		[alert show];
 		[alert release];
+        LogEndOfSelector();
 		return;
 	}
 
@@ -933,6 +1042,7 @@
 		if(!connectionDelegate)
 			[self startUpload];
 		self.progressSheet = ShowActionSheet(NSLocalizedString(@"Upload Image to yFrog", @""), self, NSLocalizedString(@"Cancel", @""), self.view);
+        LogEndOfSelector();
 		return;
 	}
 	
@@ -941,6 +1051,7 @@
 	if(![[AccountManager manager] isValidLoggedUser])
 	{
         [AccountController showAccountController:self.navigationController];
+        LogEndOfSelector();
 		return;
 	}
 	
@@ -980,11 +1091,13 @@
     
     if (self.connectionDelegate == nil)
         [self.progressSheet dismissWithClickedButtonIndex:0 animated:YES];
-	return;
+    
+    LogEndOfSelector();
 }
 
 - (void)timerCallback:(NSTimer*)aTimer
 {
+    LogBeginOfSelector();
     if (self.progressSheet || self.connectionDelegate) {
         if (self.progressSheet)
             [self.progressSheet dismissWithClickedButtonIndex:0 animated:YES];
@@ -1000,10 +1113,12 @@
         [timerFairedAlert setTag:TIMER_ALERT_TAG];
         [timerFairedAlert show];
     }
+LogEndOfSelector();
 }
 
 - (NSString *)sendMessage:(NSString *)body
 {
+    LogBeginOfSelector();
     NSString *conntectionID = nil;
     
 	if(_message)
@@ -1015,18 +1130,24 @@
 	}
     else
 		conntectionID = [_twitter sendUpdate:body];
+    LogEndOfSelector();
     return conntectionID;
 }
 
 - (BOOL)isDirectMessage
 {
+    LogBeginOfSelector();
+    LogEndOfSelector();
     return NO;
 }
 
 - (void)postImageLaterAction
 {
-	if(![self mediaIsPicked] && ![[messageText.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length])
-		return;
+    LogBeginOfSelector();
+	if(![self mediaIsPicked] && ![[messageText.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length]) {
+        LogEndOfSelector();
+        return;
+    }
 
 	if([messageText.text length] > MAX_SYMBOLS_COUNT_IN_TEXT_VIEW)
 	{
@@ -1035,6 +1156,7 @@
 													   delegate:nil cancelButtonTitle:nil otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
 		[alert show];
 		[alert release];
+        LogEndOfSelector();
 		return;
 	}
 
@@ -1088,10 +1210,12 @@
 		[alert show];
 		[alert release];
 	}
+    LogEndOfSelector();
 }
 
 - (IBAction)insertLocationAction
 {	
+    LogBeginOfSelector();
 	UIImage *theImage = nil;
 	
 	if (nil == self.location)
@@ -1128,14 +1252,18 @@
 	{
 		[locationSegmentedControl setImage:theImage forSegmentAtIndex:0];
 	}
+    LogEndOfSelector();
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
+    LogBeginOfSelector();
 	if(actionSheet.tag == PHOTO_Q_SHEET_TAG)
 	{
-		if(buttonIndex == actionSheet.cancelButtonIndex)
-			return;
+		if(buttonIndex == actionSheet.cancelButtonIndex) {
+            LogEndOfSelector();
+            return;
+        }
 		
 		if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"RemoveImageTitle", @"")])
 		{
@@ -1147,6 +1275,7 @@
 			if(connectionDelegate)
 				[connectionDelegate cancel];
 			self.currentMediaYFrogURL = nil;
+            LogEndOfSelector();
 			return;
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use photo camera", @"")])
@@ -1159,6 +1288,7 @@
 				[imgPicker performSelector:@selector(setMediaTypes:) withObject:[NSArray arrayWithObject:K_UI_TYPE_IMAGE]];
 			[self presentModalViewController:imgPicker animated:YES];
 			[imgPicker release];
+            LogEndOfSelector();
 			return;
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use video camera", @"")])
@@ -1171,6 +1301,7 @@
 				[imgPicker performSelector:@selector(setMediaTypes:) withObject:[NSArray arrayWithObject:K_UI_TYPE_MOVIE]];
 			[self presentModalViewController:imgPicker animated:YES];
 			[imgPicker release];
+            LogEndOfSelector();
 			return;
 		}
 		else if([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:NSLocalizedString(@"Use library", @"")])
@@ -1183,6 +1314,7 @@
 				[imgPicker performSelector:@selector(setMediaTypes:) withObject:[self availableMediaTypes:UIImagePickerControllerSourceTypePhotoLibrary]];
 			[self presentModalViewController:imgPicker animated:YES];
 			[imgPicker release];
+            LogEndOfSelector();
 			return;
 		}
 	}
@@ -1196,25 +1328,31 @@
         [cancelButton setEnabled:YES];
         [TweetterAppDelegate decreaseNetworkActivityIndicator];
 	}
+    LogEndOfSelector();
 }
 
 - (void)setRetwit:(NSString*)body whose:(NSString*)username
 {
+    LogBeginOfSelector();
 	if(username)
 		[self setMessageTextText:[NSString stringWithFormat:NSLocalizedString(@"ReTwitFormat", @""), username, body]];
 	else
 		[self setMessageTextText:body];
+    LogEndOfSelector();
 }
 
 - (void)setReplyToMessage:(NSDictionary*)message
 {
+    LogBeginOfSelector();
 	self._message = message;
 	NSString *replyToUser = [[message objectForKey:@"user"] objectForKey:@"screen_name"];
 	[self setMessageTextText:[NSString stringWithFormat:@"@%@ ", replyToUser]];
+    LogEndOfSelector();
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    LogBeginOfSelector();
 	[super viewWillAppear:animated];
 	if (self.navigationController.navigationBar.barStyle == UIBarStyleBlackTranslucent || self.navigationController.navigationBar.barStyle == UIBarStyleBlackOpaque) 
 		postImageSegmentedControl.tintColor = [UIColor darkGrayColor];
@@ -1228,10 +1366,12 @@
 	messageTextWillIgnoreNextViewAppearing = NO;
 	[self setCharsCount];
 	[self setNavigatorButtons];
+    LogEndOfSelector();
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
+    LogBeginOfSelector();
     [super viewDidAppear:animated];
     if (_canShowCamera)
     {
@@ -1248,17 +1388,21 @@
 			[imgPicker release];
         }
     }
+    LogEndOfSelector();
 }
 
 - (void)popController
 {
+    LogBeginOfSelector();
 	[self setImage:nil movie:nil];
 	[self setMessageTextText:@""];
 	[self.navigationController popToRootViewControllerAnimated:YES];
+    LogEndOfSelector();
 }
 
 - (IBAction)imagesSegmentedActions:(id)sender
 {
+    LogBeginOfSelector();
 	switch([sender selectedSegmentIndex])
 	{
 		case 0:
@@ -1273,10 +1417,12 @@
 		default:
 			break;
 	}
+    LogEndOfSelector();
 }
 
 - (IBAction)postMessageSegmentedActions:(id)sender
 {
+    LogBeginOfSelector();
 	switch([sender selectedSegmentIndex])
 	{
 		case 0:
@@ -1288,10 +1434,12 @@
 		default:
 			break;
 	}
+    LogEndOfSelector();
 }
 
 - (void)uploadedImage:(NSString*)yFrogURL sender:(ImageUploader*)sender
 {
+    LogBeginOfSelector();
 	[self releaseActivityIndicator];
 
     [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
@@ -1313,7 +1461,10 @@
 		self.previewImage = nil;
 	}
 	else // another media was picked
-		return;
+    {
+        LogEndOfSelector();
+        return;
+    }
 	
 	if(suspendedOperation == send)
 	{
@@ -1348,21 +1499,26 @@
 
 - (void)imageUploadDidFailedBySender:(ImageUploader *)sender
 {
+    LogBeginOfSelector();
 	if(pickedPhoto)
 	{
 		[sender postData:self.pickedPhotoData delegate:self userData:pickedPhoto];
 	}
+LogEndOfSelector();
 }
 
 - (BOOL)shouldChangeImage:(UIImage *)anImage withNewImage:(UIImage *)newImage
 {
+    LogBeginOfSelector();
 	[self setImage:newImage movie:nil];
+    LogEndOfSelector();
 	return YES;
 }
 
 #pragma mark MGTwitterEngineDelegate methods
 - (void)requestSucceeded:(NSString *)connectionIdentifier
 {
+    LogBeginOfSelector();
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
     [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
 	[self dismissProgressSheetIfExist];
@@ -1378,10 +1534,12 @@
 	inTextEditingMode = YES;
 	[self setNavigatorButtons];
 	[self.navigationController popViewControllerAnimated:YES];
+    LogEndOfSelector();
 }
 
 - (void)requestFailed:(NSString *)connectionIdentifier withError:(NSError *)error
 {
+    LogBeginOfSelector();
     [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
     
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
@@ -1396,19 +1554,23 @@
                                           otherButtonTitles: nil];
 	[alert show];	
 	[alert release];
+    LogEndOfSelector();
 }
 
 - (void)MGConnectionCanceled:(NSString *)connectionIdentifier
 {
+    LogBeginOfSelector();
     [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
 	postImageSegmentedControl.enabled = YES;
 	self.connectionDelegate = nil;
 	[TweetterAppDelegate decreaseNetworkActivityIndicator];
 	[self dismissProgressSheetIfExist];
+    LogEndOfSelector();
 }
 
 - (void)doCancel
 {
+    LogBeginOfSelector();
 	[self.navigationController popViewControllerAnimated:YES];
     
     [[UIApplication sharedApplication] setIdleTimerDisabled:NO];
@@ -1418,13 +1580,16 @@
 	[self setMessageTextText:@""];
 	[messageText resignFirstResponder];
 	[self setNavigatorButtons];
+    LogEndOfSelector();
 }
 
 - (IBAction)cancel
 {
+    LogBeginOfSelector();
 	if(!twitWasChangedManually || ([[messageText.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] length] == 0 && ![self mediaIsPicked]))
 	{
 		[self doCancel];
+        LogEndOfSelector();
 		return;
 	}
 	
@@ -1436,11 +1601,12 @@
 	alert.tag = PHOTO_DO_CANCEL_ALERT_TAG;
 	[alert show];
 	[alert release];
-		
+    LogEndOfSelector();
 }
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
+    LogBeginOfSelector();
 	if(alertView.tag == PHOTO_DO_CANCEL_ALERT_TAG)
 	{
 		if(buttonIndex > 0)
@@ -1469,10 +1635,12 @@
 			[[NSNotificationCenter defaultCenter] postNotificationName: @"UpdateLocationDefaultsChanged" object: nil];
 		}
 	}
+    LogEndOfSelector();
 }
 
 - (void)editUnsentMessage:(int)index
 {	
+    LogBeginOfSelector();
 	NSString* text;
 	NSData* imageData;
 	NSURL* movieURL;
@@ -1490,34 +1658,42 @@
 		[postImageSegmentedControl setWidth:postImageSegmentedControl.frame.size.width*0.5f
 			forSegmentAtIndex:0];
 	}
+    LogEndOfSelector();
 }
 
 - (void)retainActivityIndicator
 {
+    LogBeginOfSelector();
 	if(++_indicatorCount == 1)
 	{
 		[image addSubview:_indicator];
 		[_indicator startAnimating];
 	}
+    LogEndOfSelector();
 }
 
 - (void)releaseActivityIndicator
 {
+    LogBeginOfSelector();
 	if(_indicatorCount > 0)
 	{
 		[_indicator stopAnimating];
 		[_indicator removeFromSuperview];
 		--_indicatorCount;
 	}
+    LogEndOfSelector();
 }
 
 - (BOOL)mediaIsPicked
 {
+    LogBeginOfSelector();
+    LogEndOfSelector();
 	return pickedPhoto || pickedVideo;
 }
 
 - (BOOL)addLocation
 {
+    LogBeginOfSelector();
 	if(![[LocationManager locationManager] locationServicesEnabled])
 	{
 		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Location service is not available on the device", @"") 
@@ -1525,6 +1701,7 @@
 													   delegate:nil cancelButtonTitle:nil otherButtonTitles:NSLocalizedString(@"OK", @""), nil];
 		[alert show];
 		[alert release];
+        LogEndOfSelector();
 		return NO;
 	}
 	
@@ -1536,6 +1713,7 @@
 		alert.tag = PHOTO_ENABLE_SERVICES_ALERT_TAG;
 		[alert show];
 		[alert release];
+        LogEndOfSelector();
 		return NO;
 	}
 	
@@ -1546,6 +1724,7 @@
 													   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
 		[alert show];
 		[alert release];
+        LogEndOfSelector();
 		return NO;
 	}
 	
@@ -1556,6 +1735,7 @@
 													   delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
 		[alert show];
 		[alert release];
+        LogEndOfSelector();
 		return NO;
 	}
 	
@@ -1573,6 +1753,7 @@
 	
 	self.location = mapURL;
 	messageText.selectedRange = selectedRange;
+    LogEndOfSelector();
 	return YES;
 }
 
