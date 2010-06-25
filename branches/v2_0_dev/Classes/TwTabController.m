@@ -24,6 +24,7 @@
 #import "MyTweetViewController.h"
 #import "SearchController.h"
 #import "MoreController.h"
+#import "SearchProvider.h"
 
 @implementation TwTabController
 
@@ -96,6 +97,7 @@
 
 - (void)dealloc 
 {
+    [SearchProvider releaseSharedProvider];
     [super dealloc];
 }
 

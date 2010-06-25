@@ -36,10 +36,13 @@ typedef enum {
 
 + (SearchProvider *)sharedProviderWithObserver:(id)observer;
 
-+ (SearchProvider *)sharedProviderRelease;
++ (void)releaseSharedProvider;
+
++ (void)resetSharedProvider;
 
 - (id)initWithObserver:(id)observer;
 
+- (void)reset;
 // Update object
 - (void)update;
 

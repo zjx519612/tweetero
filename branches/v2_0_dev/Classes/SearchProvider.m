@@ -48,14 +48,20 @@ static SearchProvider *sharedProvider = nil;
     return sharedProvider;
 }
 
-+ (SearchProvider *)sharedProviderRelease
++ (void)releaseSharedProvider
 {
     if (sharedProvider)
     {
         [sharedProvider release];
         sharedProvider = nil;
     }
-    return nil;
+}
+
++ (void)resetSharedProvider
+{
+    if (sharedProvider) {
+        [sharedProvider reset];
+    }
 }
 
 - (id)init
@@ -84,7 +90,31 @@ static SearchProvider *sharedProvider = nil;
     [_twitter release];
     [_twitterConnection release];
     [_queries release];
+    if (_searchResult) {
+        [_searchResult release];
+        _searchResult = nil;
+    }
     [super dealloc];
+}
+
+- (void)reset
+{
+    if (_queries) {
+        [_queries removeAllObjects];
+    }
+    if (_observers) {
+        [_observers removeAllObjects];
+    }
+    if (_twitterConnection) {
+        [_twitterConnection removeAllObjects];
+    }
+    if (_searchResult) {
+        [_searchResult removeAllObjects];
+    }
+    if (_connections) {
+        [_connections removeAllObjects];
+    }
+    [_twitter closeAllConnections];
 }
 
 // Update object state
@@ -233,8 +263,8 @@ static SearchProvider *sharedProvider = nil;
             if (_connections) [_connections release];
             if (_searchResult) [_searchResult release];
             
-            _connections = [NSMutableDictionary new];
-            _searchResult = [NSMutableArray new];
+            _connections = [[NSMutableDictionary alloc] init];
+            _searchResult = [[NSMutableArray alloc] init];
             [self notifyAboutCountOfSearchResult:searchResults.count];
             for (NSDictionary *item in searchResults) {
                 id itemId = [item objectForKey:@"id"];

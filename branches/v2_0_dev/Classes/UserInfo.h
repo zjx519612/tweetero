@@ -62,6 +62,7 @@ enum {
     UserInfoView        *_userInfoView;
     NSMutableArray      *_userTableSection;
     NSMutableDictionary *_userTableImages;
+    UIAlertView         *_errorAlert;
 }
 
 - (id)initWithUserName:(NSString*)uname;

@@ -87,10 +87,10 @@
 
 - (void)dealloc 
 {
-    if (self.searchProvider)
-        self.searchProvider = nil;
+    if (_searchProvider)
+        _searchProvider = nil;
     
-    [SearchProvider sharedProviderRelease];
+    //[SearchProvider sharedProviderRelease];
     
     [_moreItems release];
     [super dealloc];
@@ -159,8 +159,9 @@
 
 - (SearchProvider *)searchProvider
 {
-	if (nil == _searchProvider)
-		_searchProvider = [SearchProvider sharedProviderWithObserver:self];
+	if (nil == _searchProvider) {
+        _searchProvider = [SearchProvider sharedProviderWithObserver:self];
+    }
 	return _searchProvider;
 }
 

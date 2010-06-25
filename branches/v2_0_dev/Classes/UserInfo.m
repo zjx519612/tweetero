@@ -242,13 +242,13 @@ static NSString* kActionCell = @"UserInfoActionCell";
     YFLog(@"NETWORK_FAILED: %@", connectionIdentifier);
     YFLog(@"%@", error);
     
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle: NSLocalizedString(@"Network Failure", @"")
-                                                    message: [error localizedDescription]
-												   delegate: self 
-                                          cancelButtonTitle: NSLocalizedString(@"OK", @"")
-                                          otherButtonTitles: nil];
-	[alert show];
-	[alert release];
+    if (_errorAlert == nil) {
+        _errorAlert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Network Failure", @"") message:[error localizedDescription]
+                                                delegate:self cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles:nil];
+        [_errorAlert setTag:111];
+        [_errorAlert show];
+        [_errorAlert release];
+    }
 }
 
 - (void)miscInfoReceived:(NSArray *)miscInfo forRequest:(NSString *)connectionIdentifier
@@ -435,10 +435,12 @@ static NSString* kActionCell = @"UserInfoActionCell";
 #pragma mark UIAlertView Delegate
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-	if(!_gotInfo)
-		[self.navigationController popViewControllerAnimated:YES];
-	else
-	{
+    if (alertView == _errorAlert) {
+        _errorAlert = nil;
+    }
+	if(!_gotInfo) {
+        [self.navigationController popViewControllerAnimated:YES];
+    } else {
 		_gotInfo = NO;
 		[TweetterAppDelegate increaseNetworkActivityIndicator];
 		[_twitter getUserInformationFor:_username];
